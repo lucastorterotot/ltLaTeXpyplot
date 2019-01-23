@@ -1,8 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from os.path import expanduser
 homedir = expanduser("~")
 
 import numpy as np
 import scipy as sc
+
+import scipy.optimize as spo
 
 import matplotlib as mpl
 mpl.use('pgf')
@@ -303,6 +308,94 @@ class ltPlotPts3d(ltPlotPts):
     def plot(self, fig, graph):
         fig.graphs[graph].graph.scatter(self.x, self.y, self.z, c=self.color, marker=self.marker, s=self.markersize, label=self.label)
 
+class ltPlotRegLin(ltPlotPts):
+    def __init__(self, x, y, xerr, yerr, label=None, label_reg=None, color=color_default, color_reg='C3', marker=marker_pts_default, markersize=marker_size_default,
+                 p0_x=0, p0_y=0, dashes=None, give_info=True, info_placement='aboveleft'):
+        ltPlotPts.__init__(self,x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize)
+        self.label_reg = label_reg
+        self.color_reg = color_reg
+        self.dashes=None
+        self.give_info = give_info
+        self.info_placement = info_placement
+        
+        # fonction f décrivant la courbe à ajuster aux données
+        def f(x,p):
+            a,b = p 
+            return a*x+b
+        
+        # dérivée de la fonction f par rapport à la variable de contrôle x
+        def Dx_f(x,p):
+            a,b = p
+            return a
+
+        # fonction d'écart pondérée par les erreurs
+        def residual(p, y, x):
+            return (y-f(x,p))/np.sqrt(yerr**2 + (Dx_f(x,p)*xerr)**2)
+
+        # estimation initiale des paramètres
+        # elle ne joue généralement aucun rôle
+        # néanmoins, le résultat de l'ajustement est parfois aberrant
+        # il faut alors choisir une meilleure estimation initiale
+        p0 = np.array([p0_x,p0_y])
+
+        # on utilise l'algorithme des moindres carrés non-linéaires 
+        # disponible dans la biliothèque scipy (et indirectement la
+        # bibliothèque Fortran MINPACK qui implémente l'algorithme
+        # de Levenberg-Marquardt) pour déterminer le minimum voulu
+        result = spo.leastsq(residual, p0, args=(y, x), full_output=True)
+
+        # on obtient :
+        # les paramètres d'ajustement optimaux
+        popt = result[0];
+        # la matrice de variance-covariance estimée des paramètres
+        pcov = result[1];
+        # les incertitudes-types sur ces paramètres
+        uopt = np.sqrt(np.abs(np.diagonal(pcov)))
+
+        # calcul de la valeur du "chi2 réduit" pour les paramètres ajustés
+        chi2r = np.sum(np.square(residual(popt,y,x)))/(x.size-popt.size)
+
+        print '  Regression lineaire :'
+        print '    f(x) = a * x + b avec'
+        print '    a = {} ;'.format(popt[0])
+        print '    b = {}.'.format(popt[1])
+        print ' '
+
+        x_aj = np.linspace(min(x),max(x),100)
+        y_aj = popt[0]*np.linspace(min(x),max(x),100)+popt[1]
+
+        self.result = result
+        self.popt = popt
+        self.pcov = pcov
+        self.uopt = uopt
+        self.chi2r= chi2r
+        self.x_aj = x_aj
+        self.y_aj = y_aj
+
+        self.points = ltPlotPts(x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize)
+        self.reglin = ltPlotFct(x_aj, y_aj, label=label_reg, color=color_reg, dashes=dashes)
+        
+    def plot(self, fig, graph):
+        self.plot_reg(fig, graph)
+        self.plot_pts(fig, graph)
+
+    def plot_reg(self, fig, graph):
+        self.reglin.plot(fig, graph)
+        if self.give_info:
+            if self.info_placement == 'aboveleft':
+                x_info = 0.025
+                y_info = 0.85
+            else :
+                pass
+            ax = fig.graphs[graph].graph
+            plt.text(x_info, y_info + 0.075,"R\\'egression lin\\'eaire : $f(x) = ax+b$",transform = ax.transAxes)
+            plt.text(x_info, y_info,'$a = \\num{{ {0:.2e} }} \pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]),transform = ax.transAxes)
+            plt.text(x_info, y_info - 0.075,'$b = \\num{{ {0:.2e} }} \pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1]),transform = ax.transAxes)
+
+    def plot_pts(self, fig, graph):
+        self.points.plot(fig, graph)
+
+        
 class ltPlotContour2d:
     def __init__(self, x, y, h, cmap, levels, label=None, clabel=False):
         self.label = label
