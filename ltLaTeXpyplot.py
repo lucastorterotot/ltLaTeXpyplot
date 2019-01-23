@@ -1,3 +1,6 @@
+from os.path import expanduser
+homedir = expanduser("~")
+
 import numpy as np
 import scipy as sc
 
@@ -371,3 +374,17 @@ class ltPlotNMR:
         fig.graphs[graph].set_xlim([self.delta_min, self.delta_max])
 
         plt.gca().invert_xaxis()
+        
+# class ltPlotEpH:
+#     def __init__(self, element, C_tr, pH_min, pH_max, E_min, E_max, color='auto', show_species=True):
+#         self.EpH_data_dir = homedir+'/Dropbox/Enseignement/py_files/Diagrammes_E-pH/'
+#         self.element = element
+#         self.element_data_file = self.EpH_data_dir + 'data-' + element + '.py'
+
+#         self.C_tr = C_tr
+#         self.pH_min = pH_min
+#         self.pH_max = pH_max
+#         self.E_min = E_min
+#         self.E_max = E_max
+#         self.color = color
+        
