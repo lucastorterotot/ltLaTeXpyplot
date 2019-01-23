@@ -8,11 +8,11 @@ This python package provides tools to produce `pgf` figures to be used with LaTe
 
 ## Installation
 
-### Get the files
 1. Get this repository
 ```
-mkdir -p ~/python
-cd ~/python
+mkdir -p ~/python/ltLaTeXpyplot
+cd ~/python/ltLaTeXpyplot
+git init
 git remote add ltLaTeXpyplot https://github.com/lucastorterotot/ltLaTeXpyplot.git -f -t master
 ```
 2. Add the directory to your python path: add the following line to your `~/.bashrc`:
