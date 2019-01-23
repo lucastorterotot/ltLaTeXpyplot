@@ -77,112 +77,17 @@ class ltFigure:
             self.fig.tight_layout()
         self.graphs = {}
 
+    def update(self):
+        for graph in self.graphs.keys():
+            self.graphs[graph].update()
+
     def save(self, format='pgf'):
         plt.title = self.title
+        self.update()
         plt.savefig('{}-pyplot.{}'.format(self.name, format),bbox_inches='tight')
 
-    def addgraph(self, name,
-                 x_label=None, y_label=None, z_label=None,
-                 x_scaling='linear', y_scaling='linear', z_scaling='linear', projection='rectilinear',
-                 x_min=None, x_max=None, y_min=None, y_max=None, z_min=None, z_max=None,
-                 x_ticks=True, x_ticks_min=None, x_ticks_max=None, x_ticks_step=None,
-                 y_ticks=True, y_ticks_min=None, y_ticks_max=None, y_ticks_step=None,
-                 z_ticks=True, z_ticks_min=None, z_ticks_max=None, z_ticks_step=None,
-                 minorticks=True,
-                 comma_x_major=False, comma_x_minor=False,
-                 comma_y_major=False, comma_y_minor=False,
-                 comma_z_major=False, comma_z_minor=False,
-                 show_grid=False, show_x_axis=False, show_y_axis=False,
-                 show_legend=False, legend_on_side=False,
-                 position=111,
-                 share_x=None, share_y=None):
-    
-        graph = plt.subplot(position, projection=projection, sharex=share_x, sharey=share_y)
-
-        self.graphs[name] = graph
-
-        if show_grid:
-            plt.grid(inewidth=.5)
-        if show_x_axis and not (projection=='3d' or x_min is None or x_max is None):
-            plt.plot([x_min,x_max], [0,0], color='black', linewidth=.75)
-        if show_y_axis and not (projection=='3d' or y_min is None or y_max is None):
-            plt.plot([0,0], [y_min,y_max], color='black', linewidth=.75)
-
-        if not x_ticks:
-            plt.setp(graph.get_xticklabels(), visible=False)
-        if not y_ticks:
-            plt.setp(graph.get_yticklabels(), visible=False)
-        if not z_ticks:
-            plt.setp(graph.get_zticklabels(), visible=False)
-    
-        if projection == 'polar':
-            graph.tick_params(direction='in',which='major', width=0.7)
-            graph.tick_params(direction='in',which='minor', width=0.35)
-        else:
-            graph.tick_params(direction='in',which='major',bottom=1, top=1, left=1, right=1, width=0.7)
-            graph.tick_params(direction='in',which='minor',bottom=1, top=1, left=1, right=1, width=0.35)
-
-        graph.set_xscale(x_scaling)
-        graph.set_yscale(y_scaling)
-        if projection == '3d':
-            graph.set_zscale(z_scaling)
-
-        if x_label is not None :
-            graph.set_xlabel(x_label)
-        if y_label is not None and projection is not 'polar':
-            graph.set_ylabel(y_label)
-        if z_label is not None and projection == '3d':
-            graph.set_zlabel(z_label)
-
-        if show_legend :
-            if legend_on_side:
-                plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            else :
-                plt.legend()
-
-        if x_min is not None and x_max is not None :
-            graph.set_xlim([x_min,x_max])
-        if y_min is not None and y_max is not None :
-            graph.set_ylim([y_min,y_max])
-        if z_min is not None and z_max is not None and projection=='3d':
-            graph.set_zlim([z_min,z_max])
-
-        if x_ticks and x_ticks_step is not None :
-            if x_ticks_min is None:
-                x_ticks_min = x_min
-            if x_ticks_max is None:
-                x_ticks_max = x_max
-            if x_ticks_min is not None and x_ticks_max is not None :
-                graph.xaxis.set_ticks(np.arange(x_ticks_min,x_ticks_max+x_ticks_step/10.,x_ticks_step))
-        if y_ticks and y_ticks_step is not None :
-            if y_ticks_min is None:
-                y_ticks_min = y_min
-            if y_ticks_max is None:
-                y_ticks_max = y_max
-            if y_ticks_min is not None and y_ticks_max is not None :
-                graph.yaxis.set_ticks(np.arange(y_ticks_min,y_ticks_max+y_ticks_step/10.,y_ticks_step))
-        if z_ticks and z_ticks_step is not None and projection=='3d' :
-            if z_ticks_min is None:
-                z_ticks_min = z_min
-            if z_ticks_max is None:
-                z_ticks_max = z_max
-            if z_ticks_min is not None and z_ticks_max is not None :
-                graph.zaxis.set_ticks(np.arange(z_ticks_min,z_ticks_max+z_ticks_step/10.,z_ticks_step))
-
-        if minorticks :
-            graph.minorticks_on()
-        if comma_y_major :
-            graph.yaxis.set_major_formatter(axes_format_virgule)
-        if comma_y_minor :
-            graph.yaxis.set_minor_formatter(axes_format_virgule)
-        if comma_x_major :
-            graph.xaxis.set_major_formatter(axes_format_virgule)
-        if comma_x_minor :
-            graph.xaxis.set_minor_formatter(axes_format_virgule)
-        if comma_z_major :
-            graph.zaxis.set_major_formatter(axes_format_virgule)
-        if comma_z_minor :
-            graph.zaxis.set_minor_formatter(axes_format_virgule)
+    def addgraph(self, name, **kwargs):
+        self.graphs[name] = ltGraph(name, **kwargs)
 
     def testgraph(self, name, position=111):
         if not self.graphs[name]:
@@ -199,8 +104,152 @@ class ltFigure:
 
     def fill_area(self, x, y1, y2, name, position=111, alpha=.5):
         self.testgraph(name, position)
-        self.graphs[name].fill_between(x, y1, y2, alpha=alpha)
-        
+        self.graphs[name].graph.fill_between(x, y1, y2, alpha=alpha)
+
+class ltGraph:
+    def __init__(self, name,
+                 x_label=None, y_label=None, z_label=None,
+                 x_scaling='linear', y_scaling='linear', z_scaling='linear', projection='rectilinear',
+                 x_min=None, x_max=None, y_min=None, y_max=None, z_min=None, z_max=None,
+                 x_ticks=True, x_ticks_min=None, x_ticks_max=None, x_ticks_step=None,
+                 y_ticks=True, y_ticks_min=None, y_ticks_max=None, y_ticks_step=None,
+                 z_ticks=True, z_ticks_min=None, z_ticks_max=None, z_ticks_step=None,
+                 minorticks=True,
+                 comma_x_major=False, comma_x_minor=False,
+                 comma_y_major=False, comma_y_minor=False,
+                 comma_z_major=False, comma_z_minor=False,
+                 show_grid=False, show_x_axis=False, show_y_axis=False,
+                 show_legend=False, legend_on_side=False,
+                 position=111,
+                 share_x=None, share_y=None):
+        self.name = name
+        self.x_label = x_label
+        self.y_label = y_label
+        self.z_label = z_label
+        self.x_scaling = x_scaling
+        self.y_scaling = y_scaling
+        self.z_scaling = z_scaling
+        self.projection = projection
+        self.x_min = x_min
+        self.x_max = x_max
+        self.y_min = y_min
+        self.y_max = y_max
+        self.z_min = z_min
+        self.z_max = z_max
+        self.x_ticks = x_ticks
+        self.x_ticks_min = x_ticks_min
+        self.x_ticks_max = x_ticks_max
+        self.x_ticks_step = x_ticks_step
+        self.y_ticks = y_ticks
+        self.y_ticks_min = y_ticks_min
+        self.y_ticks_max = y_ticks_max
+        self.y_ticks_step = y_ticks_step
+        self.z_ticks = z_ticks
+        self.z_ticks_min = z_ticks_min
+        self.z_ticks_max = z_ticks_max
+        self.z_ticks_step = z_ticks_step
+        self.minorticks = minorticks
+        self.comma_x_major = comma_x_major
+        self.comma_x_minor = comma_x_minor
+        self.comma_y_major = comma_y_major
+        self.comma_y_minor = comma_y_minor
+        self.comma_z_major = comma_z_major
+        self.comma_z_minor = comma_z_minor
+        self.show_grid = show_grid
+        self.show_x_axis = show_x_axis
+        self.show_y_axis = show_y_axis
+        self.show_legend = show_legend
+        self.legend_on_side = legend_on_side
+        self.position = position
+        self.share_x = share_x
+        self.share_y = share_y
+    
+        self.graph = plt.subplot(position, projection=projection, sharex=share_x, sharey=share_y)        
+
+        if show_grid:
+            plt.grid(inewidth=.5)
+        if show_x_axis and not (projection=='3d' or x_min is None or x_max is None):
+            plt.plot([x_min,x_max], [0,0], color='black', linewidth=.75)
+        if show_y_axis and not (projection=='3d' or y_min is None or y_max is None):
+            plt.plot([0,0], [y_min,y_max], color='black', linewidth=.75)
+
+        if not x_ticks:
+            plt.setp(graph.get_xticklabels(), visible=False)
+        if not y_ticks:
+            plt.setp(graph.get_yticklabels(), visible=False)
+        if not z_ticks:
+            plt.setp(graph.get_zticklabels(), visible=False)
+
+    def update(self):
+        if self.projection == 'polar':
+            self.graph.tick_params(direction='in',which='major', width=0.7)
+            self.graph.tick_params(direction='in',which='minor', width=0.35)
+        else:
+            self.graph.tick_params(direction='in',which='major',bottom=1, top=1, left=1, right=1, width=0.7)
+            self.graph.tick_params(direction='in',which='minor',bottom=1, top=1, left=1, right=1, width=0.35)
+
+        self.graph.set_xscale(self.x_scaling)
+        self.graph.set_yscale(self.y_scaling)
+        if self.projection == '3d':
+            self.graph.set_zscale(self.z_scaling)
+
+        if self.x_label is not None :
+            self.graph.set_xlabel(self.x_label)
+        if self.y_label is not None and self.projection is not 'polar':
+            self.graph.set_ylabel(self.y_label)
+        if self.z_label is not None and self.projection == '3d':
+            self.graph.set_zlabel(self.z_label)
+
+        if self.show_legend :
+            if self.legend_on_side:
+                plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+            else :
+                plt.legend()
+
+        if self.x_min is not None and self.x_max is not None :
+            self.graph.set_xlim([self.x_min,self.x_max])
+        if self.y_min is not None and self.y_max is not None :
+            self.graph.set_ylim([self.y_min,self.y_max])
+        if self.z_min is not None and self.z_max is not None and self.projection=='3d':
+            self.graph.set_zlim([self.z_min,self.z_max])
+
+        if self.x_ticks and self.x_ticks_step is not None :
+            if self.x_ticks_min is None:
+                self.x_ticks_min = self.x_min
+            if self.x_ticks_max is None:
+                self.x_ticks_max = self.x_max
+            if self.x_ticks_min is not None and self.x_ticks_max is not None :
+                self.graph.xaxis.set_ticks(np.arange(self.x_ticks_min,self.x_ticks_max+self.x_ticks_step/10.,self.x_ticks_step))
+        if self.y_ticks and self.y_ticks_step is not None :
+            if self.y_ticks_min is None:
+                self.y_ticks_min = self.y_min
+            if self.y_ticks_max is None:
+                self.y_ticks_max = self.y_max
+            if self.y_ticks_min is not None and self.y_ticks_max is not None :
+                self.graph.yaxis.set_ticks(np.arange(self.y_ticks_min,self.y_ticks_max+self.y_ticks_step/10.,self.y_ticks_step))
+        if self.z_ticks and self.z_ticks_step is not None and projection=='3d' :
+            if self.z_ticks_min is None:
+                self.z_ticks_min = self.z_min
+            if self.z_ticks_max is None:
+                self.z_ticks_max = self.z_max
+            if self.z_ticks_min is not None and self.z_ticks_max is not None :
+                self.graph.zaxis.set_ticks(np.arange(self.z_ticks_min,self.z_ticks_max+self.z_ticks_step/10.,self.z_ticks_step))
+
+        if self.minorticks :
+            self.graph.minorticks_on()
+        if self.comma_y_major :
+            self.graph.yaxis.set_major_formatter(axes_format_virgule)
+        if self.comma_y_minor :
+            self.graph.yaxis.set_minor_formatter(axes_format_virgule)
+        if self.comma_x_major :
+            self.graph.xaxis.set_major_formatter(axes_format_virgule)
+        if self.comma_x_minor :
+            self.graph.xaxis.set_minor_formatter(axes_format_virgule)
+        if self.comma_z_major :
+            self.graph.zaxis.set_major_formatter(axes_format_virgule)
+        if self.comma_z_minor :
+            self.graph.zaxis.set_minor_formatter(axes_format_virgule)
+    
 class ltPlot:
     def __init__(self, x, y, label=None, color=color_default):
         self.label = label
@@ -252,7 +301,7 @@ class ltPlotPts3d(ltPlotPts):
         self.z = z
 
     def plot(self, fig, graph):
-        fig.graphs[graph].scatter(self.x, self.y, self.z, c=self.color, marker=self.marker, s=self.markersize, label=self.label)
+        fig.graphs[graph].graph.scatter(self.x, self.y, self.z, c=self.color, marker=self.marker, s=self.markersize, label=self.label)
 
 class ltPlotContour2d:
     def __init__(self, x, y, h, cmap, levels, label=None, clabel=False):
@@ -279,7 +328,7 @@ class ltPlotScalField2d:
         self.cmap = cmap
 
     def plot(self, fig, graph):
-        fig.graphs[graph].imshow(self.V, cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower')
+        fig.graphs[graph].graph.imshow(self.V, cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower')
 
 class ltPlotVectField2d:
     def __init__(self, x, y, vx, vy, cmap, label=None):
@@ -291,7 +340,7 @@ class ltPlotVectField2d:
         self.cmap = cmap
 
     def plot(self, fig, graph):
-        fig.graphs[graph].quiver(self.x, self.y, self.vx, self.vy, linewidth=.5, label=self.label, color=self.color)
+        fig.graphs[graph].graph.quiver(self.x, self.y, self.vx, self.vy, linewidth=.5, label=self.label, color=self.color)
 
 class ltPlotVectField3d(ltPlotVectField2d):
     def __init__(self, x, y, z, vx, vy, vz, cmap, label=None):
@@ -300,7 +349,7 @@ class ltPlotVectField3d(ltPlotVectField2d):
         self.vz = vz
 
     def plot(self, fig, graph):
-        fig.graphs[graph].quiver(self.x, self.y, self.z, self.vx, self.vy, self.vz, length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
+        fig.graphs[graph].graph.quiver(self.x, self.y, self.z, self.vx, self.vy, self.vz, length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
 
 class ltPlotNMR:
     def __init__(self, delta_min=0, delta_max=11, Freq_MHz=100, color=color_default, show_integral=True, dashes=[1]):
@@ -316,8 +365,8 @@ class ltPlotNMR:
         self.signals.append([delta, nbH, mult, J_Hz])
 
     def plot(self, fig, graph):
-        plt.setp(fig.graphs[graph].get_yticklabels(), visible=False)
-        fig.graphs[graph].minorticks_on()
+        plt.setp(fig.graphs[graph].graph.get_yticklabels(), visible=False)
+        fig.graphs[graph].graph.minorticks_on()
 
         delta = np.arange(self.delta_min, self.delta_max, 1e-5)
         spectrum = 0*delta
@@ -368,23 +417,56 @@ class ltPlotNMR:
             plt.plot(delta, spectrum_integral, color='black', linewidth=.25 ,label=None)
         plt.plot(delta, spectrum, color=color, linewidth=.25 , label=None)
             
-        fig.graphs[graph].tick_params(direction='in',which='major',bottom=1, top=0, left=0, right=0, width=0.7)
-        fig.graphs[graph].tick_params(direction='in',which='minor',bottom=1, top=0, left=0, right=0, width=0.35)
+        fig.graphs[graph].graph.tick_params(direction='in',which='major',bottom=1, top=0, left=0, right=0, width=0.7)
+        fig.graphs[graph].graph.tick_params(direction='in',which='minor',bottom=1, top=0, left=0, right=0, width=0.35)
 
-        fig.graphs[graph].set_xlim([self.delta_min, self.delta_max])
+        if fig.graphs[graph].x_label is None :
+            fig.graphs[graph].graph.set_xlabel("$\\delta$ (ppm)")
+
+        fig.graphs[graph].graph.set_xlim([self.delta_min, self.delta_max])
 
         plt.gca().invert_xaxis()
         
-# class ltPlotEpH:
-#     def __init__(self, element, C_tr, pH_min, pH_max, E_min, E_max, color='auto', show_species=True):
-#         self.EpH_data_dir = homedir+'/Dropbox/Enseignement/py_files/Diagrammes_E-pH/'
-#         self.element = element
-#         self.element_data_file = self.EpH_data_dir + 'data-' + element + '.py'
+class ltPlotEpH:
+    def __init__(self, element, C_tr, pH_min=0, pH_max=14, E_min=-.1, E_max=.1, color=color_default, text_color='black', show_species=True):
+        self.EpH_data_dir = homedir+'/Dropbox/Enseignement/py_files/Diagrammes_E-pH/'
+        self.element = element
+        self.element_data_file = self.EpH_data_dir + 'data-' + element + '.py'
 
-#         self.C_tr = C_tr
-#         self.pH_min = pH_min
-#         self.pH_max = pH_max
-#         self.E_min = E_min
-#         self.E_max = E_max
-#         self.color = color
-        
+        self.C_tr = C_tr
+        self.pH_min = pH_min
+        self.pH_max = pH_max
+        self.E_min = E_min
+        self.E_max = E_max
+        self.color = color
+        self.text_color = text_color
+        self.show_species = show_species
+
+    def plot(self, fig, graph):
+        #################################
+        ## tmp lines for compatibility ##
+        functions_to_draw = []
+        lines_to_draw = []
+        afficher_especes_chimiques = self.show_species
+        text_diag_color = self.text_color
+        #################################
+        pH_min = self.pH_min
+        pH_max = self.pH_max
+        E_min = self.E_min
+        E_max = self.E_max
+        C = self.C_tr
+        pC = -np.log10(C)
+        diag_color = self.color
+        execfile(self.element_data_file)
+        #################################
+        ## tmp lines for compatibility ##
+        seps_from_data = lines_to_draw
+        seps_from_data += functions_to_draw
+        #################################
+
+        seps = []
+        for sep in seps_from_data:
+            seps.append(ltPlotFct(sep[1], sep[2], label=None, color=self.color))
+        seps[0].label = '{element}, $C_{{ {ind} }} = \\SI{{ {C} }}{{ {units} }}$'.format(element=self.element, ind='\\mathrm{{tr}}', C=C, units='mol.L^{-1}')
+        for sep in seps:
+            sep.plot(fig, graph)
