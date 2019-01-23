@@ -95,15 +95,15 @@ class ltFigure:
             print 'Warning, auto-generated graph at position {}'.format(position)
             print 'with name {}'.format(name)
 
-    def addplot(self, plot, name, position=111):
-        self.testgraph(name, position=position)
+    def addplot(self, plot, name):
+        self.testgraph(name)
         plot.plot(self, name)
 
     def addarrow(self, x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k'):
         plt.arrow(x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k')
 
-    def fill_area(self, x, y1, y2, name, position=111, alpha=.5):
-        self.testgraph(name, position)
+    def fill_area(self, x, y1, y2, name, alpha=.5):
+        self.testgraph(name)
         self.graphs[name].graph.fill_between(x, y1, y2, alpha=alpha)
 
 class ltGraph:
