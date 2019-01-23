@@ -44,6 +44,13 @@ def axes_virgule(x, pos):  # formatter function takes tick label and tick positi
 
 axes_format_virgule = tkr.FuncFormatter(axes_virgule)  # make formatter
 
+def factorial (x):
+    result = 1
+    if x > 1:
+        for k in range(1,x+1):
+            result*=k
+    return result
+
 marker_size_default = 4
 color_default = 'C0'
 marker_pts_default = '+'
@@ -291,3 +298,76 @@ class ltPlotVectField3d(ltPlotVectField2d):
 
     def plot(self, fig, graph):
         fig.graphs[graph].quiver(self.x, self.y, self.z, self.vx, self.vy, self.vz, length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
+
+class ltPlotNMR:
+    def __init__(self, delta_min=0, delta_max=11, Freq_MHz=100, color=color_default, show_integral=True, dashes=[1]):
+        self.delta_min = delta_min
+        self.delta_max = delta_max
+        self.Freq_MHz = Freq_MHz
+        self.color = color
+        self.show_integral = show_integral
+        self.dashes = dashes
+        self.signals = []
+
+    def addsignal(self, delta, nbH, mult, J_Hz):
+        self.signals.append([delta, nbH, mult, J_Hz])
+
+    def plot(self, fig, graph):
+        plt.setp(fig.graphs[graph].get_yticklabels(), visible=False)
+        fig.graphs[graph].minorticks_on()
+
+        delta = np.arange(self.delta_min, self.delta_max, 1e-5)
+        spectrum = 0*delta
+        for signal in self.signals:
+            delta0 = signal[0]
+            nbH = signal[1]
+            mults = signal[2]
+            Js = signal[3]
+            freq = self.Freq_MHz
+            color = self.color
+            dashes = self.dashes
+            nb_pikes = 1
+            for k in mults :
+                nb_pikes *= k
+            
+            pikes_deltas = [0]
+            pikes_heights = [1]
+        
+            for k in range(0,len(mults)):
+                new_pikes_deltas = []
+                new_pikes_heights = []
+                J_value = Js[k]
+                mult = mults[k]
+                coeffs_Js_max = .5*(mult-1)
+                J_coeffs = np.arange(-coeffs_Js_max,coeffs_Js_max+1e-6,1)
+                for l in range(0,len(pikes_deltas)):
+                    for m in range(0,mult):
+                        new_pikes_deltas.append(pikes_deltas[l]+J_value*1./(freq)*J_coeffs[m])
+                        new_pikes_heights.append(pikes_heights[l]*factorial(mult-1)*1./(2**(mult-1)*factorial(m)*factorial(mult-1-m)))
+                pikes_deltas = new_pikes_deltas
+                pikes_heights = new_pikes_heights
+                    
+            for pike in range(0,nb_pikes):
+                spectrum += 1./(1+(delta-delta0-pikes_deltas[pike])**2*freq**2/(1.5e0))*pikes_heights[pike]*nbH
+            
+        # for signal in signals:
+        #     delta0 = signal[0]
+        #     nbH = signal[1]
+        #     plt.text(delta0, max(spectrum), '{}'.format(nbH))
+    
+        if self.show_integral :
+            spectrum_integral = np.zeros(len(spectrum))
+            for k in range(1,len(spectrum_integral)):
+                spectrum_integral[k] = spectrum_integral[k-1] - spectrum[k]
+            spectrum_integral *= -.75*max(spectrum)/min(spectrum_integral)
+            spectrum_integral -= 1.25*min(spectrum_integral)
+            
+            plt.plot(delta, spectrum_integral, color='black', linewidth=.25 ,label=None)
+        plt.plot(delta, spectrum, color=color, linewidth=.25 , label=None)
+            
+        fig.graphs[graph].tick_params(direction='in',which='major',bottom=1, top=0, left=0, right=0, width=0.7)
+        fig.graphs[graph].tick_params(direction='in',which='minor',bottom=1, top=0, left=0, right=0, width=0.35)
+
+        fig.graphs[graph].set_xlim([self.delta_min, self.delta_max])
+
+        plt.gca().invert_xaxis()
