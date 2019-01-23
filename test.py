@@ -4,18 +4,18 @@
 import numpy as np
 import scipy as sc
 
-from ltLaTeXpyplot import *
+import ltLaTeXpyplot as lt
 
-figure = ltFigure(name='new')
+figure = lt.ltFigure(name='new')
 
 x = np.arange(-20,20,0.1)
 y = np.sin(x)
 y2 = np.cos(x)
 
-f1 = ltPlotFct(x, y, label='$y=\\sin(x)$', color='C3')
-f2 = ltPlotFct(x, y2, label='$y=\\cos(x)$')
+f1 = lt.ltPlotFct(x, y, label='$y=\\sin(x)$', color='C3')
+f2 = lt.ltPlotFct(x, y2, label='$y=\\cos(x)$')
 
-figure.addgraph('graph1')
+figure.addgraph('graph1', x_label='$\\varepsilon$', y_label='$f(\\varepsilon)$')
 for plot in [f1, f2]:
     figure.addplot(plot, 'graph1')
 
