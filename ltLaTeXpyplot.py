@@ -124,6 +124,7 @@ class ltFigure:
         self.testgraph(name)
         self.graphs[name].graph.fill_between(x, y1, y2, alpha=alpha)
 
+        
 class ltGraph:
     def __init__(self, fig, name, title=None,
                  x_label=None, y_label=None, z_label=None,
@@ -273,24 +274,14 @@ class ltGraph:
             self.graph.zaxis.set_major_formatter(axes_format_comma)
         if self.comma_z_minor :
             self.graph.zaxis.set_minor_formatter(axes_format_comma)
-    
-class ltPlot:
-    def __init__(self, x, y, label=None, color=color_default):
+
+            
+class ltPlotFct:
+    def __init__(self, x, y, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default):
         self.label = label
         self.x = x
         self.y = y
         self.color = color
-        
-        
-class ltPlot3d(ltPlot):
-    def __init__(self, x, y, z, label=None, color=color_default):
-        ltPlot.__init__(self, x, y, label=label, color=color)
-        self.z = z
-
-        
-class ltPlotFct(ltPlot):
-    def __init__(self, x, y, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default):
-        ltPlot.__init__(self, x, y, label=label, color=color)
         self.dashes = dashes
         self.marker = marker
         self.markersize = marker_size_default if marker is not None else None
@@ -307,6 +298,7 @@ class ltPlotFct3d(ltPlotFct):
     def plot(self, fig, graph):
         fig.graphs[graph].graph.plot(self.x, self.y, self.z, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
 
+        
 class ltPlotPts(ltPlotFct):
     def __init__(self, x, y, xerr=None, yerr=None, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default):
         ltPlotFct.__init__(self, x, y, label=label, color=color, marker=marker, markersize=markersize)
@@ -325,6 +317,7 @@ class ltPlotPts3d(ltPlotPts):
     def plot(self, fig, graph):
         fig.graphs[graph].graph.scatter(self.x, self.y, self.z, c=self.color, marker=self.marker, s=self.markersize, label=self.label)
 
+        
 class ltPlotRegLin(ltPlotPts):
     def __init__(self, x, y, xerr, yerr, label=None, label_reg=None, color=color_default, color_reg='C3', marker=marker_pts_default, markersize=marker_size_default,
                  p0_x=0, p0_y=0, dashes=dashes_default, give_info=True, info_placement='aboveleft'):
@@ -428,6 +421,7 @@ class ltPlotContour2d:
         if self.clabel :
             fig.fig.clabel(current_contour, self.levels[1::2], inline=1, fmt='%1.1f', fontsize=8)
         current_contour=0
+
         
 class ltPlotScalField2d:
     def __init__(self, x, y, V, cmap, label=None):
@@ -440,6 +434,7 @@ class ltPlotScalField2d:
     def plot(self, fig, graph):
         fig.graphs[graph].graph.imshow(self.V, cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower')
 
+        
 class ltPlotVectField2d:
     def __init__(self, x, y, vx, vy, cmap, label=None):
         self.label = label
@@ -452,6 +447,7 @@ class ltPlotVectField2d:
     def plot(self, fig, graph):
         fig.graphs[graph].graph.quiver(self.x, self.y, self.vx, self.vy, linewidth=.5, label=self.label, color=self.color)
 
+        
 class ltPlotVectField3d(ltPlotVectField2d):
     def __init__(self, x, y, z, vx, vy, vz, cmap, label=None):
         ltPlotVectField2d.__init__(self, x, y,vx, vy, cmap, label=label)
@@ -461,6 +457,7 @@ class ltPlotVectField3d(ltPlotVectField2d):
     def plot(self, fig, graph):
         fig.graphs[graph].graph.quiver(self.x, self.y, self.z, self.vx, self.vy, self.vz, length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
 
+        
 class ltPlotNMR:
     def __init__(self, delta_min=0, delta_max=11, Freq_MHz=100, color=color_default, show_integral=True, dashes=dashes_default):
         self.delta_min = delta_min
@@ -536,6 +533,7 @@ class ltPlotNMR:
         fig.graphs[graph].graph.set_xlim([self.delta_min, self.delta_max])
 
         fig.fig.gca().invert_xaxis()
+
         
 class ltPlotEpH:
     def __init__(self, element, C_tr, pH_min=0, pH_max=14, E_min=-.1, E_max=.1, color=color_default, text_color='black', show_species=True):
