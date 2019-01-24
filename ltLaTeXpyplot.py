@@ -62,6 +62,7 @@ def factorial (x):
 marker_size_default = 4
 color_default = 'C0'
 marker_pts_default = '+'
+dashes_default=[]
 
 class ltFigure:
     def __init__(self, name='fig', title=None, page_width_cm=17, width_frac=.8, height_width_ratio=((5.0)**0.5-1.0)/2.0, tight_layout=False):
@@ -76,7 +77,7 @@ class ltFigure:
 
         self.figsize = [self.fig_width_inches, self.fig_height_inches]
 
-        plt.clf()
+        plt.clf() # TODO check that there is no conflict with other figures
         self.fig = plt.figure(figsize=self.figsize)
         if tight_layout :
             self.fig.tight_layout()
@@ -275,22 +276,20 @@ class ltPlot3d(ltPlot):
         ltPlot.__init__(self, x, y, label=label, color=color)
         self.z = z
 
+        
 class ltPlotFct(ltPlot):
-    def __init__(self, x, y, label=None, color=color_default, dashes=None, marker=None, markersize=marker_size_default):
+    def __init__(self, x, y, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default):
         ltPlot.__init__(self, x, y, label=label, color=color)
         self.dashes = dashes
         self.marker = marker
         self.markersize = marker_size_default if marker is not None else None
 
     def plot(self, fig, graph):
-        if self.dashes is not None:
-            fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
-        else:
-            fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize)
-            
+        fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
+
         
 class ltPlotFct3d(ltPlotFct):
-    def __init__(self, x, y, z, label=None, color=color_default, dashes=None, marker=None, markersize=marker_size_default):
+    def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default):
         ltPlotFct.__init__(self, x, y, label=label, color=color, dashes=dashes, marker=marker, markersize=markersize)
         self.z = z
 
@@ -317,11 +316,11 @@ class ltPlotPts3d(ltPlotPts):
 
 class ltPlotRegLin(ltPlotPts):
     def __init__(self, x, y, xerr, yerr, label=None, label_reg=None, color=color_default, color_reg='C3', marker=marker_pts_default, markersize=marker_size_default,
-                 p0_x=0, p0_y=0, dashes=None, give_info=True, info_placement='aboveleft'):
+                 p0_x=0, p0_y=0, dashes=dashes_default, give_info=True, info_placement='aboveleft'):
         ltPlotPts.__init__(self,x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize)
         self.label_reg = label_reg
         self.color_reg = color_reg
-        self.dashes=None
+        self.dashes = dashes
         self.give_info = give_info
         self.info_placement = info_placement
         
@@ -452,7 +451,7 @@ class ltPlotVectField3d(ltPlotVectField2d):
         fig.graphs[graph].graph.quiver(self.x, self.y, self.z, self.vx, self.vy, self.vz, length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
 
 class ltPlotNMR:
-    def __init__(self, delta_min=0, delta_max=11, Freq_MHz=100, color=color_default, show_integral=True, dashes=[1]):
+    def __init__(self, delta_min=0, delta_max=11, Freq_MHz=100, color=color_default, show_integral=True, dashes=dashes_default):
         self.delta_min = delta_min
         self.delta_max = delta_max
         self.Freq_MHz = Freq_MHz
@@ -515,7 +514,7 @@ class ltPlotNMR:
             spectrum_integral -= 1.25*min(spectrum_integral)
             
             fig.graphs[graph].graph.plot(delta, spectrum_integral, color='black', linewidth=.25 ,label=None)
-        fig.graphs[graph].graph.plot(delta, spectrum, color=color, linewidth=.25 , label=None)
+        fig.graphs[graph].graph.plot(delta, spectrum, color=color, linewidth=.25 , label=None, dashes=self.dashes)
             
         fig.graphs[graph].graph.tick_params(direction='in',which='major',bottom=1, top=0, left=0, right=0, width=0.7)
         fig.graphs[graph].graph.tick_params(direction='in',which='minor',bottom=1, top=0, left=0, right=0, width=0.35)
