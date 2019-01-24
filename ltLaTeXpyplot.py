@@ -118,7 +118,7 @@ class ltFigure:
         plot.plot(self, name)
 
     def addarrow(self, x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k'):
-        self.fig.arrow(x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k')
+        self.fig.arrow(x, y, vx, vy, head_width=head_width, head_length=head_length, fc=fc, ec=ec)
 
     def fill_area(self, x, y1, y2, name, alpha=.5):
         self.testgraph(name)
