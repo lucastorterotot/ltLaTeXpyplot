@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+### Importing packages
+
 from os.path import expanduser
 homedir = expanduser("~")
 
@@ -16,13 +18,39 @@ import matplotlib.ticker as tkr
 
 from mpl_toolkits.mplot3d import Axes3D
 
+
+### Defining global variables for this package
+
+marker_size_default = 4
+color_default = 'C0'
+marker_pts_default = '+'
+dashes_default=[]
+
 inches_per_cm = 0.3937007874 # Convert cm to inch
+
+### Defining usefull tools
+
+def axes_comma(x, pos):  # formatter function takes tick label and tick position
+    s = str(x)
+    ind = s.index('.')
+    return s[:ind] + ',' + s[ind+1:]   # change dot to comma
+
+axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
+
+def factorial (x):
+    result = 1
+    if x > 1:
+        for k in range(1,x+1):
+            result*=k
+    return result
 
 def figsize(scale,ratio):
     fig_width = 17*inches_per_cm*scale    # width in inches
     fig_height = fig_width*ratio              # height in inches
     fig_size = [fig_width,fig_height]
     return fig_size
+
+### LaTeX parameters
 
 pgf_with_latex = {                      # setup matplotlib to use latex for output
     "pgf.texsystem": "pdflatex",        # change this if using xetex or luatex
@@ -45,24 +73,7 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
     }
 mpl.rcParams.update(pgf_with_latex)
 
-def axes_comma(x, pos):  # formatter function takes tick label and tick position
-    s = str(x)
-    ind = s.index('.')
-    return s[:ind] + ',' + s[ind+1:]   # change dot to comma
-
-axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
-
-def factorial (x):
-    result = 1
-    if x > 1:
-        for k in range(1,x+1):
-            result*=k
-    return result
-
-marker_size_default = 4
-color_default = 'C0'
-marker_pts_default = '+'
-dashes_default=[]
+### Package core
 
 class ltFigure:
     def __init__(self, name='fig', title=None, page_width_cm=17, width_frac=.8, height_width_ratio=((5.0)**0.5-1.0)/2.0, tight_layout=False):
