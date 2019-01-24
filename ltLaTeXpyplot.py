@@ -45,12 +45,12 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
     }
 mpl.rcParams.update(pgf_with_latex)
 
-def axes_virgule(x, pos):  # formatter function takes tick label and tick position
+def axes_comma(x, pos):  # formatter function takes tick label and tick position
     s = str(x)
     ind = s.index('.')
     return s[:ind] + ',' + s[ind+1:]   # change dot to comma
 
-axes_format_virgule = tkr.FuncFormatter(axes_virgule)  # make formatter
+axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
 def factorial (x):
     result = 1
@@ -246,17 +246,17 @@ class ltGraph:
         if self.minorticks :
             self.graph.minorticks_on()
         if self.comma_y_major :
-            self.graph.yaxis.set_major_formatter(axes_format_virgule)
+            self.graph.yaxis.set_major_formatter(axes_format_comma)
         if self.comma_y_minor :
-            self.graph.yaxis.set_minor_formatter(axes_format_virgule)
+            self.graph.yaxis.set_minor_formatter(axes_format_comma)
         if self.comma_x_major :
-            self.graph.xaxis.set_major_formatter(axes_format_virgule)
+            self.graph.xaxis.set_major_formatter(axes_format_comma)
         if self.comma_x_minor :
-            self.graph.xaxis.set_minor_formatter(axes_format_virgule)
+            self.graph.xaxis.set_minor_formatter(axes_format_comma)
         if self.comma_z_major :
-            self.graph.zaxis.set_major_formatter(axes_format_virgule)
+            self.graph.zaxis.set_major_formatter(axes_format_comma)
         if self.comma_z_minor :
-            self.graph.zaxis.set_minor_formatter(axes_format_virgule)
+            self.graph.zaxis.set_minor_formatter(axes_format_comma)
     
 class ltPlot:
     def __init__(self, x, y, label=None, color=color_default):
