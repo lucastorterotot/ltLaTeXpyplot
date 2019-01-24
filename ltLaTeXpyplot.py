@@ -83,11 +83,12 @@ class ltFigure:
         self.graphs = {}
 
     def update(self):
+        if self.title is not None:
+            self.fig.suptitle(self.title, fontsize=10.95)
         for graph in self.graphs.keys():
             self.graphs[graph].update()
 
     def save(self, format='pgf'):
-        self.fig.title = self.title
         self.update()
         self.fig.savefig('{}-pyplot.{}'.format(self.name, format),bbox_inches='tight')
 
@@ -112,7 +113,7 @@ class ltFigure:
         self.graphs[name].graph.fill_between(x, y1, y2, alpha=alpha)
 
 class ltGraph:
-    def __init__(self, fig, name,
+    def __init__(self, fig, name, title=None,
                  x_label=None, y_label=None, z_label=None,
                  x_scaling='linear', y_scaling='linear', z_scaling='linear', projection='rectilinear',
                  x_min=None, x_max=None, y_min=None, y_max=None, z_min=None, z_max=None,
@@ -129,6 +130,7 @@ class ltGraph:
                  share_x=None, share_y=None):
         self.fig = fig
         self.name = name
+        self.title = title
         self.x_label = x_label
         self.y_label = y_label
         self.z_label = z_label
@@ -196,6 +198,8 @@ class ltGraph:
 
 
     def update(self):
+        if self.title is not None:
+            self.graph.set_title(self.title, fontsize=10)
         self.graph.set_xscale(self.x_scaling)
         self.graph.set_yscale(self.y_scaling)
         if self.projection == '3d':
