@@ -87,12 +87,12 @@ class ltFigure:
             self.graphs[graph].update()
 
     def save(self, format='pgf'):
-        plt.title = self.title
+        self.fig.title = self.title
         self.update()
-        plt.savefig('{}-pyplot.{}'.format(self.name, format),bbox_inches='tight')
+        self.fig.savefig('{}-pyplot.{}'.format(self.name, format),bbox_inches='tight')
 
     def addgraph(self, name, **kwargs):
-        self.graphs[name] = ltGraph(name, **kwargs)
+        self.graphs[name] = ltGraph(self, name, **kwargs)
 
     def testgraph(self, name, position=111):
         if not self.graphs[name]:
@@ -105,14 +105,14 @@ class ltFigure:
         plot.plot(self, name)
 
     def addarrow(self, x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k'):
-        plt.arrow(x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k')
+        self.fig.arrow(x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k')
 
     def fill_area(self, x, y1, y2, name, alpha=.5):
         self.testgraph(name)
         self.graphs[name].graph.fill_between(x, y1, y2, alpha=alpha)
 
 class ltGraph:
-    def __init__(self, name,
+    def __init__(self, fig, name,
                  x_label=None, y_label=None, z_label=None,
                  x_scaling='linear', y_scaling='linear', z_scaling='linear', projection='rectilinear',
                  x_min=None, x_max=None, y_min=None, y_max=None, z_min=None, z_max=None,
@@ -124,9 +124,10 @@ class ltGraph:
                  comma_y_major=False, comma_y_minor=False,
                  comma_z_major=False, comma_z_minor=False,
                  show_grid=False, show_x_axis=False, show_y_axis=False,
-                 show_legend=False, legend_on_side=False,
+                 show_legend=False, legend_location='best', legend_on_side=False,
                  position=111,
                  share_x=None, share_y=None):
+        self.fig = fig
         self.name = name
         self.x_label = x_label
         self.y_label = y_label
@@ -164,28 +165,28 @@ class ltGraph:
         self.show_x_axis = show_x_axis
         self.show_y_axis = show_y_axis
         self.show_legend = show_legend
+        self.legend_location = legend_location
         self.legend_on_side = legend_on_side
         self.position = position
         self.share_x = share_x
         self.share_y = share_y
-    
-        self.graph = plt.subplot(position, projection=projection, sharex=share_x, sharey=share_y)        
+
+        self.graph = fig.fig.add_subplot(position, projection=projection, sharex=share_x, sharey=share_y)        
 
         if show_grid:
-            plt.grid(inewidth=.5)
+            fig.fig.grid(linewidth=.5)
         if show_x_axis and not (projection=='3d' or x_min is None or x_max is None):
-            plt.plot([x_min,x_max], [0,0], color='black', linewidth=.75)
+            fig.graphs[graph].graph.plot([x_min,x_max], [0,0], color='black', linewidth=.75)
         if show_y_axis and not (projection=='3d' or y_min is None or y_max is None):
-            plt.plot([0,0], [y_min,y_max], color='black', linewidth=.75)
+            fig.graphs[graph].graph.plot([0,0], [y_min,y_max], color='black', linewidth=.75)
 
         if not x_ticks:
-            plt.setp(graph.get_xticklabels(), visible=False)
+            fig.fig.setp(graph.get_xticklabels(), visible=False)
         if not y_ticks:
-            plt.setp(graph.get_yticklabels(), visible=False)
+            fig.fig.setp(graph.get_yticklabels(), visible=False)
         if not z_ticks:
-            plt.setp(graph.get_zticklabels(), visible=False)
+            fig.fig.setp(graph.get_zticklabels(), visible=False)
 
-    def update(self):
         if self.projection == 'polar':
             self.graph.tick_params(direction='in',which='major', width=0.7)
             self.graph.tick_params(direction='in',which='minor', width=0.35)
@@ -193,6 +194,8 @@ class ltGraph:
             self.graph.tick_params(direction='in',which='major',bottom=1, top=1, left=1, right=1, width=0.7)
             self.graph.tick_params(direction='in',which='minor',bottom=1, top=1, left=1, right=1, width=0.35)
 
+
+    def update(self):
         self.graph.set_xscale(self.x_scaling)
         self.graph.set_yscale(self.y_scaling)
         if self.projection == '3d':
@@ -207,9 +210,9 @@ class ltGraph:
 
         if self.show_legend :
             if self.legend_on_side:
-                plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+                self.graph.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else :
-                plt.legend()
+                self.graph.legend()
 
         if self.x_min is not None and self.x_max is not None :
             self.graph.set_xlim([self.x_min,self.x_max])
@@ -277,9 +280,9 @@ class ltPlotFct(ltPlot):
 
     def plot(self, fig, graph):
         if self.dashes is not None:
-            plt.plot(self.x, self.y, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
+            fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
         else:
-            plt.plot(self.x, self.y, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize)
+            fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize)
             
         
 class ltPlotFct3d(ltPlotFct):
@@ -288,7 +291,7 @@ class ltPlotFct3d(ltPlotFct):
         self.z = z
 
     def plot(self, fig, graph):
-        plt.plot(self.x, self.y, self.z, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
+        fig.graphs[graph].graph.plot(self.x, self.y, self.z, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
 
 class ltPlotPts(ltPlotFct):
     def __init__(self, x, y, xerr=None, yerr=None, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default):
@@ -297,7 +300,7 @@ class ltPlotPts(ltPlotFct):
         self.yerr = yerr
 
     def plot(self, fig, graph):
-        plt.errorbar(self.x, self.y, xerr=self.xerr, yerr=self.yerr, marker=self.marker, markersize=self.markersize, fmt=' ', linewidth=0.4, elinewidth=1,capsize=3,capthick=0.4,color=self.color,label=self.label)
+        fig.graphs[graph].graph.errorbar(self.x, self.y, xerr=self.xerr, yerr=self.yerr, marker=self.marker, markersize=self.markersize, fmt=' ', linewidth=0.4, elinewidth=1,capsize=3,capthick=0.4,color=self.color,label=self.label)
         
 
 class ltPlotPts3d(ltPlotPts):
@@ -388,9 +391,9 @@ class ltPlotRegLin(ltPlotPts):
             else :
                 pass
             ax = fig.graphs[graph].graph
-            plt.text(x_info, y_info + 0.075,"R\\'egression lin\\'eaire : $f(x) = ax+b$",transform = ax.transAxes)
-            plt.text(x_info, y_info,'$a = \\num{{ {0:.2e} }} \pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]),transform = ax.transAxes)
-            plt.text(x_info, y_info - 0.075,'$b = \\num{{ {0:.2e} }} \pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1]),transform = ax.transAxes)
+            ax.text(x_info, y_info + 0.075,"R\\'egression lin\\'eaire : $f(x) = ax+b$",transform = ax.transAxes)
+            ax.text(x_info, y_info,'$a = \\num{{ {0:.2e} }} \pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]),transform = ax.transAxes)
+            ax.text(x_info, y_info - 0.075,'$b = \\num{{ {0:.2e} }} \pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1]),transform = ax.transAxes)
 
     def plot_pts(self, fig, graph):
         self.points.plot(fig, graph)
@@ -407,9 +410,9 @@ class ltPlotContour2d:
         self.clabel = clabel
 
     def plot(self, fig, graph):
-        current_contour=plt.contour(self.x, self.y, self.h, origin='lower', linewidths=1, cmap=self.cmap, levels=self.levels)
+        current_contour=fig.fig.contour(self.x, self.y, self.h, origin='lower', linewidths=1, cmap=self.cmap, levels=self.levels)
         if self.clabel :
-            plt.clabel(current_contour, self.levels[1::2], inline=1, fmt='%1.1f', fontsize=8)
+            fig.fig.clabel(current_contour, self.levels[1::2], inline=1, fmt='%1.1f', fontsize=8)
         current_contour=0
         
 class ltPlotScalField2d:
@@ -498,7 +501,7 @@ class ltPlotNMR:
         # for signal in signals:
         #     delta0 = signal[0]
         #     nbH = signal[1]
-        #     plt.text(delta0, max(spectrum), '{}'.format(nbH))
+        #     fig.fig.text(delta0, max(spectrum), '{}'.format(nbH))
     
         if self.show_integral :
             spectrum_integral = np.zeros(len(spectrum))
@@ -507,8 +510,8 @@ class ltPlotNMR:
             spectrum_integral *= -.75*max(spectrum)/min(spectrum_integral)
             spectrum_integral -= 1.25*min(spectrum_integral)
             
-            plt.plot(delta, spectrum_integral, color='black', linewidth=.25 ,label=None)
-        plt.plot(delta, spectrum, color=color, linewidth=.25 , label=None)
+            fig.graphs[graph].graph.plot(delta, spectrum_integral, color='black', linewidth=.25 ,label=None)
+        fig.graphs[graph].graph.plot(delta, spectrum, color=color, linewidth=.25 , label=None)
             
         fig.graphs[graph].graph.tick_params(direction='in',which='major',bottom=1, top=0, left=0, right=0, width=0.7)
         fig.graphs[graph].graph.tick_params(direction='in',which='minor',bottom=1, top=0, left=0, right=0, width=0.35)
@@ -518,7 +521,7 @@ class ltPlotNMR:
 
         fig.graphs[graph].graph.set_xlim([self.delta_min, self.delta_max])
 
-        plt.gca().invert_xaxis()
+        fig.fig.gca().invert_xaxis()
         
 class ltPlotEpH:
     def __init__(self, element, C_tr, pH_min=0, pH_max=14, E_min=-.1, E_max=.1, color=color_default, text_color='black', show_species=True):
