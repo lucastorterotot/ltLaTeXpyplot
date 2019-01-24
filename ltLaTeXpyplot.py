@@ -212,7 +212,7 @@ class ltGraph:
             if self.legend_on_side:
                 self.graph.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else :
-                self.graph.legend()
+                self.graph.legend(loc=self.legend_location)
 
         if self.x_min is not None and self.x_max is not None :
             self.graph.set_xlim([self.x_min,self.x_max])
@@ -553,6 +553,7 @@ class ltPlotEpH:
         C = self.C_tr
         pC = -np.log10(C)
         diag_color = self.color
+        ax = fig.graphs[graph].graph
         execfile(self.element_data_file)
         #################################
         ## tmp lines for compatibility ##
