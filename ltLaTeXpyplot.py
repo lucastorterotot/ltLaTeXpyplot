@@ -25,6 +25,7 @@ marker_size_default = 4
 color_default = 'C0'
 marker_pts_default = '+'
 dashes_default=[]
+cmap_default = 'inferno'
 
 inches_per_cm = 0.3937007874 # Convert cm to inch
 
@@ -407,55 +408,71 @@ class ltPlotRegLin(ltPlotPts):
 
         
 class ltPlotContour2d:
-    def __init__(self, x, y, h, cmap, levels, label=None, clabel=False):
+    def __init__(self, x, y, z_fct, cmap=cmap_default, levels=None, label=None, clabel=False, norm_xy=True):
         self.label = label
         self.x = x
         self.y = y
-        self.h = h
+        self.z_fct = z_fct
+        self.X, self.Y = np.meshgrid(x, y)
         self.cmap = cmap
         self.levels = levels
         self.clabel = clabel
+        self.norm_xy = norm_xy
 
     def plot(self, fig, graph):
-        current_contour=fig.fig.contour(self.x, self.y, self.h, origin='lower', linewidths=1, cmap=self.cmap, levels=self.levels)
+        if self.norm_xy :
+            plt.gca().set_aspect('equal', adjustable='box')
+        if self.levels is not None :
+            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=1, cmap=self.cmap, levels=self.levels)
+        else:
+            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=1, cmap=self.cmap)
         if self.clabel :
-            fig.fig.clabel(current_contour, self.levels[1::2], inline=1, fmt='%1.1f', fontsize=8)
+            fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt='%1.1f', fontsize=8)
         current_contour=0
 
         
 class ltPlotScalField2d:
-    def __init__(self, x, y, V, cmap, label=None):
+    def __init__(self, x, y, z_fct, cmap=cmap_default, label=None, norm_xy=True):
         self.label = label
         self.x = x
         self.y = y
-        self.V = V
+        self.z_fct = z_fct
+        self.X, self.Y = np.meshgrid(x, y)
         self.cmap = cmap
+        self.norm_xy = norm_xy
 
     def plot(self, fig, graph):
-        fig.graphs[graph].graph.imshow(self.V, cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower')
+        if self.norm_xy :
+            plt.gca().set_aspect('equal', adjustable='box')
+        fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower')
 
         
 class ltPlotVectField2d:
-    def __init__(self, x, y, vx, vy, cmap, label=None):
+    def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True):
         self.label = label
         self.x = x
         self.y = y
-        self.vx = vx
-        self.vy = vy
-        self.cmap = cmap
+        self.vx_fct = vx_fct
+        self.vy_fct = vy_fct
+        self.X, self.Y = np.meshgrid(x, y)
+        self.color = color
+        self.norm_xy = norm_xy
 
     def plot(self, fig, graph):
-        fig.graphs[graph].graph.quiver(self.x, self.y, self.vx, self.vy, linewidth=.5, label=self.label, color=self.color)
+        if self.norm_xy :
+            plt.gca().set_aspect('equal', adjustable='box')
+        fig.graphs[graph].graph.quiver(self.X, self.Y, self.vx_fct(self.X, self.Y), self.vy_fct(self.X, self.Y), linewidth=.5, label=self.label, color=self.color)
 
         
 class ltPlotVectField3d(ltPlotVectField2d):
-    def __init__(self, x, y, z, vx, vy, vz, cmap, label=None):
-        ltPlotVectField2d.__init__(self, x, y,vx, vy, cmap, label=label)
+    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, norm_xyz=True):
+        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, norm_xy=norm_xyz)
         self.z = z
-        self.vz = vz
+        self.vz_fct = vz_fct
+        self.X, self.Y, self.Z = np.meshgrid(x, y, z)
 
     def plot(self, fig, graph):
-        fig.graphs[graph].graph.quiver(self.x, self.y, self.z, self.vx, self.vy, self.vz, length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
+        fig.graphs[graph].graph.quiver(self.X, self.Y, self.Z, self.vx_fct(self.X, self.Y, self.Z), self.vy_fct(self.X, self.Y, self.Z), self.vz_fct(self.X, self.Y, self.Z), length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
 
         
 class ltPlotNMR:
