@@ -422,7 +422,7 @@ class ltPlotContour2d:
 
     def plot(self, fig, graph):
         if self.norm_xy :
-            plt.gca().set_aspect('equal', adjustable='box')
+            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         if self.levels is not None :
             current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=1, cmap=self.cmap, levels=self.levels)
         else:
@@ -444,9 +444,8 @@ class ltPlotScalField2d:
 
     def plot(self, fig, graph):
         if self.norm_xy :
-            plt.gca().set_aspect('equal', adjustable='box')
+            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower')
-
         
 class ltPlotVectField2d:
     def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default):
@@ -465,7 +464,7 @@ class ltPlotVectField2d:
 
     def plot(self, fig, graph):
         if self.norm_xy :
-            plt.gca().set_aspect('equal', adjustable='box')
+            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         fig.graphs[graph].graph.quiver(self.X, self.Y, self.vx_fct(self.X, self.Y), self.vy_fct(self.X, self.Y), linewidth=.5, label=self.label, color=self.color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
@@ -476,7 +475,7 @@ class ltPlotVectField2d:
         if dashes is None:
             dashes = self.dashes_fieldline
         if self.norm_xy :
-            plt.gca().set_aspect('equal', adjustable='box')
+            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         T = np.linspace(startT, endT, stepT)
         def _field(p, t):
             x, y = p
@@ -494,7 +493,7 @@ class ltPlotVectField3d(ltPlotVectField2d):
 
     def plot(self, fig, graph):
         if self.norm_xy :
-            plt.gca().set_aspect('equal', adjustable='box')
+            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         fig.graphs[graph].graph.quiver(self.X, self.Y, self.Z, self.vx_fct(self.X, self.Y, self.Z), self.vy_fct(self.X, self.Y, self.Z), self.vz_fct(self.X, self.Y, self.Z), length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
@@ -505,7 +504,7 @@ class ltPlotVectField3d(ltPlotVectField2d):
         if dashes is None:
             dashes = self.dashes_fieldline
         if self.norm_xy :
-            plt.gca().set_aspect('equal', adjustable='box')
+            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         T = np.linspace(startT, endT, stepT)
         def _field(p, t):
             x, y, z = p
