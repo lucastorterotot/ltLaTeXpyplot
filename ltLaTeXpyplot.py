@@ -10,6 +10,7 @@ import numpy as np
 import scipy as sc
 
 import scipy.optimize as spo
+from scipy.integrate import odeint
 
 import matplotlib as mpl
 mpl.use('pgf')
@@ -448,7 +449,7 @@ class ltPlotScalField2d:
 
         
 class ltPlotVectField2d:
-    def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True):
+    def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default):
         self.label = label
         self.x = x
         self.y = y
@@ -458,11 +459,31 @@ class ltPlotVectField2d:
         self.color = color
         self.norm_xy = norm_xy
 
+        self.label_fieldline = label_fieldline
+        self.color_fieldline = color_fieldline
+        self.dashes_fieldline = dashes_fieldline
+
     def plot(self, fig, graph):
         if self.norm_xy :
             plt.gca().set_aspect('equal', adjustable='box')
         fig.graphs[graph].graph.quiver(self.X, self.Y, self.vx_fct(self.X, self.Y), self.vy_fct(self.X, self.Y), linewidth=.5, label=self.label, color=self.color)
 
+    def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
+        if color is None:
+            color = self.color_fieldline
+        if label is None:
+            label = self.label_fieldline
+        if dashes is None:
+            dashes = self.dashes_fieldline
+        if self.norm_xy :
+            plt.gca().set_aspect('equal', adjustable='box')
+        T = np.linspace(startT, endT, stepT)
+        def _field(p, t):
+            x, y = p
+            return self.vx_fct(x, y), self.vy_fct(x, y)
+        line_xy = odeint(_field, point, T).transpose()
+        fig.graphs[graph].graph.plot(line_xy[0], line_xy[1], label=label, color=color, dashes=dashes, linewidth=.5)
+        
         
 class ltPlotVectField3d(ltPlotVectField2d):
     def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, norm_xyz=True):
