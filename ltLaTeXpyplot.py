@@ -446,6 +446,41 @@ class ltPlotScalField2d:
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower')
+
+
+class ltPlotSurf3d:
+    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, alpha=0.5, color=color_default, norm_xyz=True):
+        if R_fct is not None:
+            def x_fct(t, p):
+                return R_fct(t, p) * np.sin(t) * np.cos(p)
+            def y_fct(t, p):
+                return R_fct(t, p) * np.sin(t) * np.sin(p)
+            def z_fct(t, p):
+                return R_fct(t, p) * np.cos(t)
+        self.theta = theta
+        self.phi = phi
+        self.Theta, self.Phi = np.meshgrid(theta, phi)
+        self.x_fct = x_fct
+        self.y_fct = y_fct
+        self.z_fct = z_fct
+        self.R_fct = R_fct
+        self.alpha = alpha
+        self.color = color
+        self.norm_xyz=True
+
+    def plot(self, fig, graph):
+        if self.norm_xyz :
+            ax = fig.graphs[graph].graph
+            ax.set_aspect('equal', adjustable='box')
+        bounds = [fig.graphs[graph].x_min, fig.graphs[graph].x_max, fig.graphs[graph].y_min, fig.graphs[graph].y_max, fig.graphs[graph].z_min, fig.graphs[graph].z_max]
+        if not any(m is None for m in bounds):
+            max_range = np.array([bounds[1]-bounds[0], bounds[3]-bounds[1], bounds[5]-bounds[4]]).max()
+            Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(bounds[0]+bounds[1])
+            Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(bounds[2]+bounds[3])
+            Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(bounds[4]+bounds[5])
+            for xb, yb, zb in zip(Xb, Yb, Zb):
+                ax.plot([xb], [yb], [zb], 'w')
+        fig.graphs[graph].graph.plot_surface(self.x_fct(self.Theta, self.Phi), self.y_fct(self.Theta, self.Phi), self.z_fct(self.Theta, self.Phi), rstride=1, cstride=1, linewidth=0, alpha=self.alpha, color=self.color)
         
 class ltPlotVectField2d:
     def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default):
