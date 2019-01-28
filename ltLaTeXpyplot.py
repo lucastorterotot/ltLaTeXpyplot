@@ -486,14 +486,32 @@ class ltPlotVectField2d:
         
         
 class ltPlotVectField3d(ltPlotVectField2d):
-    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, norm_xyz=True):
-        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, norm_xy=norm_xyz)
+    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, norm_xyz=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default):
+        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, norm_xy=norm_xyz, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline)
         self.z = z
         self.vz_fct = vz_fct
         self.X, self.Y, self.Z = np.meshgrid(x, y, z)
 
     def plot(self, fig, graph):
+        if self.norm_xy :
+            plt.gca().set_aspect('equal', adjustable='box')
         fig.graphs[graph].graph.quiver(self.X, self.Y, self.Z, self.vx_fct(self.X, self.Y, self.Z), self.vy_fct(self.X, self.Y, self.Z), self.vz_fct(self.X, self.Y, self.Z), length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
+
+    def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
+        if color is None:
+            color = self.color_fieldline
+        if label is None:
+            label = self.label_fieldline
+        if dashes is None:
+            dashes = self.dashes_fieldline
+        if self.norm_xy :
+            plt.gca().set_aspect('equal', adjustable='box')
+        T = np.linspace(startT, endT, stepT)
+        def _field(p, t):
+            x, y, z = p
+            return self.vx_fct(x, y, z), self.vy_fct(x, y, z), self.vz_fct(x, y, z)
+        line_xyz = odeint(_field, point, T).transpose()
+        fig.graphs[graph].graph.plot(line_xyz[0], line_xyz[1], line_xyz[2], label=label, color=color, dashes=dashes, linewidth=.5)
 
         
 class ltPlotNMR:
