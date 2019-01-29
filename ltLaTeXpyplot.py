@@ -396,22 +396,33 @@ class ltPlotRegLin(ltPlotPts):
     def plot_reg(self, fig, graph):
         self.reglin.plot(fig, graph)
         if self.give_info:
-            x_info = 0.24
+            x_info = 0.5
             y_info = 0.5
+            multialignment='center'
+            verticalalignment='center'
+            horizontalalignment='center'
             if 'left' in self.info_placement :
                 x_info = 0.025
+                multialignment='left'
+                horizontalalignment='left'
             if 'right' in self.info_placement :
-                x_info = 0.455
+                x_info = 0.975
+                multialignment='right'
+                horizontalalignment='right'
             if 'upper' in self.info_placement :
-                y_info = 0.85
+                y_info = 0.95
+                verticalalignment='top'
             if 'lower' in self.info_placement :
-                y_info = 0.125
+                y_info = 0.05
+                verticalalignment='bottom'
             else :
                 pass
             ax = fig.graphs[graph].graph
-            ax.text(x_info, y_info + 0.075,"R\\'egression lin\\'eaire : $f(x) = ax+b$",transform = ax.transAxes)
-            ax.text(x_info, y_info,'$a = \\num{{ {0:.2e} }} \pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]),transform = ax.transAxes)
-            ax.text(x_info, y_info - 0.075,'$b = \\num{{ {0:.2e} }} \pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1]),transform = ax.transAxes)
+            mpl.rc('text', usetex=True)
+            
+            ax.text(x_info, y_info,
+                    "R\\'egression lin\\'eaire : $f(x) = ax+b$" + "\n" + '$a = \\num{{ {0:.2e} }} \pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]) + "\n" + '$b = \\num{{ {0:.2e} }} \pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1]),
+                    transform = ax.transAxes, multialignment=multialignment, verticalalignment=verticalalignment, horizontalalignment=horizontalalignment)
 
     def plot_pts(self, fig, graph):
         self.points.plot(fig, graph)
