@@ -17,6 +17,8 @@ mpl.use('pgf')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tkr
 
+from matplotlib.patches import FancyArrowPatch
+
 from mpl_toolkits.mplot3d import Axes3D
 
 
@@ -121,9 +123,6 @@ class ltFigure:
     def addplot(self, plot, name):
         self.testgraph(name)
         plot.plot(self, name)
-
-    def addarrow(self, x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k'):
-        self.fig.arrow(x, y, vx, vy, head_width=head_width, head_length=head_length, fc=fc, ec=ec)
 
         
 class ltGraph:
@@ -278,6 +277,12 @@ class ltGraph:
 
     def fill_between(self, x, y1, y2, alpha=.5, **kwargs):
         self.graph.fill_between(x, y1, y2, alpha=alpha, **kwargs)
+
+    def addarrow(self, x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k', length_includes_head=True, **kwargs):
+        self.graph.add_patch(FancyArrowPatch(posA=(x, y), posB=(x+vx, y+vy),
+                                             arrowstyle='->', lw=1, 
+                                             mutation_scale=7, mutation_aspect=None))
+        #self.graph.arrow(x, y, vx, vy, head_width=head_width, head_length=head_length, fc=fc, ec=ec, length_includes_head=length_includes_head, **kwargs)
 
             
 class ltPlotFct:
