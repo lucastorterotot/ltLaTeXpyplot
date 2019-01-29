@@ -198,11 +198,11 @@ class ltGraph:
             fig.graphs[graph].graph.plot([0,0], [y_min,y_max], color='black', linewidth=.75)
 
         if not x_ticks:
-            fig.fig.setp(graph.get_xticklabels(), visible=False)
+            plt.setp(self.graph.get_xticklabels(), visible=False)
         if not y_ticks:
-            fig.fig.setp(graph.get_yticklabels(), visible=False)
+            plt.setp(self.graph.get_yticklabels(), visible=False)
         if not z_ticks:
-            fig.fig.setp(graph.get_zticklabels(), visible=False)
+            plt.setp(self.graph.get_zticklabels(), visible=False)
 
         if self.projection == 'polar':
             self.graph.tick_params(direction='in',which='major', width=0.7)
@@ -469,18 +469,19 @@ class ltPlotSurf3d:
         self.norm_xyz=True
 
     def plot(self, fig, graph):
+        x = self.x_fct(self.Theta, self.Phi)
+        y = self.y_fct(self.Theta, self.Phi)
+        z = self.z_fct(self.Theta, self.Phi)
         if self.norm_xyz :
             ax = fig.graphs[graph].graph
             ax.set_aspect('equal', adjustable='box')
-        bounds = [fig.graphs[graph].x_min, fig.graphs[graph].x_max, fig.graphs[graph].y_min, fig.graphs[graph].y_max, fig.graphs[graph].z_min, fig.graphs[graph].z_max]
-        if not any(m is None for m in bounds):
-            max_range = np.array([bounds[1]-bounds[0], bounds[3]-bounds[1], bounds[5]-bounds[4]]).max()
-            Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(bounds[0]+bounds[1])
-            Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(bounds[2]+bounds[3])
-            Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(bounds[4]+bounds[5])
+            max_range = np.array([x.max()-x.min(), y.max()-y.min(), z.max()-z.min()]).max()
+            Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
+            Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
+            Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
             for xb, yb, zb in zip(Xb, Yb, Zb):
                 ax.plot([xb], [yb], [zb], 'w')
-        fig.graphs[graph].graph.plot_surface(self.x_fct(self.Theta, self.Phi), self.y_fct(self.Theta, self.Phi), self.z_fct(self.Theta, self.Phi), rstride=1, cstride=1, linewidth=0, alpha=self.alpha, color=self.color)
+        fig.graphs[graph].graph.plot_surface(x, y, z, rstride=1, cstride=1, linewidth=0, alpha=self.alpha, color=self.color)
         
 class ltPlotVectField2d:
     def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default):
