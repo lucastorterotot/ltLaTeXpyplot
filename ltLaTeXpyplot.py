@@ -107,10 +107,13 @@ class ltFigure:
         self.fig.savefig('{}-pyplot.{}'.format(self.name, format),bbox_inches='tight')
 
     def addgraph(self, name, **kwargs):
-        self.graphs[name] = ltGraph(self, name, **kwargs)
+        if not name in self.graphs.keys():
+            self.graphs[name] = ltGraph(self, name, **kwargs)
+        else:
+            raise NameError('Figure {} already has a graph named {}.'.format(self.name, name))
 
     def testgraph(self, name, position=111):
-        if not self.graphs[name]:
+        if not name in self.graphs.keys():
             self.addgraph(name, position=position)
             print 'Warning, auto-generated graph at position {}'.format(position)
             print 'with name {}'.format(name)
