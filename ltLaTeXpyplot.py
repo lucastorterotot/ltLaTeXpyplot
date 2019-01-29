@@ -623,7 +623,7 @@ class ltPlotNMR:
 
         fig.graphs[graph].graph.set_xlim([self.delta_min, self.delta_max])
 
-        fig.fig.gca().invert_xaxis()
+        fig.graphs[graph].graph.invert_xaxis()
 
         
 class ltPlotEpH:
