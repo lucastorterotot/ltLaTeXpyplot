@@ -122,10 +122,6 @@ class ltFigure:
     def addarrow(self, x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k'):
         self.fig.arrow(x, y, vx, vy, head_width=head_width, head_length=head_length, fc=fc, ec=ec)
 
-    def fill_area(self, x, y1, y2, name, alpha=.5):
-        self.testgraph(name)
-        self.graphs[name].graph.fill_between(x, y1, y2, alpha=alpha)
-
         
 class ltGraph:
     def __init__(self, fig, name, title=None,
@@ -276,6 +272,9 @@ class ltGraph:
             self.graph.zaxis.set_major_formatter(axes_format_comma)
         if self.comma_z_minor :
             self.graph.zaxis.set_minor_formatter(axes_format_comma)
+
+    def fill_between(self, x, y1, y2, alpha=.5, **kwargs):
+        self.graph.fill_between(x, y1, y2, alpha=alpha, **kwargs)
 
             
 class ltPlotFct:
