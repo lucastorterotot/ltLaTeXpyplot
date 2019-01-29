@@ -324,7 +324,7 @@ class ltPlotPts3d(ltPlotPts):
         
 class ltPlotRegLin(ltPlotPts):
     def __init__(self, x, y, xerr, yerr, label=None, label_reg=None, color=color_default, color_reg='C3', marker=marker_pts_default, markersize=marker_size_default,
-                 p0_x=0, p0_y=0, dashes=dashes_default, give_info=True, info_placement='aboveleft'):
+                 p0_x=0, p0_y=0, dashes=dashes_default, give_info=True, info_placement='upper left'):
         ltPlotPts.__init__(self,x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize)
         self.label_reg = label_reg
         self.color_reg = color_reg
@@ -396,9 +396,16 @@ class ltPlotRegLin(ltPlotPts):
     def plot_reg(self, fig, graph):
         self.reglin.plot(fig, graph)
         if self.give_info:
-            if self.info_placement == 'aboveleft':
+            x_info = 0.24
+            y_info = 0.5
+            if 'left' in self.info_placement :
                 x_info = 0.025
+            if 'right' in self.info_placement :
+                x_info = 0.455
+            if 'upper' in self.info_placement :
                 y_info = 0.85
+            if 'lower' in self.info_placement :
+                y_info = 0.125
             else :
                 pass
             ax = fig.graphs[graph].graph
