@@ -457,24 +457,41 @@ class ltPlotContour2d:
         current_contour=0
 
         
-class ltPlotScalField2d:
-    def __init__(self, x, y, z_fct, cmap=cmap_default, label=None, norm_xy=True):
+class ltPlotScalField:
+    def __init__(self, x, y, z_fct, cmap=cmap_default, color=color_default, label=None, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True):
         self.label = label
         self.x = x
         self.y = y
         self.z_fct = z_fct
         self.X, self.Y = np.meshgrid(x, y)
         self.cmap = cmap
-        self.norm_xy = norm_xy
+        self.color = color
+        self.alpha = alpha
+        self.alpha_3d = alpha_3d
+        self.norm_xy = norm_xy or norm_xyz
+        self.norm_xyz = norm_xyz
+        self.use_cmap = use_cmap
 
     def plot(self, fig, graph):
+        if fig.graphs[graph].projection == '3d':
+            self._plot3d(fig, graph)
+        else :
+            self._plot2d(fig, graph)
+
+    def _plot2d(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower')
+        fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
+
+    def _plot3d(self, fig, graph):
+        if self.alpha == 1 :
+            self.alpha = self.alpha_3d
+        _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap)
+        _ScalField3d.plot(fig, graph)
 
 
-class ltPlotSurf3d:
-    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, alpha=0.5, color=color_default, norm_xyz=True):
+class ltPlotSurf:
+    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=True, use_cmap=False):
         if R_fct is not None:
             def x_fct(t, p):
                 return R_fct(t, p) * np.sin(t) * np.cos(p)
@@ -482,6 +499,11 @@ class ltPlotSurf3d:
                 return R_fct(t, p) * np.sin(t) * np.sin(p)
             def z_fct(t, p):
                 return R_fct(t, p) * np.cos(t)
+        elif z_fct is not None and x_fct is None and y_fct is None :
+            def x_fct(t, p):
+                return t
+            def y_fct(t, p):
+                return p
         self.theta = theta
         self.phi = phi
         self.Theta, self.Phi = np.meshgrid(theta, phi)
@@ -489,24 +511,42 @@ class ltPlotSurf3d:
         self.y_fct = y_fct
         self.z_fct = z_fct
         self.R_fct = R_fct
+        self.label = label
         self.alpha = alpha
         self.color = color
-        self.norm_xyz=True
+        self.cmap = cmap
+        self.norm_xy = norm_xy or norm_xyz
+        self.norm_xyz = norm_xyz
+        self.use_cmap = use_cmap
 
     def plot(self, fig, graph):
+        if fig.graphs[graph].projection == '3d':
+            self._plot3d(fig, graph)
+        else :
+            self._plot2d(fig, graph)
+
+    def _plot2d(self, fig, graph):
+        _Surf2d = ltPlotScalField(self.theta, self.phi, z_fct=self.z_fct, cmap=self.cmap, color=self.color, label=self.label, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, alpha=self.alpha)
+        _Surf2d.plot(fig, graph)
+
+    def _plot3d(self, fig, graph):
         x = self.x_fct(self.Theta, self.Phi)
         y = self.y_fct(self.Theta, self.Phi)
         z = self.z_fct(self.Theta, self.Phi)
-        if self.norm_xyz :
-            ax = fig.graphs[graph].graph
+        ax = fig.graphs[graph].graph
+        if self.norm_xy :
             ax.set_aspect('equal', adjustable='box')
+        if self.norm_xyz :
             max_range = np.array([x.max()-x.min(), y.max()-y.min(), z.max()-z.min()]).max()
             Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
             Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
             Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
             for xb, yb, zb in zip(Xb, Yb, Zb):
                 ax.plot([xb], [yb], [zb], 'w')
-        fig.graphs[graph].graph.plot_surface(x, y, z, rstride=1, cstride=1, linewidth=0, alpha=self.alpha, color=self.color)
+        if self.use_cmap:
+            fig.graphs[graph].graph.plot_surface(x, y, z, rstride=1, cstride=1, linewidth=0, alpha=self.alpha, cmap=self.cmap)
+        else:
+            fig.graphs[graph].graph.plot_surface(x, y, z, rstride=1, cstride=1, linewidth=0, alpha=self.alpha, color=self.color)
         
 class ltPlotVectField2d:
     def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default):
