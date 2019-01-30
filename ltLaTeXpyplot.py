@@ -24,6 +24,8 @@ from mpl_toolkits.mplot3d import Axes3D
 
 ### Defining global variables for this package
 
+lang = 'FR'
+
 marker_size_default = 4
 color_default = 'C0'
 marker_pts_default = '+'
@@ -37,7 +39,13 @@ inches_per_cm = 0.3937007874 # Convert cm to inch
 def axes_comma(x, pos):  # formatter function takes tick label and tick position
     s = str(x)
     ind = s.index('.')
-    return s[:ind] + ',' + s[ind+1:]   # change dot to comma
+    int_part = s[:ind]
+    dec_part = s[ind+1:]
+    string = '\\num{{' + int_part
+    if dec_part is not '0':
+        string += '.'+dec_part
+    string += '}}'
+    return string
 
 axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
@@ -134,9 +142,9 @@ class ltGraph:
                  y_ticks=True, y_ticks_min=None, y_ticks_max=None, y_ticks_step=None,
                  z_ticks=True, z_ticks_min=None, z_ticks_max=None, z_ticks_step=None,
                  minorticks=True,
-                 comma_x_major=False, comma_x_minor=False,
-                 comma_y_major=False, comma_y_minor=False,
-                 comma_z_major=False, comma_z_minor=False,
+                 comma_x_major=True, comma_x_minor=False,
+                 comma_y_major=True, comma_y_minor=False,
+                 comma_z_major=True, comma_z_minor=False,
                  show_grid=False, show_x_axis=False, show_y_axis=False,
                  show_legend=False, legend_location='best', legend_on_side=False,
                  position=111,
@@ -270,10 +278,11 @@ class ltGraph:
             self.graph.xaxis.set_major_formatter(axes_format_comma)
         if self.comma_x_minor :
             self.graph.xaxis.set_minor_formatter(axes_format_comma)
-        if self.comma_z_major :
-            self.graph.zaxis.set_major_formatter(axes_format_comma)
-        if self.comma_z_minor :
-            self.graph.zaxis.set_minor_formatter(axes_format_comma)
+        if hasattr(self.graph, 'zaxis'):
+            if self.comma_z_major :
+                self.graph.zaxis.set_major_formatter(axes_format_comma)
+            if self.comma_z_minor :
+                self.graph.zaxis.set_minor_formatter(axes_format_comma)
 
     def fill_between(self, x, y1, y2, alpha=.5, **kwargs):
         self.graph.fill_between(x, y1, y2, alpha=alpha, **kwargs)
@@ -337,45 +346,44 @@ class ltPlotRegLin(ltPlotPts):
         self.give_info = give_info
         self.info_placement = info_placement
         
-        # fonction f décrivant la courbe à ajuster aux données
+        # linear function to adjust
         def f(x,p):
             a,b = p 
             return a*x+b
         
-        # dérivée de la fonction f par rapport à la variable de contrôle x
+        # its derivative
         def Dx_f(x,p):
             a,b = p
             return a
 
-        # fonction d'écart pondérée par les erreurs
+        # difference to data
         def residual(p, y, x):
             return (y-f(x,p))/np.sqrt(yerr**2 + (Dx_f(x,p)*xerr)**2)
 
-        # estimation initiale des paramètres
-        # elle ne joue généralement aucun rôle
-        # néanmoins, le résultat de l'ajustement est parfois aberrant
-        # il faut alors choisir une meilleure estimation initiale
+        # initial estimation
+        # usually OK but sometimes one need to give a different
+        # starting point to make it converge
         p0 = np.array([p0_x,p0_y])
 
-        # on utilise l'algorithme des moindres carrés non-linéaires 
-        # disponible dans la biliothèque scipy (et indirectement la
-        # bibliothèque Fortran MINPACK qui implémente l'algorithme
-        # de Levenberg-Marquardt) pour déterminer le minimum voulu
+        # minimizing algorithm
         result = spo.leastsq(residual, p0, args=(y, x), full_output=True)
 
-        # on obtient :
-        # les paramètres d'ajustement optimaux
+        # Result:
+        # optimized parameters a and b
         popt = result[0];
-        # la matrice de variance-covariance estimée des paramètres
+        # variance-covariance matrix
         pcov = result[1];
-        # les incertitudes-types sur ces paramètres
+        # uncetainties on parameters (1 sigma)
         uopt = np.sqrt(np.abs(np.diagonal(pcov)))
 
-        # calcul de la valeur du "chi2 réduit" pour les paramètres ajustés
+        # reduced chi2 for a and b
         chi2r = np.sum(np.square(residual(popt,y,x)))/(x.size-popt.size)
 
-        print '  Regression lineaire :'
-        print '    f(x) = a * x + b avec'
+        if lang == 'FR':
+            print '  Regression lineaire :'
+        else :
+            print '  Linear regression :'
+        print '    f(x) = a * x + b'
         print '    a = {} ;'.format(popt[0])
         print '    b = {}.'.format(popt[1])
         print ' '
@@ -424,9 +432,12 @@ class ltPlotRegLin(ltPlotPts):
                 pass
             ax = fig.graphs[graph].graph
             mpl.rc('text', usetex=True)
-            
+
+            reglintxt = "Linear regression:"
+            if lang == 'FR':
+                reglintxt = "R\\'egression lin\\'eaire :"
             ax.text(x_info, y_info,
-                    "R\\'egression lin\\'eaire : $f(x) = ax+b$" + "\n" + '$a = \\num{{ {0:.2e} }} \pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]) + "\n" + '$b = \\num{{ {0:.2e} }} \pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1]),
+                    reglintxt + " $f(x) = ax+b$" + "\n" + '$a = \\num{{ {0:.2e} }} \pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]) + "\n" + '$b = \\num{{ {0:.2e} }} \pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1]),
                     transform = ax.transAxes, multialignment=multialignment, verticalalignment=verticalalignment, horizontalalignment=horizontalalignment)
 
     def plot_pts(self, fig, graph):
@@ -526,7 +537,7 @@ class ltPlotSurf:
             self._plot2d(fig, graph)
 
     def _plot2d(self, fig, graph):
-        _Surf2d = ltPlotScalField(self.theta, self.phi, z_fct=self.z_fct, cmap=self.cmap, color=self.color, label=self.label, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, alpha=self.alpha)
+        _Surf2d = ltPlotScalField(self.theta, self.phi, z_fct=self.z_fct, cmap=self.cmap, color=self.color, label=self.label, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, alpha=self.alpha, use_cmap=self.use_cmap)
         _Surf2d.plot(fig, graph)
 
     def _plot3d(self, fig, graph):
