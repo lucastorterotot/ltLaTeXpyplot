@@ -754,7 +754,7 @@ class ltPlotEpH:
             self.compute()
             
         from data.EpH.EpHgeneric import EpHgeneric
-        data = EpHgeneric(pH_min=self.pH_min, pH_max=self.pH_max, E_min=self.E_min-.1, E_max=self.E_max+.1, conc=self.C_tr)
+        data = EpHgeneric(pH_min=self.pH_min-.5, pH_max=self.pH_max+.5, E_min=self.E_min-.1, E_max=self.E_max+.1, conc=self.C_tr)
 
         for sep in self.data_file.seps:
             data.addsep(sep)
@@ -764,7 +764,11 @@ class ltPlotEpH:
         seps = []
         for sep in data.seps:
             seps.append(ltPlotFct(sep[0], sep[1], label=None, color=self.color))
-        seps[0].label = '{element}, $C_{{ {ind} }} = \\SI{{ {C} }}{{ {units} }}$'.format(element=self.element, ind='\\mathrm{{tr}}', C=self.C_tr, units='mol.L^{-1}')
+        element=self.element
+        if '_' in element:
+            index = element.index('_')
+            element = element[:index]
+        seps[0].label = '{element}, $C_{{ {ind} }} = \\SI{{ {C} }}{{ {units} }}$'.format(element=element, ind='\\mathrm{{tr}}', C=self.C_tr, units='mol.L^{-1}')
         for sep in seps:
             sep.plot(fig, graph)
             
