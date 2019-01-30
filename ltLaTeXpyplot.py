@@ -704,9 +704,7 @@ class ltPlotNMR:
         
 class ltPlotEpH:
     def __init__(self, element, C_tr, pH_min=0, pH_max=14, E_min=-.1, E_max=.1, color=color_default, text_color='black', show_species=True):
-        self.EpH_data_dir = homedir+'/Dropbox/Enseignement/py_files/Diagrammes_E-pH/'
         self.element = element
-        self.element_data_file = self.EpH_data_dir + 'data-' + element + '.py'
 
         self.C_tr = C_tr
         self.pH_min = pH_min
@@ -716,33 +714,61 @@ class ltPlotEpH:
         self.color = color
         self.text_color = text_color
         self.show_species = show_species
+        self.data_file = __import__('ltLaTeXpyplot.data.EpH.'+self.element, fromlist=[''])
+        self.computed = False
+
+    def compute(self):
+        E_min, E_max = self.E_min, self.E_max
+        pH_min, pH_max = self.pH_min, self.pH_max
+        pC = -np.log10(self.C_tr)
+        for sep in self.data_file.seps:
+            for pH in [sep.pHa, sep.pHb]:
+                if type(pH) is not str:
+                    pH_min = min([pH_min, pH(pC)])
+                    pH_max = max([pH_max, pH(pC)])
+            for Ep in [sep.Ea, sep.Eb]:
+                if type(Ep) is not str:
+                    E_min = min([E_min, Ep(pC, pH_min), Ep(pC, pH_max)])
+                    E_max = max([E_max, Ep(pC, pH_min), Ep(pC, pH_max)])
+        self.E_min, self.E_max = E_min, E_max
+        self.pH_min, self.pH_max = pH_min, pH_max
+        self.computed = True
+
+    def compute_with(self, others):
+        if not self.computed:
+            self.compute()
+        E_min, E_max = self.E_min, self.E_max
+        pH_min, pH_max = self.pH_min, self.pH_max
+        for PlotEpH in others:
+            PlotEpH.compute()
+            E_min = min([E_min, PlotEpH.E_min])
+            E_max = max([E_max, PlotEpH.E_max])
+            pH_min = min([pH_min, PlotEpH.pH_min])
+            pH_max = max([pH_max, PlotEpH.pH_max])
+        for PlotEpH in [self]+others:
+            PlotEpH.E_min, PlotEpH.E_max = E_min, E_max
+            PlotEpH.pH_min, PlotEpH.pH_max = pH_min, pH_max
 
     def plot(self, fig, graph):
-        #################################
-        ## tmp lines for compatibility ##
-        functions_to_draw = []
-        lines_to_draw = []
-        afficher_especes_chimiques = self.show_species
-        text_diag_color = self.text_color
-        #################################
-        pH_min = self.pH_min
-        pH_max = self.pH_max
-        E_min = self.E_min
-        E_max = self.E_max
-        C = self.C_tr
-        pC = -np.log10(C)
-        diag_color = self.color
-        ax = fig.graphs[graph].graph
-        execfile(self.element_data_file)
-        #################################
-        ## tmp lines for compatibility ##
-        seps_from_data = lines_to_draw
-        seps_from_data += functions_to_draw
-        #################################
+        if not self.computed:
+            self.compute()
+            
+        from data.EpH.EpHgeneric import EpHgeneric
+        data = EpHgeneric(pH_min=self.pH_min, pH_max=self.pH_max, E_min=self.E_min-.1, E_max=self.E_max+.1, conc=self.C_tr)
+
+        for sep in self.data_file.seps:
+            data.addsep(sep)
+        for spe in self.data_file.spes:
+            data.addspe(spe)
 
         seps = []
-        for sep in seps_from_data:
-            seps.append(ltPlotFct(sep[1], sep[2], label=None, color=self.color))
-        seps[0].label = '{element}, $C_{{ {ind} }} = \\SI{{ {C} }}{{ {units} }}$'.format(element=self.element, ind='\\mathrm{{tr}}', C=C, units='mol.L^{-1}')
+        for sep in data.seps:
+            seps.append(ltPlotFct(sep[0], sep[1], label=None, color=self.color))
+        seps[0].label = '{element}, $C_{{ {ind} }} = \\SI{{ {C} }}{{ {units} }}$'.format(element=self.element, ind='\\mathrm{{tr}}', C=self.C_tr, units='mol.L^{-1}')
         for sep in seps:
             sep.plot(fig, graph)
+            
+        if self.show_species:
+            ax = fig.graphs[graph].graph
+            for spe in data.spes:
+                ax.text(spe[0], spe[1], spe[3], color=self.color)
