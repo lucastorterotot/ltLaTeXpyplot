@@ -728,8 +728,12 @@ class ltPlotEpH:
                     pH_max = max([pH_max, pH(pC)])
             for Ep in [sep.Ea, sep.Eb]:
                 if type(Ep) is not str:
-                    E_min = min([E_min, Ep(pC, pH_min), Ep(pC, pH_max)])
-                    E_max = max([E_max, Ep(pC, pH_min), Ep(pC, pH_max)])
+                    list_E = [E_min, E_max, Ep(pC, pH_min), Ep(pC, pH_max)]
+                    for pH in [sep.pHa, sep.pHb]:
+                        if type(pH) is not str:
+                            list_E.append(Ep(pC, pH(pC)))
+                    E_min = min(list_E)
+                    E_max = max(list_E)
         self.E_min, self.E_max = E_min, E_max
         self.pH_min, self.pH_max = pH_min, pH_max
         self.computed = True
