@@ -3,11 +3,10 @@
 
 import numpy as np
 
-e_value = 1.602176563e-19
-kB_value = 1.38064852e-23
+from scipy.constants import elementary_charge, Boltzmann
 T_value_C = 25
 T_value = T_value_C + 273.15
-RT_on_F = (kB_value*T_value/e_value * np.log(10))
+RT_on_F = (Boltzmann*T_value/elementary_charge * np.log(10))
 
 class EpHgeneric:
     def __init__(self, pH_min=0, pH_max=14, E_min=-1, E_max=1, conc=1e-3, pC=None):
