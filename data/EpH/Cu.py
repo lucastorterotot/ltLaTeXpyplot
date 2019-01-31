@@ -12,7 +12,7 @@ def pHsepb(pC):
     return 14-(pKs_Cu_2OH-pC)/2.
 
 def pHcrois(pC):
-    return pHsepa(pC) + .5*(Esepza1(pC, pHsepa(pC))-Esepab1(pC, pHsepa(pC)))/0.06
+    return pHsepa(pC) + .5*(Esepza1(pC, pHsepa(pC))-Esepab1(pC, pHsepa(pC)))/RT_on_F
 
 def pHeff_list(pC):
     list = [pHsepa(pC), pHsepb(pC), pHcrois(pC)]
@@ -27,16 +27,16 @@ def pHeff3(pC):
     return pHeff_list(pC)[2]
 
 def Esepza1(pC, pH):
-    return Eza-0.06*pC
+    return Eza-RT_on_F*pC
 def Esepza2(pC, pH):
-    return Esepza1(pC, pHsepa(pC)) - 0.06*(pH-pHsepa(pC))
+    return Esepza1(pC, pHsepa(pC)) - RT_on_F*(pH-pHsepa(pC))
 
 def Esepab1(pC, pH):
     return Eab
 def Esepab2(pC, pH):
-    return Esepab1(pC, pHsepa(pC)) + 0.06*(pH-pHsepa(pC))
+    return Esepab1(pC, pHsepa(pC)) + RT_on_F*(pH-pHsepa(pC))
 def Esepab3(pC, pH):
-    return Esepab2(pC, pHsepb(pC)) - 0.06*(pH-pHsepb(pC))
+    return Esepab2(pC, pHsepb(pC)) - RT_on_F*(pH-pHsepb(pC))
 
 def Esepzb1(pC, pH):
     return (Esepza1(pC, pH)+Esepab1(pC, pH))/2.

@@ -11,20 +11,20 @@ def Esepza(pC, pH):
 
 def pHsepa(pC):
     c_tr = 10**(-pC)
-    return (Eab + 0.03 * np.log10((c_tr*2./3)**2/    (c_tr*1./3)) - Eza)/0.06
+    return (Eab + RT_on_F/2 * np.log10((c_tr*2./3)**2/    (c_tr*1./3)) - Eza)/RT_on_F
 
 def pHsepb(pC):
     return pKa_HClO_ClO
 
 def E1(pC, pH):
-    return (Eza+Eab)*.5 - 0.03*pHsepb(pC)
+    return (Eza+Eab)*.5 - RT_on_F/2*pHsepb(pC)
 
 def E2(pC, pH):
-    return (Eza+Eab)*.5 - 0.03 * pKa_HClO_ClO - 0.06*(pH-pHsepb(pC))
+    return (Eza+Eab)*.5 - RT_on_F/2 * pKa_HClO_ClO - RT_on_F*(pH-pHsepb(pC))
 
 def E3(pC, pH):
     c_tr = 10**(-pC)
-    return Eab + 0.03 * np.log10((c_tr*2./3)**2/(c_tr*1./3)) - 0.06*pH
+    return Eab + RT_on_F/2 * np.log10((c_tr*2./3)**2/(c_tr*1./3)) - RT_on_F*pH
 
 sep1 = EpHsep('min', pHsepa, Esepza, Esepza)
 sep2 = EpHsep(pHsepa, pHsepb, Esepza, E1)

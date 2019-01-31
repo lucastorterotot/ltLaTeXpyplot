@@ -11,18 +11,18 @@ def pHsepb(pC):
     return 14-(pKsFe2OH2-pC)/2
 
 def Esepzb(pC, pH):
-    return Ezb-0.03*pC
+    return Ezb-RT_on_F/2*pC
 
 def Esepbc(pC, pH):
     return Ebc
 
 def Ecible(pC, pH):
-    return Esepbc(pC, pH)-0.18*pHsepb(pC)+0.18*pHsepa(pC)
+    return Esepbc(pC, pH)-RT_on_F*3*pHsepb(pC)+RT_on_F*3*pHsepa(pC)
 
 def Efa(pC, pH):
-    return Ecible(pC, pH)-0.06*pH+0.06*pHsepb(pC)
+    return Ecible(pC, pH)-RT_on_F*pH+RT_on_F*pHsepb(pC)
 def Efb(pC, pH):
-    return Esepzb(pC, pH)-0.06*pH+0.06*pHsepb(pC)
+    return Esepzb(pC, pH)-RT_on_F*pH+RT_on_F*pHsepb(pC)
 
 sep1 = EpHsep('min', pHsepa, Esepbc, Esepbc)
 sep2 = EpHsep('min', pHsepb, Esepzb, Esepzb)
