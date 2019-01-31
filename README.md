@@ -4,7 +4,7 @@ This package is under development for the moment!
 
 ## Introduction
 
-This python package provides tools to produce `pgf` figures to be used with LaTeX.
+This package for Python 3.x provides tools to produce `pgf` figures to be used with LaTeX.
 
 ## Installation
 
