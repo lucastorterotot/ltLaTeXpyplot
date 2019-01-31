@@ -9,6 +9,7 @@ homedir = expanduser("~")
 import numpy as np
 import scipy as sc
 
+from scipy.constants import golden
 import scipy.optimize as spo
 from scipy.integrate import odeint
 
@@ -88,7 +89,7 @@ mpl.rcParams.update(pgf_with_latex)
 ### Package core
 
 class ltFigure:
-    def __init__(self, name='fig', title=None, page_width_cm=17, width_frac=.8, height_width_ratio=((5.0)**0.5-1.0)/2.0, tight_layout=False):
+    def __init__(self, name='fig', title=None, page_width_cm=17, width_frac=.8, height_width_ratio=1./golden, tight_layout=False):
         self.name = name
         self.title = title
         self.page_width_cm = page_width_cm
