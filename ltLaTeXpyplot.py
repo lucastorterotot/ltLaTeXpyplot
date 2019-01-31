@@ -125,8 +125,8 @@ class ltFigure:
     def testgraph(self, name, position=111):
         if not name in self.graphs.keys():
             self.addgraph(name, position=position)
-            print 'Warning, auto-generated graph at position {}'.format(position)
-            print 'with name {}'.format(name)
+            print('Warning, auto-generated graph at position {}'.format(position))
+            print('with name {}'.format(name))
 
     def addplot(self, plot, name):
         self.testgraph(name)
@@ -380,13 +380,13 @@ class ltPlotRegLin(ltPlotPts):
         chi2r = np.sum(np.square(residual(popt,y,x)))/(x.size-popt.size)
 
         if lang == 'FR':
-            print '  Regression lineaire :'
+            print('  Regression lineaire :')
         else :
-            print '  Linear regression :'
-        print '    f(x) = a * x + b'
-        print '    a = {} ;'.format(popt[0])
-        print '    b = {}.'.format(popt[1])
-        print ' '
+            print('  Linear regression :')
+        print('    f(x) = a * x + b')
+        print('    a = {} ;'.format(popt[0]))
+        print('    b = {}.'.format(popt[1]))
+        print(' ')
 
         x_aj = np.linspace(min(x),max(x),100)
         y_aj = popt[0]*np.linspace(min(x),max(x),100)+popt[1]
@@ -757,7 +757,7 @@ class ltPlotEpH:
         if not self.computed:
             self.compute()
             
-        from data.EpH.EpHgeneric import EpHgeneric
+        from ltLaTeXpyplot.data.EpH.EpHgeneric import EpHgeneric
         data = EpHgeneric(pH_min=self.pH_min-.5, pH_max=self.pH_max+.5, E_min=self.E_min-.1, E_max=self.E_max+.1, conc=self.C_tr)
 
         for sep in self.data_file.seps:

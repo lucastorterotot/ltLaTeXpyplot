@@ -1,4 +1,4 @@
-from EpHgeneric import *
+from ltLaTeXpyplot.data.EpH.EpHgeneric import *
 
 Eza = 0.52
 Eab = 0.16

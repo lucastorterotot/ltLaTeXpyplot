@@ -1,1 +1,1 @@
-from ltLaTeXpyplot import *
+from ltLaTeXpyplot.ltLaTeXpyplot import *

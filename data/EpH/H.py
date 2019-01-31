@@ -1,4 +1,4 @@
-from EpHgeneric import *
+from ltLaTeXpyplot.data.EpH.EpHgeneric import *
 
 E0 = 0
 
