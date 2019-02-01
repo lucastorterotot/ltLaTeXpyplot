@@ -32,14 +32,11 @@ sep3c = EpHsep(pHsepb, pHsepb, Ecible, Esepzb)
 sep4 = EpHsep(pHsepb, 'max', Ecible, Efa)
 sep5 = EpHsep(pHsepb, 'max', Esepzb, Efb)
 
-# if afficher_especes_chimiques is not False:
-#     ax.text(0.75*pH_min+0.25*pHsepa, Ebc+.1, 'Fe$^{3+}$', color = text_diag_color)
-#     ax.text(0.7*pH_min+0.3*pHsepb, 0.5*Ebc+0.5*Ezb, 'Fe$^{2+}$', color = text_diag_color)
-#     ax.text(0.5*pH_min+0.5*pH_max, 0.5*Esepzb+0.5*E_min, 'Fe', color = text_diag_color)
-#     ax.text(0.5*pHsepa+0.5*pH_max,.5*Ebc+.5*Ecible, 'Fe(OH)$_{3}$', color = text_diag_color)
-#     ax.text(0.6*pHsepb+0.4*pH_max,0.5*Ecible+0.5*Efb, 'Fe(OH)$_{2}$', color = text_diag_color)
-
-
+spe1 = EpHspe('Fe$^{3+}$', 'min', pHsepa, 'max', Esepbc)
+spe2 = EpHspe('Fe$^{2+}$', 'min', pHsepb, Esepbc, Esepzb)
+spe3 = EpHspe('Fe', 'min', 'max', Esepzb, 'min')
+spe4 = EpHspe('Fe(OH)$_{3}$', pHsepa, 'max', Esepbc, Ecible, pH_r=.6)
+spe5 = EpHspe('Fe(OH)$_{2}$', pHsepb, 'max', Efb, Efa)
 
 seps = [sep1, sep2, sep3a, sep3b, sep3c, sep4, sep5]
-spes = []
+spes = [spe1, spe2, spe3, spe4, spe5]

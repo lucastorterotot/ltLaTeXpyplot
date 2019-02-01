@@ -5,11 +5,15 @@ E0 = 0
 def E1 (pC, pH):
     return E0-RT_on_F*pH
 
+def E1_up(pC, pH):
+    return E1(pC, pH)+.1
+def E1_down(pC, pH):
+    return E1(pC, pH)-.1
+
 sep1 = EpHsep('min', 'max', E1, E1)
 
-# if afficher_especes_chimiques is not False:
-#     ax.text(0.75*pH_min+0.25*pH_max, -RT_on_F*(0.75*pH_min+0.25*pH_max)+.05, 'H$^{+}$', color = text_diag_color)
-#     ax.text(0.75*pH_min+0.25*pH_max, -RT_on_F*(0.75*pH_min+0.25*pH_max)-.1, 'H$_{2}$', color = text_diag_color)
+spe1 = EpHspe('H$^+$', 'min', 'max', E1_up, E1_up, pH_r=.25, E_r=.25)
+spe2 = EpHspe('H$_2$', 'min', 'max', E1_down, E1_down, pH_r=.25, E_r=.25)
 
 seps = [sep1]
-spes = []
+spes = [spe1, spe2]

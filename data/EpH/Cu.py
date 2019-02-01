@@ -70,11 +70,16 @@ sep8 = EpHsep(pHsepb, pHsepb, Esepabeff, 'max')
 
 sep9 = EpHsep(pHsepa, pHsepa, Esepzaeff, Esepabeff)
 
-# if afficher_especes_chimiques is not False:
-#     ax.text(0.75*pH_min+0.25*pHsepb, Ecible+.1, 'Cu', color = text_diag_color)
-#     ax.text(0.5*pH_min+0.5*pHsepb, 0.5*Esepzb+0.5*E_max, 'Cu$^{2+}$', color = text_diag_color)
-#     ax.text(0.25*pH_max+0.75*pHsepb, 0.75*Esepzb+0.25*E_max, 'Cu(OH)$_{2}$', color = text_diag_color)
-#     ax.text(0.85*pHsepb+0.15*pH_max, 0.85*Esepzb+0.15*Ecible-.025, 'Cu$_{2}$O', color = text_diag_color)
+spe1 = EpHspe('Cu', 'min', 'max', Esepzaeff, Esepzaeff)
+spe2 = EpHspe('Cu$_2$O', pHeff3, 'max', Esepabeff, Esepzaeff)
+spe3 = EpHspe('Cu(OH)$_2$', pHsepb, 'max', Esepabeff, 'max', E_r=.25)
+spe4 = EpHspe('Cu$^{2+}$', 'min', pHsepb, 'max', Esepabeff, E_r=.75)
+
+def condition_I(pC):
+    return Esepza1(pC, 0) < Esepab1(pC, 0)
+
+spe5 = EpHspe('Cu$^+$', 'min', pHsepa, Esepzaeff, Esepabeff, condition=condition_I)
 
 seps = [sep1, sep2, sep3, sep4, sep5, sep6, sep7, sep8, sep9]
-spes = []
+
+spes = [spe1, spe2, spe3, spe4, spe5]

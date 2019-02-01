@@ -32,11 +32,10 @@ sep3 = EpHsep(pHsepb, 'max', E1, E2)
 sep4 = EpHsep('min', pHsepa, E3, Esepza)
 sep5 = EpHsep(pHsepb, pHsepb, E1, 'max')
 
-# if afficher_especes_chimiques is not False:
-#     ax.text(pH_min, 0.1*sep2E[0]+0.9*sep2E[1], 'Cl$_{2}$', color = text_diag_color)
-#     ax.text(0.5*pH_min+0.5*pHsepb, 0.5*Esepza+0.5*E_max, 'HClO', color = text_diag_color)
-#     ax.text(0.25*pH_min+0.75*pHsepb, 0.8*Esepza+0.2*E_min, 'Cl$^-$', color = text_diag_color)
-#     ax.text(0.5*pH_max+0.5*pHsepb, 0.75*Esepza+0.25*E_max, 'ClO$^-$', color = text_diag_color)
+spe1 = EpHspe('Cl$_2$', 'min', pHsepa, E3, Esepza, E_r=.7, pH_r=.25)
+spe2 = EpHspe('HClO', 'min', pHsepb, 'max', Esepza)
+spe3 = EpHspe('Cl$^-$', 'min', 'max', Esepza, E2)
+spe4 = EpHspe('ClO$^-$', 'max', pHsepb, 'max', E2)
 
 seps = [sep1, sep2, sep3, sep4, sep5]
-spes = []
+spes = [spe1, spe2, spe3, spe4]

@@ -16,11 +16,10 @@ sep1 = EpHsep('min', pI_sep, Esep_pI_min, Esepza)
 sep2 = EpHsep(pI_sep, 'max', Esepza, Esepza)
 sep3 = EpHsep(pI_sep, pI_sep, Esepza, 'max')
 
-# if afficher_especes_chimiques is not False:
-#     ax.text(.5*pI_sep + .5*pI_max, .5*Esepza + .5*E_max, 'Ag$^+$', color = text_diag_color)
-#     ax.text(.5*pI_sep + .5*pI_max, .5*Esepza + .5*Esep_pI_min, 'Ag', color = text_diag_color)
-#     ax.text(.5*pI_sep + .5*pI_min, Esepza, 'AgI', color = text_diag_color)
+spe1 = EpHspe('Ag$^+$', pI_sep, 'max', Esepza, 'max')
+spe2 = EpHspe('Ag', pI_sep, 'max', Esepza, Esep_pI_min)
+spe3 = EpHspe('AgI', pI_sep, 'min', 'min', Esepza, E_r = .75)
 
 seps = [sep1, sep2, sep3]
-spes = []
+spes = [spe1, spe2, spe3]
 

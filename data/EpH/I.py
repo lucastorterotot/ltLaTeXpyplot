@@ -25,10 +25,9 @@ sep1 = EpHsep('min', pHsep, Esepaz, Esepaz)
 sep2 = EpHsep(pHsep, 'max', Esepaz, Esepab2)
 sep3 = EpHsep('min', pHsep, Esepzb1, Esepzb2)
 
-# if afficher_especes_chimiques is not False:
-#     ax.text(0.9*pH_min+0.1*pHsep, 0.25*sep2E[0]+0.75*sep2E[1], 'I$_{2}$', color = text_diag_color)
-#     ax.text(0.5*pH_min+0.5*pH_max, 0.5*Esepaz+0.5*E_max, 'IO$_3^-$', color = text_diag_color)
-#     ax.text(0.25*pH_min+0.75*pHsep, 0.8*Esepaz+0.2*E_min, 'I$^-$', color = text_diag_color)
+spe1 = EpHspe('I$_2$', 'min', pHsep, Esepzb1, Esepaz, pH_r=.25, E_r=.6)
+spe2 = EpHspe('IO$_3^-$', 'min', 'max', 'max', Esepzb1)
+spe3 = EpHspe('I$^-$', 'min', 'max', Esepaz, Esepab2)
 
 seps = [sep1, sep2, sep3]
-spes = []
+spes = [spe1, spe2, spe3]
