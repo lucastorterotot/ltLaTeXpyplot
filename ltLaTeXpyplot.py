@@ -755,7 +755,11 @@ class ltPlotEpH:
         self.color = color
         self.text_color = text_color
         self.show_species = show_species
-        self.data_file = __import__('ltLaTeXpyplot.data.EpH.'+self.element, fromlist=[''])
+        try:
+            self.data_file = __import__('ltLaTeXpyplot.data.EpH.'+self.element, fromlist=[''])
+        except ModuleNotFoundError:
+            print('\n' + 'Ouch, seems like there are no data file for element {}.'.format(self.element) + '\n')
+            raise
         self.computed = False
 
     def compute(self):
