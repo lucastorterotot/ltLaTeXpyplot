@@ -304,10 +304,33 @@ class ltPlotFct:
         self.dashes = dashes
         self.marker = marker
         self.markersize = marker_size_default if marker is not None else None
+        self.TF_computed = False
 
     def plot(self, fig, graph):
         fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
 
+    def compute_TF(self, **kwargs):
+        ''' This code has been adapted from
+        https://www.physique-experimentale.com/python/transformee_de_fourier.py
+        '''
+        tf_to_sort = np.fft.fft(self.y)
+        f_to_sort = np.fft.fftfreq(n=self.x.shape[-1], d=np.mean(np.diff(self.x)))
+        ind = int(len(f_to_sort)/2)
+        tf_deb = tf_to_sort[ind:]
+        tf_fin = tf_to_sort[:ind]
+        self.tf = np.concatenate((tf_deb, tf_fin))
+        f_deb = f_to_sort[ind:]
+        f_fin = f_to_sort[:ind]
+        self.f = np.concatenate((f_deb, f_fin))
+        self.psd = np.square(np.abs(self.tf))
+        self.psdn = self.psd/self.psd.max()
+        self.TF = ltPlotFct(self.f, self.psd, **kwargs)
+        self.TF_computed = True
+
+    def plot_TF(self, fig, graph, **kwargs):
+        if not self.TF_computed:
+            self.compute_TF(**kwargs)
+        self.TF.plot(fig, graph)
         
 class ltPlotFct3d(ltPlotFct):
     def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default):
