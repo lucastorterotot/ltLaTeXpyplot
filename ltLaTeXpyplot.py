@@ -103,15 +103,16 @@ class ltFigure:
 
         plt.clf() # TODO check that there is no conflict with other figures
         self.fig = plt.figure(figsize=self.figsize)
-        if tight_layout :
-            self.fig.tight_layout()
         self.graphs = {}
+        self.tight_layout = tight_layout
 
     def update(self):
         if self.title is not None:
             self.fig.suptitle(self.title, fontsize=10.95)
         for graph in self.graphs.keys():
             self.graphs[graph].update()
+        if self.tight_layout :
+            self.fig.tight_layout()
 
     def save(self, format='pgf'):
         self.update()
