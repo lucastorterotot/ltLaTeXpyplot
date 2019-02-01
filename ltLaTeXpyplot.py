@@ -338,6 +338,9 @@ class ltPlotPts3d(ltPlotPts):
 
         
 class ltPlotRegLin(ltPlotPts):
+    ''' This code has been taken from
+    https://www.physique-experimentale.com/python/ajustement_de_courbe.py
+    '''
     def __init__(self, x, y, xerr, yerr, label=None, label_reg=None, color=color_default, color_reg='C3', marker=marker_pts_default, markersize=marker_size_default,
                  p0_x=0, p0_y=0, dashes=dashes_default, give_info=True, info_placement='upper left'):
         ltPlotPts.__init__(self,x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize)
