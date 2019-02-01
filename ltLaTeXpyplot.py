@@ -820,4 +820,4 @@ class ltPlotEpH:
         if self.show_species:
             ax = fig.graphs[graph].graph
             for spe in data.spes:
-                ax.text(spe[0], spe[1], spe[2], color=self.color)
+                ax.text(spe[0], spe[1], spe[2], color=self.color, verticalalignment='center', horizontalalignment='center')
