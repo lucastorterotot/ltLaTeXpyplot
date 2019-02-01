@@ -294,6 +294,15 @@ class ltGraph:
                                              mutation_scale=7, mutation_aspect=None))
         #self.graph.arrow(x, y, vx, vy, head_width=head_width, head_length=head_length, fc=fc, ec=ec, length_includes_head=length_includes_head, **kwargs)
 
+    def test_graph_3d(self):
+        if not self.projection == '3d' :
+            raise RuntimeError('\n' + '  You tried to draw a 3d object on a non-3d graph. Aborting...'\
+                               + '\n'\
+                               + '    Graph name: '+self.name\
+                               + '\n'\
+                               + '    Graph projection: '+self.projection
+            )
+
             
 class ltPlotFct:
     def __init__(self, x, y, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default):
@@ -338,6 +347,7 @@ class ltPlotFct3d(ltPlotFct):
         self.z = z
 
     def plot(self, fig, graph):
+        fig.graphs[graph].test_graph_3d()
         fig.graphs[graph].graph.plot(self.x, self.y, self.z, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
 
         
@@ -357,6 +367,7 @@ class ltPlotPts3d(ltPlotPts):
         self.z = z
 
     def plot(self, fig, graph):
+        fig.graphs[graph].test_graph_3d()
         fig.graphs[graph].graph.scatter(self.x, self.y, self.z, c=self.color, marker=self.marker, s=self.markersize, label=self.label)
 
         
@@ -568,6 +579,7 @@ class ltPlotSurf:
         _Surf2d.plot(fig, graph)
 
     def _plot3d(self, fig, graph):
+        fig.graphs[graph].test_graph_3d()
         x = self.x_fct(self.Theta, self.Phi)
         y = self.y_fct(self.Theta, self.Phi)
         z = self.z_fct(self.Theta, self.Phi)
@@ -631,11 +643,13 @@ class ltPlotVectField3d(ltPlotVectField2d):
         self.X, self.Y, self.Z = np.meshgrid(x, y, z)
 
     def plot(self, fig, graph):
+        fig.graphs[graph].test_graph_3d()
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         fig.graphs[graph].graph.quiver(self.X, self.Y, self.Z, self.vx_fct(self.X, self.Y, self.Z), self.vy_fct(self.X, self.Y, self.Z), self.vz_fct(self.X, self.Y, self.Z), length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
+        fig.graphs[graph].test_graph_3d()
         if color is None:
             color = self.color_fieldline
         if label is None:
