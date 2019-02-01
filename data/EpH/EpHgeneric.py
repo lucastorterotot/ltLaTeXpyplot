@@ -30,10 +30,14 @@ class EpHgeneric:
         self.seps.append([[pHa, pHb],[Ea, Eb]])
 
     def addspe(self, spe):
-        pHa, pHb, Ea, Eb = self.get_position(spe, spe.pHa, spe.pHb, spe.Ea, spe.Eb)
-        pH = pHa * (1-spe.pH_r) + pHb * spe.pH_r
-        E = Ea * (1-spe.E_r) + Eb * spe.E_r
-        self.spes.append([pH, E, spe.chf])
+        condition = spe.condition
+        if not spe.condition == True :
+            condition = spe.condition(self.pC)
+        if condition:
+            pHa, pHb, Ea, Eb = self.get_position(spe, spe.pHa, spe.pHb, spe.Ea, spe.Eb)
+            pH = pHa * (1-spe.pH_r) + pHb * spe.pH_r
+            E = Ea * (1-spe.E_r) + Eb * spe.E_r
+            self.spes.append([pH, E, spe.chf])
 
     def get_position(self, obj, pHa, pHb, Ea, Eb):
         if obj.pHa == 'min':
@@ -70,8 +74,8 @@ class EpHsep:
         self.Eb = Eb
 
         
-class EpHspecies:
-    def __init__(self, chf, pHa, pHb, Ea, Eb, pH_r=.5, E_r=.5):
+class EpHspe:
+    def __init__(self, chf, pHa, pHb, Ea, Eb, pH_r=.5, E_r=.5, condition=True):
         self.chf = chf
         self.pHa = pHa
         self.pHb = pHb
@@ -79,4 +83,5 @@ class EpHspecies:
         self.Eb = Eb
         self.pH_r = pH_r
         self.E_r = E_r
+        self.condition = condition
         
