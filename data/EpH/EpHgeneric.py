@@ -26,37 +26,41 @@ class EpHgeneric:
         self.spes = []
 
     def addsep(self, sep):
-        if sep.pHa == 'min':
-            pHa = self.pH_min
-        elif sep.pHa == 'max':
-            pHa = self.pH_max
-        else:
-            pHa = sep.pHa(self.pC)
-        if sep.pHb == 'min':
-            pHb = self.pH_min
-        elif sep.pHb == 'max':
-            pHb = self.pH_max
-        else:
-            pHb = sep.pHb(self.pC)
-        if sep.Ea == 'min':
-            Ea = self.E_min
-        elif sep.Ea == 'max':
-            Ea = self.E_max
-        else:
-            Ea = sep.Ea(self.pC, pHa)
-        if sep.Eb == 'min':
-            Eb = self.E_min
-        elif sep.Eb == 'max':
-            Eb = self.E_max
-        else:
-            Eb = sep.Eb(self.pC, pHb)
+        pHa, pHb, Ea, Eb = self.get_position(sep, sep.pHa, sep.pHb, sep.Ea, sep.Eb)
         self.seps.append([[pHa, pHb],[Ea, Eb]])
 
     def addspe(self, spe):
-        pH = spe.pH(self.pC)
-        E = spe.E(self.pC)
+        pHa, pHb, Ea, Eb = self.get_position(spe, spe.pHa, spe.pHb, spe.Ea, spe.Eb)
+        pH = pHa * (1-spe.pH_r) + pHb * spe.pH_r
+        E = Ea * (1-spe.E_r) + Eb * spe.E_r
         self.spes.append([pH, E, spe.chf])
-    
+
+    def get_position(self, obj, pHa, pHb, Ea, Eb):
+        if obj.pHa == 'min':
+            pHa = self.pH_min
+        elif obj.pHa == 'max':
+            pHa = self.pH_max
+        else:
+            pHa = obj.pHa(self.pC)
+        if obj.pHb == 'min':
+            pHb = self.pH_min
+        elif obj.pHb == 'max':
+            pHb = self.pH_max
+        else:
+            pHb = obj.pHb(self.pC)
+        if obj.Ea == 'min':
+            Ea = self.E_min
+        elif obj.Ea == 'max':
+            Ea = self.E_max
+        else:
+            Ea = obj.Ea(self.pC, pHa)
+        if obj.Eb == 'min':
+            Eb = self.E_min
+        elif obj.Eb == 'max':
+            Eb = self.E_max
+        else:
+            Eb = obj.Eb(self.pC, pHb)
+        return pHa, pHb, Ea, Eb
 
 class EpHsep:
     def __init__(self, pHa, pHb, Ea, Eb):
@@ -67,8 +71,12 @@ class EpHsep:
 
         
 class EpHspecies:
-    def __init__(self, chf, pH, E):
+    def __init__(self, chf, pHa, pHb, Ea, Eb, pH_r=.5, E_r=.5):
         self.chf = chf
-        self.pH = pH
-        self.E = E
+        self.pHa = pHa
+        self.pHb = pHb
+        self.Ea = Ea
+        self.Eb = Eb
+        self.pH_r = pH_r
+        self.E_r = E_r
         
