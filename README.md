@@ -19,6 +19,10 @@ git remote add ltLaTeXpyplot https://github.com/lucastorterotot/ltLaTeXpyplot.gi
 ```
 export PYTHONPATH=$PYTHONPATH:~/python/
 ```
+3. You may want to install Python3 modules:
+```
+sudo apt-get install python3-numpy python3-scipy python3-matplotlib
+```
 
 ## Usage
 
