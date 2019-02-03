@@ -267,21 +267,21 @@ class ltGraph:
         if self.z_min is not None and self.z_max is not None and self.projection=='3d':
             self.graph.set_zlim([self.z_min,self.z_max])
 
-        if self.x_ticks and self.x_ticks_step is not None :
+        if self.x_ticks_step is not None :
             if self.x_ticks_min is None:
                 self.x_ticks_min = self.x_min
             if self.x_ticks_max is None:
                 self.x_ticks_max = self.x_max
             if self.x_ticks_min is not None and self.x_ticks_max is not None :
                 self.graph.xaxis.set_ticks(np.arange(self.x_ticks_min,self.x_ticks_max+self.x_ticks_step/10.,self.x_ticks_step))
-        if self.y_ticks and self.y_ticks_step is not None :
+        if self.y_ticks_step is not None :
             if self.y_ticks_min is None:
                 self.y_ticks_min = self.y_min
             if self.y_ticks_max is None:
                 self.y_ticks_max = self.y_max
             if self.y_ticks_min is not None and self.y_ticks_max is not None :
                 self.graph.yaxis.set_ticks(np.arange(self.y_ticks_min,self.y_ticks_max+self.y_ticks_step/10.,self.y_ticks_step))
-        if self.z_ticks and self.z_ticks_step is not None and projection=='3d' :
+        if self.z_ticks_step is not None and projection=='3d' :
             if self.z_ticks_min is None:
                 self.z_ticks_min = self.z_min
             if self.z_ticks_max is None:
