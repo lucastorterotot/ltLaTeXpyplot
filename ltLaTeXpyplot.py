@@ -84,6 +84,11 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
         r"\usepackage{sistyle}",        
         ]
     }
+
+pgf_with_latex['pgf.preamble'] += [r"\SIproductsign{\!\times\!}\SIunitsep{\,}\SIunitdot{{\fontfamily{cmr}\cdot}}"]
+if lang == 'FR':
+    pgf_with_latex['pgf.preamble'] += [r"\SIdecimalsign{,}\SIthousandsep{\,}"]
+
 mpl.rcParams.update(pgf_with_latex)
 
 ### Package core
