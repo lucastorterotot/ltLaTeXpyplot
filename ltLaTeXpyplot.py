@@ -3,9 +3,6 @@
 
 ### Importing packages
 
-from os.path import expanduser
-homedir = expanduser("~")
-
 import numpy as np
 import scipy as sc
 
