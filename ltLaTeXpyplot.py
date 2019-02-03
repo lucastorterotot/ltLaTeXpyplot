@@ -470,7 +470,6 @@ class ltPlotRegLin(ltPlotPts):
             else :
                 pass
             ax = fig.graphs[graph].graph
-            mpl.rc('text', usetex=True)
 
             reglintxt = "Linear regression:"
             if lang == 'FR':
