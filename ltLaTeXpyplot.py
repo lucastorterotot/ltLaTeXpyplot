@@ -33,6 +33,23 @@ marker_pts_default = '+'
 dashes_default=[]
 cmap_default = 'inferno'
 
+linewidths = {
+    'grid' : .5,
+    'gridaxis' : .75,
+    'majorticks' : .7,
+    'minorticks' : .35,
+    'plotfct' : 1,
+    'plotpts' : .4,
+    'plotpts_e' : 1,
+    'capsize' : 3,
+    'capthick' : .4,
+    'contour2d' : 1,
+    'vectfield' : .5,
+    'vectfieldline' : .5,
+    'NMR' : .25,
+    'NMR integral' : .25,
+    }
+
 inches_per_cm = 0.3937007874 # Convert cm to inch
 
 ### Defining usefull tools
@@ -204,11 +221,11 @@ class ltGraph:
         self.graph = fig.fig.add_subplot(position, projection=projection, sharex=share_x, sharey=share_y)        
 
         if show_grid:
-            fig.fig.grid(linewidth=.5)
+            fig.fig.grid(linewidth=linewidths['grid'])
         if show_x_axis and not (projection=='3d' or x_min is None or x_max is None):
-            fig.graphs[graph].graph.plot([x_min,x_max], [0,0], color='black', linewidth=.75)
+            fig.graphs[graph].graph.plot([x_min,x_max], [0,0], color='black', linewidth=linewidths['gridaxis'])
         if show_y_axis and not (projection=='3d' or y_min is None or y_max is None):
-            fig.graphs[graph].graph.plot([0,0], [y_min,y_max], color='black', linewidth=.75)
+            fig.graphs[graph].graph.plot([0,0], [y_min,y_max], color='black', linewidth=linewidths['gridaxis'])
 
         if not x_ticks:
             plt.setp(self.graph.get_xticklabels(), visible=False)
@@ -218,11 +235,11 @@ class ltGraph:
             plt.setp(self.graph.get_zticklabels(), visible=False)
 
         if self.projection == 'polar':
-            self.graph.tick_params(direction='in',which='major', width=0.7)
-            self.graph.tick_params(direction='in',which='minor', width=0.35)
+            self.graph.tick_params(direction='in',which='major', width=linewidths['majorticks'])
+            self.graph.tick_params(direction='in',which='minor', width=linewidths['minorticks'])
         else:
-            self.graph.tick_params(direction='in',which='major',bottom=1, top=1, left=1, right=1, width=0.7)
-            self.graph.tick_params(direction='in',which='minor',bottom=1, top=1, left=1, right=1, width=0.35)
+            self.graph.tick_params(direction='in',which='major',bottom=1, top=1, left=1, right=1, width=linewidths['majorticks'])
+            self.graph.tick_params(direction='in',which='minor',bottom=1, top=1, left=1, right=1, width=linewidths['minorticks'])
 
 
     def update(self):
@@ -294,11 +311,10 @@ class ltGraph:
     def fill_between(self, x, y1, y2, alpha=.5, **kwargs):
         self.graph.fill_between(x, y1, y2, alpha=alpha, **kwargs)
 
-    def addarrow(self, x, y, vx, vy, head_width=0.05, head_length=0.1, fc='k', ec='k', length_includes_head=True, **kwargs):
+    def addarrow(self, x, y, vx, vy):
         self.graph.add_patch(FancyArrowPatch(posA=(x, y), posB=(x+vx, y+vy),
                                              arrowstyle='->', lw=1, 
                                              mutation_scale=7, mutation_aspect=None))
-        #self.graph.arrow(x, y, vx, vy, head_width=head_width, head_length=head_length, fc=fc, ec=ec, length_includes_head=length_includes_head, **kwargs)
 
     def test_graph_3d(self):
         if not self.projection == '3d' :
@@ -311,7 +327,7 @@ class ltGraph:
 
             
 class ltPlotFct:
-    def __init__(self, x, y, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default):
+    def __init__(self, x, y, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct']):
         self.label = label
         self.x = x
         self.y = y
@@ -320,9 +336,10 @@ class ltPlotFct:
         self.marker = marker
         self.markersize = marker_size_default if marker is not None else None
         self.TF_computed = False
+        self.linewidth = linewidth
 
     def plot(self, fig, graph):
-        fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
+        fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=self.linewidth, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
 
     def compute_TF(self, **kwargs):
         ''' This code has been adapted from
@@ -348,23 +365,26 @@ class ltPlotFct:
         self.TF.plot(fig, graph)
         
 class ltPlotFct3d(ltPlotFct):
-    def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default):
-        ltPlotFct.__init__(self, x, y, label=label, color=color, dashes=dashes, marker=marker, markersize=markersize)
+    def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct']):
+        ltPlotFct.__init__(self, x, y, label=label, color=color, dashes=dashes, marker=marker, markersize=markersize, linewidth=linewidth)
         self.z = z
 
     def plot(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
-        fig.graphs[graph].graph.plot(self.x, self.y, self.z, color=self.color, linewidth=1, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
+        fig.graphs[graph].graph.plot(self.x, self.y, self.z, color=self.color, linewidth=self.linewidth, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
 
         
 class ltPlotPts(ltPlotFct):
-    def __init__(self, x, y, xerr=None, yerr=None, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default):
-        ltPlotFct.__init__(self, x, y, label=label, color=color, marker=marker, markersize=markersize)
+    def __init__(self, x, y, xerr=None, yerr=None, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, linewidth=linewidths['plotpts'], elinewidth=linewidths['plotpts_e'], capsize=linewidths['capsize'], capthick=linewidths['capthick']):
+        ltPlotFct.__init__(self, x, y, label=label, color=color, marker=marker, markersize=markersize, linewidth=linewidth)
         self.xerr = xerr
         self.yerr = yerr
+        self.elinewidth = elinewidth
+        self.capthick = capthick
+        self.capsize = capsize
 
     def plot(self, fig, graph):
-        fig.graphs[graph].graph.errorbar(self.x, self.y, xerr=self.xerr, yerr=self.yerr, marker=self.marker, markersize=self.markersize, fmt=' ', linewidth=0.4, elinewidth=1,capsize=3,capthick=0.4,color=self.color,label=self.label)
+        fig.graphs[graph].graph.errorbar(self.x, self.y, xerr=self.xerr, yerr=self.yerr, marker=self.marker, markersize=self.markersize, fmt=' ', linewidth=self.linewidth, elinewidth=self.elinewidth,capsize=self.capsize,capthick=self.capthick,color=self.color,label=self.label)
         
 
 class ltPlotPts3d(ltPlotPts):
@@ -381,9 +401,9 @@ class ltPlotRegLin(ltPlotPts):
     ''' This code has been taken from
     https://www.physique-experimentale.com/python/ajustement_de_courbe.py
     '''
-    def __init__(self, x, y, xerr, yerr, label=None, label_reg=None, color=color_default, color_reg='C3', marker=marker_pts_default, markersize=marker_size_default,
+    def __init__(self, x, y, xerr, yerr, label=None, label_reg=None, color=color_default, color_reg='C3', marker=marker_pts_default, markersize=marker_size_default, linewidth=linewidths['plotfct'], elinewidth=linewidths['plotpts_e'], capsize=linewidths['capsize'], capthick=linewidths['capthick'],
                  p0_x=0, p0_y=0, dashes=dashes_default, give_info=True, info_placement='upper left'):
-        ltPlotPts.__init__(self,x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize)
+        ltPlotPts.__init__(self,x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize, linewidth=linewidth, elinewidth=elinewidth, capsize=capsize, capthick=capthick)
         self.label_reg = label_reg
         self.color_reg = color_reg
         self.dashes = dashes
@@ -443,8 +463,8 @@ class ltPlotRegLin(ltPlotPts):
         self.x_aj = x_aj
         self.y_aj = y_aj
 
-        self.points = ltPlotPts(x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize)
-        self.reglin = ltPlotFct(x_aj, y_aj, label=label_reg, color=color_reg, dashes=dashes)
+        self.points = ltPlotPts(x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize, linewidth=self.linewidth, elinewidth=self.elinewidth, capsize=self.capsize, capthick=self.capthick)
+        self.reglin = ltPlotFct(x_aj, y_aj, label=label_reg, color=color_reg, dashes=dashes, linewidth=self.linewidth)
         
     def plot(self, fig, graph):
         self.plot_reg(fig, graph)
@@ -488,7 +508,7 @@ class ltPlotRegLin(ltPlotPts):
 
         
 class ltPlotContour2d:
-    def __init__(self, x, y, z_fct, cmap=cmap_default, levels=None, label=None, clabel=False, norm_xy=True):
+    def __init__(self, x, y, z_fct, cmap=cmap_default, levels=None, label=None, clabel=False, norm_xy=True, linewidths=linewidths['contour2d']):
         self.label = label
         self.x = x
         self.y = y
@@ -498,14 +518,15 @@ class ltPlotContour2d:
         self.levels = levels
         self.clabel = clabel
         self.norm_xy = norm_xy
+        self.linewidths = linewidths
 
     def plot(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         if self.levels is not None :
-            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=1, cmap=self.cmap, levels=self.levels)
+            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=self.linewidths, cmap=self.cmap, levels=self.levels)
         else:
-            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=1, cmap=self.cmap)
+            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=self.linewidths, cmap=self.cmap)
         if self.clabel :
             fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt='%1.1f', fontsize=8)
         current_contour=0
@@ -604,7 +625,7 @@ class ltPlotSurf:
             fig.graphs[graph].graph.plot_surface(x, y, z, rstride=1, cstride=1, linewidth=0, alpha=self.alpha, color=self.color)
         
 class ltPlotVectField2d:
-    def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default):
+    def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
         self.label = label
         self.x = x
         self.y = y
@@ -613,15 +634,17 @@ class ltPlotVectField2d:
         self.X, self.Y = np.meshgrid(x, y)
         self.color = color
         self.norm_xy = norm_xy
+        self.linewidth = linewidth
 
         self.label_fieldline = label_fieldline
         self.color_fieldline = color_fieldline
         self.dashes_fieldline = dashes_fieldline
+        self.linewidth_fieldline = linewidth_fieldline
 
     def plot(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        fig.graphs[graph].graph.quiver(self.X, self.Y, self.vx_fct(self.X, self.Y), self.vy_fct(self.X, self.Y), linewidth=.5, label=self.label, color=self.color)
+        fig.graphs[graph].graph.quiver(self.X, self.Y, self.vx_fct(self.X, self.Y), self.vy_fct(self.X, self.Y), linewidth=self.linewidth, label=self.label, color=self.color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         if color is None:
@@ -637,12 +660,12 @@ class ltPlotVectField2d:
             x, y = p
             return self.vx_fct(x, y), self.vy_fct(x, y)
         line_xy = odeint(_field, point, T).transpose()
-        fig.graphs[graph].graph.plot(line_xy[0], line_xy[1], label=label, color=color, dashes=dashes, linewidth=.5)
+        fig.graphs[graph].graph.plot(line_xy[0], line_xy[1], label=label, color=color, dashes=dashes, linewidth=self.linewidth_fieldline)
         
         
 class ltPlotVectField3d(ltPlotVectField2d):
-    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, norm_xyz=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default):
-        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, norm_xy=norm_xyz, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline)
+    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, norm_xyz=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
+        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, norm_xy=norm_xyz, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
         self.z = z
         self.vz_fct = vz_fct
         self.X, self.Y, self.Z = np.meshgrid(x, y, z)
@@ -651,7 +674,7 @@ class ltPlotVectField3d(ltPlotVectField2d):
         fig.graphs[graph].test_graph_3d()
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        fig.graphs[graph].graph.quiver(self.X, self.Y, self.Z, self.vx_fct(self.X, self.Y, self.Z), self.vy_fct(self.X, self.Y, self.Z), self.vz_fct(self.X, self.Y, self.Z), length=0.1, normalize=True, linewidth=.5, label=self.label, color=self.color)
+        fig.graphs[graph].graph.quiver(self.X, self.Y, self.Z, self.vx_fct(self.X, self.Y, self.Z), self.vy_fct(self.X, self.Y, self.Z), self.vz_fct(self.X, self.Y, self.Z), length=0.1, normalize=True, linewidth=self.linewidth, label=self.label, color=self.color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         fig.graphs[graph].test_graph_3d()
@@ -668,11 +691,11 @@ class ltPlotVectField3d(ltPlotVectField2d):
             x, y, z = p
             return self.vx_fct(x, y, z), self.vy_fct(x, y, z), self.vz_fct(x, y, z)
         line_xyz = odeint(_field, point, T).transpose()
-        fig.graphs[graph].graph.plot(line_xyz[0], line_xyz[1], line_xyz[2], label=label, color=color, dashes=dashes, linewidth=.5)
+        fig.graphs[graph].graph.plot(line_xyz[0], line_xyz[1], line_xyz[2], label=label, color=color, dashes=dashes, linewidth=self.linewidth_fieldline)
 
         
 class ltPlotNMR:
-    def __init__(self, delta_min=0, delta_max=11, Freq_MHz=100, color=color_default, show_integral=True, dashes=dashes_default):
+    def __init__(self, delta_min=0, delta_max=11, Freq_MHz=100, color=color_default, show_integral=True, dashes=dashes_default, linewidth=linewidths['NMR'], integral_linewidth=linewidths['NMR integral']):
         self.delta_min = delta_min
         self.delta_max = delta_max
         self.Freq_MHz = Freq_MHz
@@ -680,6 +703,8 @@ class ltPlotNMR:
         self.show_integral = show_integral
         self.dashes = dashes
         self.signals = []
+        self.linewidth = linewidth
+        self.integral_linewidth = integral_linewidth
 
     def addsignal(self, delta, nbH, mult, J_Hz):
         self.signals.append([delta, nbH, mult, J_Hz])
@@ -734,11 +759,11 @@ class ltPlotNMR:
             spectrum_integral *= -.75*max(spectrum)/min(spectrum_integral)
             spectrum_integral -= 1.25*min(spectrum_integral)
             
-            fig.graphs[graph].graph.plot(delta, spectrum_integral, color='black', linewidth=.25 ,label=None)
-        fig.graphs[graph].graph.plot(delta, spectrum, color=color, linewidth=.25 , label=None, dashes=self.dashes)
+            fig.graphs[graph].graph.plot(delta, spectrum_integral, color='black', linewidth=self.linewidth_integral ,label=None)
+        fig.graphs[graph].graph.plot(delta, spectrum, color=color, linewidth=self.linewidth , label=None, dashes=self.dashes)
             
-        fig.graphs[graph].graph.tick_params(direction='in',which='major',bottom=1, top=0, left=0, right=0, width=0.7)
-        fig.graphs[graph].graph.tick_params(direction='in',which='minor',bottom=1, top=0, left=0, right=0, width=0.35)
+        fig.graphs[graph].graph.tick_params(direction='in',which='major',bottom=1, top=0, left=0, right=0, width=linewidths['majorticks'])
+        fig.graphs[graph].graph.tick_params(direction='in',which='minor',bottom=1, top=0, left=0, right=0, width=linewidths['minorticks'])
 
         if fig.graphs[graph].x_label is None :
             fig.graphs[graph].graph.set_xlabel("$\\delta$ (ppm)")
@@ -749,7 +774,7 @@ class ltPlotNMR:
 
         
 class ltPlotEpH:
-    def __init__(self, element, C_tr, pH_min=0, pH_max=14, E_min=-.1, E_max=.1, color=color_default, text_color='black', show_species=True):
+    def __init__(self, element, C_tr, pH_min=0, pH_max=14, E_min=-.1, E_max=.1, color=color_default, text_color=None, show_species=True, linewidth=linewidths['plotfct']):
         self.element = element
 
         self.C_tr = C_tr
@@ -758,7 +783,10 @@ class ltPlotEpH:
         self.E_min = E_min
         self.E_max = E_max
         self.color = color
-        self.text_color = text_color
+        self.text_color = color
+        if text_color is not None :
+            self.text_color = text_color
+        self.linewidth = linewidth
         self.show_species = show_species
         try:
             self.data_file = __import__('ltLaTeXpyplot.data.EpH.'+self.element, fromlist=[''])
@@ -817,7 +845,7 @@ class ltPlotEpH:
 
         seps = []
         for sep in data.seps:
-            seps.append(ltPlotFct(sep[0], sep[1], label=None, color=self.color))
+            seps.append(ltPlotFct(sep[0], sep[1], label=None, color=self.color, linewidth=self.linewidth))
         element=self.element
         if '_' in element:
             index = element.index('_')
@@ -829,4 +857,4 @@ class ltPlotEpH:
         if self.show_species:
             ax = fig.graphs[graph].graph
             for spe in data.spes:
-                ax.text(spe[0], spe[1], spe[2], color=self.color, verticalalignment='center', horizontalalignment='center')
+                ax.text(spe[0], spe[1], spe[2], color=self.text_color, verticalalignment='center', horizontalalignment='center')
