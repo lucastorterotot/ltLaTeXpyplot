@@ -218,11 +218,11 @@ class ltGraph:
         self.graph = fig.fig.add_subplot(position, projection=projection, sharex=share_x, sharey=share_y)        
 
         if show_grid:
-            fig.fig.grid(linewidth=linewidths['grid'])
+            self.graph.grid(linewidth=linewidths['grid'])
         if show_x_axis and not (projection=='3d' or x_min is None or x_max is None):
-            fig.graphs[graph].graph.plot([x_min,x_max], [0,0], color='black', linewidth=linewidths['gridaxis'])
+            self.graph.plot([x_min,x_max], [0,0], color='black', linewidth=linewidths['gridaxis'])
         if show_y_axis and not (projection=='3d' or y_min is None or y_max is None):
-            fig.graphs[graph].graph.plot([0,0], [y_min,y_max], color='black', linewidth=linewidths['gridaxis'])
+            self.graph.plot([0,0], [y_min,y_max], color='black', linewidth=linewidths['gridaxis'])
 
         if not x_ticks:
             plt.setp(self.graph.get_xticklabels(), visible=False)
