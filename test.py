@@ -4,9 +4,9 @@
 import numpy as np
 import scipy as sc
 
-import ltLaTeXpyplot as lt
+import ltLaTeXpyplot.core as lt
 
-figure = lt.ltFigure(name='new')
+figure = lt.ltFigure(name='test_fig')
 
 x = np.arange(-20,20,0.1)
 y = np.sin(x)
