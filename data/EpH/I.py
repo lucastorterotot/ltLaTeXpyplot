@@ -26,7 +26,7 @@ sep2 = EpHsep(pHsep, 'max', Esepaz, Esepab2)
 sep3 = EpHsep('min', pHsep, Esepzb1, Esepzb2)
 
 spe1 = EpHspe('I$_2$', 'min', pHsep, Esepzb1, Esepaz, pH_r=.25, E_r=.6)
-spe2 = EpHspe('IO$_3^-$', 'min', 'max', 'max', Esepzb1)
+spe2 = EpHspe('IO$_3^-$', 'min', 'max', 'max', Esepzb1, pH_r=.75, E_r=.25)
 spe3 = EpHspe('I$^-$', 'min', 'max', Esepaz, Esepab2)
 
 seps = [sep1, sep2, sep3]
