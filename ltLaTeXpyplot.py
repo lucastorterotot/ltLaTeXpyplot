@@ -756,7 +756,7 @@ class ltPlotNMR:
             spectrum_integral *= -.75*max(spectrum)/min(spectrum_integral)
             spectrum_integral -= 1.25*min(spectrum_integral)
             
-            fig.graphs[graph].graph.plot(delta, spectrum_integral, color='black', linewidth=self.linewidth_integral ,label=None)
+            fig.graphs[graph].graph.plot(delta, spectrum_integral, color='black', linewidth=self.integral_linewidth ,label=None)
         fig.graphs[graph].graph.plot(delta, spectrum, color=color, linewidth=self.linewidth , label=None, dashes=self.dashes)
             
         fig.graphs[graph].graph.tick_params(direction='in',which='major',bottom=1, top=0, left=0, right=0, width=linewidths['majorticks'])
