@@ -399,13 +399,15 @@ class ltPlotRegLin(ltPlotPts):
     https://www.physique-experimentale.com/python/ajustement_de_courbe.py
     '''
     def __init__(self, x, y, xerr, yerr, label=None, label_reg=None, color=color_default, color_reg='C3', marker=marker_pts_default, markersize=marker_size_default, linewidth=linewidths['plotfct'], elinewidth=linewidths['plotpts_e'], capsize=linewidths['capsize'], capthick=linewidths['capthick'],
-                 p0_x=0, p0_y=0, dashes=dashes_default, give_info=True, info_placement='upper left'):
+                 p0_x=0, p0_y=0, dashes=dashes_default, give_info=True, info_placement='upper left',
+                 verbose=False):
         ltPlotPts.__init__(self,x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize, linewidth=linewidth, elinewidth=elinewidth, capsize=capsize, capthick=capthick)
         self.label_reg = label_reg
         self.color_reg = color_reg
         self.dashes = dashes
         self.give_info = give_info
         self.info_placement = info_placement
+        self.verbose = verbose
         
         # linear function to adjust
         def f(x,p):
@@ -440,14 +442,15 @@ class ltPlotRegLin(ltPlotPts):
         # reduced chi2 for a and b
         chi2r = np.sum(np.square(residual(popt,y,x)))/(x.size-popt.size)
 
-        if lang == 'FR':
-            print('  Regression lineaire :')
-        else :
-            print('  Linear regression :')
-        print('    f(x) = a * x + b')
-        print('    a = {} ;'.format(popt[0]))
-        print('    b = {}.'.format(popt[1]))
-        print(' ')
+        if self.verbose:
+            if lang == 'FR':
+                print('  Regression lineaire :')
+            else :
+                print('  Linear regression :')
+            print('    f(x) = a * x + b')
+            print('    a = {} ;'.format(popt[0]))
+            print('    b = {}.'.format(popt[1]))
+            print(' ')
 
         x_aj = np.linspace(min(x),max(x),100)
         y_aj = popt[0]*np.linspace(min(x),max(x),100)+popt[1]
