@@ -16,6 +16,9 @@ def Esepzb(pC, pH):
 def Esepbc(pC, pH):
     return Ebc
 
+def Esepbc_plus(pC, pH):
+    return Ebc + .2
+
 def Ecible(pC, pH):
     return Esepbc(pC, pH)-RT_on_F*3*pHsepb(pC)+RT_on_F*3*pHsepa(pC)
 
@@ -26,7 +29,8 @@ def Efb(pC, pH):
 
 sep1 = EpHsep('min', pHsepa, Esepbc, Esepbc)
 sep2 = EpHsep('min', pHsepb, Esepzb, Esepzb)
-sep3a = EpHsep(pHsepa, pHsepa, 'max', Esepbc)
+sep3a1 = EpHsep(pHsepa, pHsepa, Esepbc, Esepbc_plus)
+sep3a2 = EpHsep(pHsepa, pHsepa, 'max', Esepbc_plus)
 sep3b = EpHsep(pHsepa, pHsepb, Esepbc, Ecible)
 sep3c = EpHsep(pHsepb, pHsepb, Ecible, Esepzb)
 sep4 = EpHsep(pHsepb, 'max', Ecible, Efa)
@@ -38,5 +42,5 @@ spe3 = EpHspe('Fe', 'min', 'max', Esepzb, 'min')
 spe4 = EpHspe('Fe(OH)$_{3}$', pHsepa, 'max', Esepbc, Ecible, pH_r=.6)
 spe5 = EpHspe('Fe(OH)$_{2}$', pHsepb, 'max', Efb, Efa)
 
-seps = [sep1, sep2, sep3a, sep3b, sep3c, sep4, sep5]
+seps = [sep1, sep2, sep3a1, sep3a2, sep3b, sep3c, sep4, sep5]
 spes = [spe1, spe2, spe3, spe4, spe5]

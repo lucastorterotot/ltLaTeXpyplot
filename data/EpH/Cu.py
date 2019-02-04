@@ -56,6 +56,9 @@ def Esepabeff(pC, pH):
         return max([Esepab2(pC, pH), Esepzb2(pC, pH)])
     else:
         return Esepab3(pC, pH)
+
+def Esepabeff_plus(pC, pH):
+    return Esepabeff(pC, pH) + .25
     
 sep1 = EpHsep('min', pHeff1, Esepzaeff, Esepzaeff)
 sep2 = EpHsep(pHeff1, pHeff2, Esepzaeff, Esepzaeff)
@@ -66,7 +69,8 @@ sep5 = EpHsep(pHeff1, pHeff2, Esepabeff, Esepabeff)
 sep6 = EpHsep(pHeff2, pHeff3, Esepabeff, Esepabeff)
 sep7 = EpHsep(pHeff3, 'max', Esepabeff, Esepabeff)
 
-sep8 = EpHsep(pHsepb, pHsepb, Esepabeff, 'max')
+sep8a = EpHsep(pHsepb, pHsepb, Esepabeff, Esepabeff_plus)
+sep8b = EpHsep(pHsepb, pHsepb, Esepabeff_plus, 'max')
 
 sep9 = EpHsep(pHsepa, pHsepa, Esepzaeff, Esepabeff)
 
@@ -80,6 +84,6 @@ def condition_I(pC):
 
 spe5 = EpHspe('Cu$^+$', 'min', pHsepa, Esepzaeff, Esepabeff, condition=condition_I)
 
-seps = [sep1, sep2, sep3, sep4, sep5, sep6, sep7, sep8, sep9]
+seps = [sep1, sep2, sep3, sep4, sep5, sep6, sep7, sep8a, sep8b, sep9]
 
 spes = [spe1, spe2, spe3, spe4, spe5]
