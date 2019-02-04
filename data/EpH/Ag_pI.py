@@ -10,7 +10,7 @@ def Esepza(pC, pH):
     return Eza - RT_on_F * pC
 
 def Esep_pI_min(pC, pH):
-    return Esepza(pC, pH) + RT_on_F * pH - pI_sep(pC)
+    return Esepza(pC, pH) + RT_on_F * (pH - pI_sep(pC))
 
 sep1 = EpHsep('min', pI_sep, Esep_pI_min, Esepza)
 sep2 = EpHsep(pI_sep, 'max', Esepza, Esepza)
