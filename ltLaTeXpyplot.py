@@ -806,10 +806,14 @@ class ltPlotEpH:
                     pH_max = max([pH_max, pH(pC)])
             for Ep in [sep.Ea, sep.Eb]:
                 if type(Ep) is not str:
-                    list_E = [E_min, E_max, Ep(pC, pH_min), Ep(pC, pH_max)]
+                    list_E = [E_min, E_max]
                     for pH in [sep.pHa, sep.pHb]:
                         if type(pH) is not str:
                             list_E.append(Ep(pC, pH(pC)))
+                        elif pH == 'min':
+                            list_E.append(Ep(pC, pH_min))
+                        elif pH == 'max':
+                            list_E.append(Ep(pC, pH_max))
                     E_min = min(list_E)
                     E_max = max(list_E)
         self.E_min, self.E_max = E_min, E_max
@@ -836,7 +840,7 @@ class ltPlotEpH:
             self.compute()
             
         from ltLaTeXpyplot.data.EpH.EpHgeneric import EpHgeneric
-        data = EpHgeneric(pH_min=self.pH_min, pH_max=self.pH_max, E_min=self.E_min-.1, E_max=self.E_max+.1, conc=self.C_tr)
+        data = EpHgeneric(pH_min=self.pH_min, pH_max=self.pH_max, E_min=self.E_min, E_max=self.E_max, conc=self.C_tr)
 
         for sep in self.data_file.seps:
             data.addsep(sep)
