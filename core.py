@@ -66,6 +66,14 @@ def axes_comma(x, pos):  # formatter function takes tick label and tick position
 
 axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
+def clb_comma(x, pos):
+    return '\\num{{'+str(round(x, 2))+'}}'
+
+def add_colorbar(obj, plot, ax=None):
+    clb = plt.colorbar(plot, ax=ax)
+    # if ax is not None and lang == 'FR':
+    #     clb.ax.yaxis.set_major_formatter(tkr.FuncFormatter(clb_comma))
+          
 def factorial (x):
     result = 1
     if x > 1:
@@ -532,7 +540,7 @@ class ltPlotContour2d:
         else:
             current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=self.linewidths, cmap=self.cmap)
         if fig.graphs[graph].show_cmap_legend:
-            plt.colorbar(current_contour, ax=fig.graphs[graph].graph)
+            add_colorbar(self, current_contour, ax=fig.graphs[graph].graph)
         if self.clabel :
             fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt='%1.1f', fontsize=8)
         current_contour=0
@@ -566,7 +574,7 @@ class ltPlotScalField:
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         imshow = fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
         if fig.graphs[graph].show_cmap_legend:
-            plt.colorbar(imshow, ax=fig.graphs[graph].graph)
+            add_colorbar(self, imshow, ax=fig.graphs[graph].graph)
 
     def _plot3d(self, fig, graph):
         if self.alpha == 1 :
@@ -646,7 +654,7 @@ class ltPlotSurf:
         if fig.graphs[graph].show_cmap_legend:
             m = mpl.cm.ScalarMappable(cmap=getattr(mpl.cm, self.cmap), norm=norm)
             m.set_array([])
-            plt.colorbar(m, ax=fig.graphs[graph].graph)
+            add_colorbar(self, m, ax=fig.graphs[graph].graph)
         
 class ltPlotVectField2d:
     def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
