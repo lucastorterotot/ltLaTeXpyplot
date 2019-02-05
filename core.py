@@ -628,8 +628,6 @@ class ltPlotSurf:
             for xb, yb, zb in zip(Xb, Yb, Zb):
                 ax.plot([xb], [yb], [zb], 'w')
         method = ax.plot_surface
-#        if not self.linewidth == 0 :
-#            method = ax.plot_wireframe
         if self.use_cmap:
             C_fct_eff = self.z_fct
             if self.C_fct is not None :
@@ -643,9 +641,11 @@ class ltPlotSurf:
                 return ( C_fct_eff(x, y) + offset ) * coeff
                         
             facecolors = getattr(mpl.cm, self.cmap)(C_fct(self.Theta, self.Phi))
-            method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap, facecolors=facecolors)
+            surf = method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap, facecolors=facecolors)
         else:
-            method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, color=self.color)
+            surf = method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, color=self.color, edgecolors=self.color)
+        if not self.linewidth == 0 :
+            surf.set_facecolor((1,1,1,0))
         
 class ltPlotVectField2d:
     def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
