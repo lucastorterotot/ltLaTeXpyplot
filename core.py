@@ -569,7 +569,7 @@ class ltPlotScalField:
 
 
 class ltPlotSurf:
-    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=True, use_cmap=False, linewidth=linewidths['surface']):
+    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, C_fct=None, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=True, use_cmap=False, linewidth=linewidths['surface']):
         if R_fct is not None:
             def x_fct(t, p):
                 return R_fct(t, p) * np.sin(t) * np.cos(p)
@@ -597,6 +597,7 @@ class ltPlotSurf:
         self.norm_xyz = norm_xyz
         self.use_cmap = use_cmap
         self.linewidth = linewidth
+        self.C_fct = C_fct
 
     def plot(self, fig, graph):
         if fig.graphs[graph].projection == '3d':
@@ -628,7 +629,11 @@ class ltPlotSurf:
         else :
             method = ax.plot_wireframe
         if self.use_cmap:
-            method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap)
+            if self.C_fct is not None :
+                facecolors = getattr(mpl.cm, self.cmap)(self.C_fct(self.Theta, self.Phi))
+                method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap, facecolors=facecolors)
+            else:
+                method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap)
         else:
             method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, color=self.color)
         
