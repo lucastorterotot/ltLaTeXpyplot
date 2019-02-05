@@ -41,6 +41,8 @@ linewidths = {
     'capsize' : 3,
     'capthick' : .4,
     'contour2d' : 1,
+    'surface' : 0,
+    'scalfield' : 0,
     'vectfield' : .5,
     'vectfieldline' : .5,
     'NMR' : .25,
@@ -533,7 +535,7 @@ class ltPlotContour2d:
 
         
 class ltPlotScalField:
-    def __init__(self, x, y, z_fct, cmap=cmap_default, color=color_default, label=None, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True):
+    def __init__(self, x, y, z_fct, cmap=cmap_default, color=color_default, label=None, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield']):
         self.label = label
         self.x = x
         self.y = y
@@ -546,6 +548,7 @@ class ltPlotScalField:
         self.norm_xy = norm_xy or norm_xyz
         self.norm_xyz = norm_xyz
         self.use_cmap = use_cmap
+        self.linewidth = linewidth
 
     def plot(self, fig, graph):
         if fig.graphs[graph].projection == '3d':
@@ -561,12 +564,12 @@ class ltPlotScalField:
     def _plot3d(self, fig, graph):
         if self.alpha == 1 :
             self.alpha = self.alpha_3d
-        _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap)
+        _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap, linewidth=self.linewidth)
         _ScalField3d.plot(fig, graph)
 
 
 class ltPlotSurf:
-    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=True, use_cmap=False):
+    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=True, use_cmap=False, linewidth=linewidths['surface']):
         if R_fct is not None:
             def x_fct(t, p):
                 return R_fct(t, p) * np.sin(t) * np.cos(p)
@@ -593,6 +596,7 @@ class ltPlotSurf:
         self.norm_xy = norm_xy or norm_xyz
         self.norm_xyz = norm_xyz
         self.use_cmap = use_cmap
+        self.linewidth = linewidth
 
     def plot(self, fig, graph):
         if fig.graphs[graph].projection == '3d':
@@ -601,7 +605,7 @@ class ltPlotSurf:
             self._plot2d(fig, graph)
 
     def _plot2d(self, fig, graph):
-        _Surf2d = ltPlotScalField(self.theta, self.phi, z_fct=self.z_fct, cmap=self.cmap, color=self.color, label=self.label, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, alpha=self.alpha, use_cmap=self.use_cmap)
+        _Surf2d = ltPlotScalField(self.theta, self.phi, z_fct=self.z_fct, cmap=self.cmap, color=self.color, label=self.label, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, alpha=self.alpha, use_cmap=self.use_cmap, linewidth=self.linewidth)
         _Surf2d.plot(fig, graph)
 
     def _plot3d(self, fig, graph):
@@ -619,10 +623,14 @@ class ltPlotSurf:
             Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
             for xb, yb, zb in zip(Xb, Yb, Zb):
                 ax.plot([xb], [yb], [zb], 'w')
+        if self.linewidth == 0 :
+            method = ax.plot_surface
+        else :
+            method = ax.plot_wireframe
         if self.use_cmap:
-            fig.graphs[graph].graph.plot_surface(x, y, z, rstride=1, cstride=1, linewidth=0, alpha=self.alpha, cmap=self.cmap)
+            method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap)
         else:
-            fig.graphs[graph].graph.plot_surface(x, y, z, rstride=1, cstride=1, linewidth=0, alpha=self.alpha, color=self.color)
+            method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, color=self.color)
         
 class ltPlotVectField2d:
     def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
