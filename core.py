@@ -535,7 +535,7 @@ class ltPlotContour2d:
 
         
 class ltPlotScalField:
-    def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, color=color_default, label=None, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield']):
+    def __init__(self, x, y, z_fct, C_fct=None, norm_C_fct=True, cmap=cmap_default, color=color_default, label=None, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield']):
         self.label = label
         self.x = x
         self.y = y
@@ -550,6 +550,7 @@ class ltPlotScalField:
         self.use_cmap = use_cmap
         self.linewidth = linewidth
         self.C_fct = C_fct
+        self.norm_C_fct = norm_C_fct
 
     def plot(self, fig, graph):
         if fig.graphs[graph].projection == '3d':
@@ -565,12 +566,12 @@ class ltPlotScalField:
     def _plot3d(self, fig, graph):
         if self.alpha == 1 :
             self.alpha = self.alpha_3d
-        _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, C_fct=self.C_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap, linewidth=self.linewidth)
+        _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, C_fct=self.C_fct, norm_C_fct=self.norm_C_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap, linewidth=self.linewidth)
         _ScalField3d.plot(fig, graph)
 
 
 class ltPlotSurf:
-    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, C_fct=None, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=True, use_cmap=False, linewidth=linewidths['surface']):
+    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, C_fct=None, norm_C_fct=True, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=True, use_cmap=False, linewidth=linewidths['surface']):
         if R_fct is not None:
             def x_fct(t, p):
                 return R_fct(t, p) * np.sin(t) * np.cos(p)
@@ -599,6 +600,7 @@ class ltPlotSurf:
         self.use_cmap = use_cmap
         self.linewidth = linewidth
         self.C_fct = C_fct
+        self.norm_C_fct = norm_C_fct
 
     def plot(self, fig, graph):
         if fig.graphs[graph].projection == '3d':
@@ -625,16 +627,23 @@ class ltPlotSurf:
             Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
             for xb, yb, zb in zip(Xb, Yb, Zb):
                 ax.plot([xb], [yb], [zb], 'w')
-        if self.linewidth == 0 :
-            method = ax.plot_surface
-        else :
-            method = ax.plot_wireframe
+        method = ax.plot_surface
+#        if not self.linewidth == 0 :
+#            method = ax.plot_wireframe
         if self.use_cmap:
+            C_fct_eff = self.z_fct
             if self.C_fct is not None :
-                facecolors = getattr(mpl.cm, self.cmap)(self.C_fct(self.Theta, self.Phi))
-                method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap, facecolors=facecolors)
-            else:
-                method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap)
+                C_fct_eff = self.C_fct
+            def C_fct(x, y):
+                offset = 0
+                coeff = 1
+                if self.norm_C_fct:
+                    offset -= C_fct_eff(self.Theta, self.Phi).min()
+                    coeff *= 1/(C_fct_eff(self.Theta, self.Phi).max()-C_fct_eff(self.Theta, self.Phi).min())
+                return ( C_fct_eff(x, y) + offset ) * coeff
+                        
+            facecolors = getattr(mpl.cm, self.cmap)(C_fct(self.Theta, self.Phi))
+            method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap, facecolors=facecolors)
         else:
             method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, color=self.color)
         
