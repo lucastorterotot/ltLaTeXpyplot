@@ -66,13 +66,14 @@ def axes_comma(x, pos):  # formatter function takes tick label and tick position
 
 axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
-def clb_comma(x, pos):
-    return '\\num{{'+str(round(x, 2))+'}}'
-
 def add_colorbar(obj, plot, ax=None):
     clb = plt.colorbar(plot, ax=ax)
-    # if ax is not None and lang == 'FR':
-    #     clb.ax.yaxis.set_major_formatter(tkr.FuncFormatter(clb_comma))
+    if lang == 'FR':
+        clb_FR_ticks = []
+        for tick in clb.get_ticks():
+            clb_FR_ticks.append('\\num{'+str(tick)+'}')
+        clb.set_ticks(clb.get_ticks())
+        clb.set_ticklabels(clb_FR_ticks)
           
 def factorial (x):
     result = 1
