@@ -531,6 +531,8 @@ class ltPlotContour2d:
             current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=self.linewidths, cmap=self.cmap, levels=self.levels)
         else:
             current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=self.linewidths, cmap=self.cmap)
+        if fig.graphs[graph].show_cmap_legend:
+            plt.colorbar(current_contour, ax=fig.graphs[graph].graph)
         if self.clabel :
             fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt='%1.1f', fontsize=8)
         current_contour=0
