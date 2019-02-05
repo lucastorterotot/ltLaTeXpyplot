@@ -535,7 +535,7 @@ class ltPlotContour2d:
 
         
 class ltPlotScalField:
-    def __init__(self, x, y, z_fct, cmap=cmap_default, color=color_default, label=None, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield']):
+    def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, color=color_default, label=None, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield']):
         self.label = label
         self.x = x
         self.y = y
@@ -549,6 +549,7 @@ class ltPlotScalField:
         self.norm_xyz = norm_xyz
         self.use_cmap = use_cmap
         self.linewidth = linewidth
+        self.C_fct = C_fct
 
     def plot(self, fig, graph):
         if fig.graphs[graph].projection == '3d':
@@ -564,7 +565,7 @@ class ltPlotScalField:
     def _plot3d(self, fig, graph):
         if self.alpha == 1 :
             self.alpha = self.alpha_3d
-        _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap, linewidth=self.linewidth)
+        _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, C_fct=self.C_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap, linewidth=self.linewidth)
         _ScalField3d.plot(fig, graph)
 
 
