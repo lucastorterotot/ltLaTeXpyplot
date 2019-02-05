@@ -51,44 +51,13 @@ linewidths = {
 
 inches_per_cm = 0.3937007874 # Convert cm to inch
 
-### Defining usefull tools
-
-def axes_comma(x, pos):  # formatter function takes tick label and tick position
-    s = str(x)
-    ind = s.index('.')
-    int_part = s[:ind]
-    dec_part = s[ind+1:]
-    string = '\\num{{' + int_part
-    if dec_part is not '0':
-        string += '.'+dec_part
-    string += '}}'
-    return string
-
-axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
-
-def add_colorbar(obj, plot, ax=None):
-    clb = plt.colorbar(plot, ax=ax)
-    if lang == 'FR':
-        clb_FR_ticks = []
-        for tick in clb.get_ticks():
-            clb_FR_ticks.append('\\num{'+str(tick)+'}')
-        clb.set_ticks(clb.get_ticks())
-        clb.set_ticklabels(clb_FR_ticks)
-          
-def factorial (x):
-    result = 1
-    if x > 1:
-        for k in range(1,x+1):
-            result*=k
-    return result
+### LaTeX parameters
 
 def figsize(scale,ratio):
     fig_width = 17*inches_per_cm*scale    # width in inches
     fig_height = fig_width*ratio              # height in inches
     fig_size = [fig_width,fig_height]
     return fig_size
-
-### LaTeX parameters
 
 pgf_with_latex = {                      # setup matplotlib to use latex for output
     "pgf.texsystem": "pdflatex",        # change this if using xetex or luatex
@@ -116,6 +85,40 @@ if lang == 'FR':
 
 mpl.rcParams.update(pgf_with_latex)
 
+### Defining usefull tools
+
+def axes_comma(x, pos):  # formatter function takes tick label and tick position
+    s = str(x)
+    ind = s.index('.')
+    int_part = s[:ind]
+    dec_part = s[ind+1:]
+    string = '\\num{{' + int_part
+    if dec_part is not '0':
+        string += '.'+dec_part
+    string += '}}'
+    return string
+
+axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
+
+def add_colorbar(plot, ltGraph):
+    clb = plt.colorbar(plot, ax=ltGraph.graph)
+    if lang == 'FR':
+        clb_FR_ticks = []
+        for tick in clb.get_ticks():
+            clb_FR_ticks.append('\\num{'+str(tick)+'}')
+        clb.set_ticks(clb.get_ticks())
+        clb.set_ticklabels(clb_FR_ticks)
+        clb.ax.tick_params(labelsize=pgf_with_latex['xtick.labelsize'])
+    if ltGraph.cmap_label is not None:
+        clb.ax.set_title(ltGraph.cmap_label, fontsize=pgf_with_latex['axes.labelsize'])
+          
+def factorial (x):
+    result = 1
+    if x > 1:
+        for k in range(1,x+1):
+            result*=k
+    return result
+
 ### Package core
 
 class ltFigure:
@@ -138,7 +141,7 @@ class ltFigure:
 
     def update(self):
         if self.title is not None:
-            self.fig.suptitle(self.title, fontsize=10.95)
+            self.fig.suptitle(self.title, fontsize=pgf_with_latex["font.size"]+.95)
         for graph in self.graphs.keys():
             self.graphs[graph].update()
         if self.tight_layout :
@@ -179,7 +182,7 @@ class ltGraph:
                  comma_z_major=(lang == 'FR'), comma_z_minor=False,
                  show_grid=False, show_x_axis=False, show_y_axis=False,
                  show_legend=False, legend_location='best', legend_on_side=False,
-                 show_cmap_legend=False,
+                 show_cmap_legend=False, cmap_label=None,
                  position=111,
                  share_x=None, share_y=None):
         self.fig = fig
@@ -225,6 +228,7 @@ class ltGraph:
         self.legend_on_side = legend_on_side
         self.position = position
         self.show_cmap_legend = show_cmap_legend
+        self.cmap_label = cmap_label
         self.share_x = share_x
         self.share_y = share_y
 
@@ -254,7 +258,7 @@ class ltGraph:
 
     def update(self):
         if self.title is not None:
-            self.graph.set_title(self.title, fontsize=10)
+            self.graph.set_title(self.title, fontsize=pgf_with_latex["font.size"])
         self.graph.set_xscale(self.x_scaling)
         self.graph.set_yscale(self.y_scaling)
         if self.projection == '3d':
@@ -541,9 +545,9 @@ class ltPlotContour2d:
         else:
             current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=self.linewidths, cmap=self.cmap)
         if fig.graphs[graph].show_cmap_legend:
-            add_colorbar(self, current_contour, ax=fig.graphs[graph].graph)
+            add_colorbar(current_contour, fig.graphs[graph])
         if self.clabel :
-            fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt='%1.1f', fontsize=8)
+            fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt=r'${value}$'.format(value='%1.1f'), fontsize=pgf_with_latex['legend.fontsize']-1)
         current_contour=0
 
         
@@ -575,7 +579,7 @@ class ltPlotScalField:
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         imshow = fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
         if fig.graphs[graph].show_cmap_legend:
-            add_colorbar(self, imshow, ax=fig.graphs[graph].graph)
+            add_colorbar(imshow, fig.graphs[graph])
 
     def _plot3d(self, fig, graph):
         if self.alpha == 1 :
@@ -655,7 +659,7 @@ class ltPlotSurf:
         if fig.graphs[graph].show_cmap_legend:
             m = mpl.cm.ScalarMappable(cmap=getattr(mpl.cm, self.cmap), norm=norm)
             m.set_array([])
-            add_colorbar(self, m, ax=fig.graphs[graph].graph)
+            add_colorbar(m, fig.graphs[graph])
         
 class ltPlotVectField2d:
     def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
