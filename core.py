@@ -537,6 +537,13 @@ class ltPlotContour2d:
         self.norm_xy = norm_xy
         self.linewidths = linewidths
 
+    def plot_field(self, fig, graph):
+        _field = ltPlotScalField(self.x, self.y, self.z_fct, cmap=self.cmap, label=self.label, norm_xy=self.norm_xy, use_cmap=True)
+        _field.plot(fig, graph)
+
+    def plot_contour(self, fig, graph):
+        self.plot(fig, graph)
+        
     def plot(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
@@ -574,6 +581,13 @@ class ltPlotScalField:
         else :
             self._plot2d(fig, graph)
 
+    def plot_field(self, fig, graph):
+        self.plot(fig, graph)
+
+    def plot_contour(self, fig, graph):
+        _contour = ltPlotContour2d(self.x, self.y, self.z_fct, cmap=self.cmap, label=self.label, norm_xy=self.norm_xy)
+        _contour.plot(fig, graph)
+            
     def _plot2d(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
