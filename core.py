@@ -102,13 +102,12 @@ axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
 def add_colorbar(plot, ltGraph):
     clb = plt.colorbar(plot, ax=ltGraph.graph)
-    if lang == 'FR':
-        clb_FR_ticks = []
-        for tick in clb.get_ticks():
-            clb_FR_ticks.append('\\num{'+str(tick)+'}')
-        clb.set_ticks(clb.get_ticks())
-        clb.set_ticklabels(clb_FR_ticks)
-        clb.ax.tick_params(labelsize=pgf_with_latex['xtick.labelsize'])
+    clb_FR_ticks = []
+    for tick in clb.get_ticks():
+        clb_FR_ticks.append('\\num{'+str(tick)+'}')
+    clb.set_ticks(clb.get_ticks())
+    clb.set_ticklabels(clb_FR_ticks)
+    clb.ax.tick_params(labelsize=pgf_with_latex['xtick.labelsize'])
     if ltGraph.cmap_label is not None:
         clb.ax.set_title(ltGraph.cmap_label, fontsize=pgf_with_latex['axes.labelsize'])
           
