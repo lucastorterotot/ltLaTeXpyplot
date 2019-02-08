@@ -89,14 +89,16 @@ mpl.rcParams.update(pgf_with_latex)
 
 def axes_comma(x, pos):  # formatter function takes tick label and tick position
     s = str(x)
-    ind = s.index('.')
-    int_part = s[:ind]
-    dec_part = s[ind+1:]
-    string = '\\num{{' + int_part
-    if dec_part is not '0':
-        string += '.'+dec_part
-    string += '}}'
-    return string
+    if '.' in s:
+        ind = s.index('.')
+        int_part = s[:ind]
+        dec_part = s[ind+1:]
+        string = '\\num{{' + int_part
+        if dec_part is not '0':
+            string += '.'+dec_part
+        string += '}}'
+        return string
+    return s
 
 axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
@@ -401,13 +403,14 @@ class ltPlotPts(ltPlotFct):
         
 
 class ltPlotPts3d(ltPlotPts):
-    def __init__(self, x, y, z, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default):
+    def __init__(self, x, y, z, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, cmap=None):
         ltPlotPts.__init__(self, x, y, label=label, color=color, marker=marker, markersize=markersize)
         self.z = z
+        self.cmap=cmap
 
     def plot(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
-        fig.graphs[graph].graph.scatter(self.x, self.y, self.z, c=self.color, marker=self.marker, s=self.markersize, label=self.label)
+        fig.graphs[graph].graph.scatter(self.x, self.y, self.z, c=self.color, marker=self.marker, s=self.markersize, label=self.label, cmap=self.cmap)
 
         
 class ltPlotRegLin(ltPlotPts):
