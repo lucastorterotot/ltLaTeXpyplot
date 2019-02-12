@@ -382,13 +382,28 @@ class ltPlotFct:
         self.TF.plot(fig, graph)
         
 class ltPlotFct3d(ltPlotFct):
-    def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct']):
+    def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct'], norm_xy=True, norm_xyz=True):
         ltPlotFct.__init__(self, x, y, label=label, color=color, dashes=dashes, marker=marker, markersize=markersize, linewidth=linewidth)
         self.z = z
+        self.norm_xy = norm_xy or norm_xyz
+        self.norm_xyz = norm_xyz
 
     def plot(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
-        fig.graphs[graph].graph.plot(self.x, self.y, self.z, color=self.color, linewidth=self.linewidth, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
+        x = self.x
+        y = self.y
+        z = self.z
+        ax = fig.graphs[graph].graph
+        if self.norm_xy :
+            ax.set_aspect('equal', adjustable='box')
+        if self.norm_xyz :
+            max_range = np.array([x.max(), -x.min(), y.max(), -y.min(), z.max(), -z.min()]).max()
+            Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
+            Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
+            Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
+            for xb, yb, zb in zip(Xb, Yb, Zb):
+                ax.plot([xb], [yb], [zb], 'w')
+        ax.plot(x, y, z, color=self.color, linewidth=self.linewidth, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
 
         
 class ltPlotPts(ltPlotFct):
@@ -405,14 +420,29 @@ class ltPlotPts(ltPlotFct):
         
 
 class ltPlotPts3d(ltPlotPts):
-    def __init__(self, x, y, z, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, cmap=None):
+    def __init__(self, x, y, z, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, cmap=None, norm_xy=True, norm_xyz=True):
         ltPlotPts.__init__(self, x, y, label=label, color=color, marker=marker, markersize=markersize)
         self.z = z
+        self.norm_xy = norm_xy or norm_xyz
+        self.norm_xyz = norm_xyz
         self.cmap=cmap
 
     def plot(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
-        fig.graphs[graph].graph.scatter(self.x, self.y, self.z, c=self.color, marker=self.marker, s=self.markersize, label=self.label, cmap=self.cmap)
+        x = self.x
+        y = self.y
+        z = self.z
+        ax = fig.graphs[graph].graph
+        if self.norm_xy :
+            ax.set_aspect('equal', adjustable='box')
+        if self.norm_xyz :
+            max_range = np.array([x.max(), -x.min(), y.max(), -y.min(), z.max(), -z.min()]).max()
+            Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
+            Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
+            Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
+            for xb, yb, zb in zip(Xb, Yb, Zb):
+                ax.plot([xb], [yb], [zb], 'w')
+        ax.scatter(x, y, z, c=self.color, marker=self.marker, s=self.markersize, label=self.label, cmap=self.cmap)
 
         
 class ltPlotRegLin(ltPlotPts):
