@@ -89,16 +89,18 @@ mpl.rcParams.update(pgf_with_latex)
 
 def axes_comma(x, pos):  # formatter function takes tick label and tick position
     s = str(x)
+    string = '\\num{{'
     if '.' in s:
         ind = s.index('.')
         int_part = s[:ind]
         dec_part = s[ind+1:]
-        string = '\\num{{' + int_part
+        string += int_part
         if dec_part is not '0':
             string += '.'+dec_part
-        string += '}}'
-        return string
-    return s
+    else:
+        string += s    
+    string += '}}'
+    return string
 
 axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
