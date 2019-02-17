@@ -602,6 +602,7 @@ class ltPlotScalField:
         self.x = x
         self.y = y
         self.z_fct = z_fct
+        self.X, self.Y = np.meshgrid(x, y)
         self.cmap = cmap
         self.color = color
         self.alpha = alpha
@@ -628,7 +629,7 @@ class ltPlotScalField:
     def _plot2d(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        imshow = fig.graphs[graph].graph.imshow(self.z_fct, cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
+        imshow = fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
         if fig.graphs[graph].show_cmap_legend:
             add_colorbar(imshow, fig.graphs[graph])
 
@@ -719,7 +720,6 @@ class ltPlotVectField2d:
         self.y = y
         self.vx_fct = vx_fct
         self.vy_fct = vy_fct
-        self.X, self.Y = np.meshgrid(x, y)
         self.color = color
         self.norm_xy = norm_xy
         self.linewidth = linewidth
@@ -735,7 +735,7 @@ class ltPlotVectField2d:
         vx, vy = self.vx_fct, self.vy_fct
         xs, ys = self.x, self.y
         if callable(self.vx_fct) and callable(self.vy_fct):
-            xs, ys = self.X, self.Y
+            xs, ys = np.meshgrid(xs, ys)
             vx = self.vx_fct(xs, ys)
             vy = self.vy_fct(xs, ys)
         fig.graphs[graph].graph.quiver(xs, ys, vx, vy, linewidth=self.linewidth, label=self.label, color=self.color)
@@ -762,20 +762,19 @@ class ltPlotVectField3d(ltPlotVectField2d):
         ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, norm_xy=norm_xyz, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
         self.z = z
         self.vz_fct = vz_fct
-        self.X, self.Y, self.Z = np.meshgrid(x, y, z)
 
     def plot(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
+        xs, ys, zs = self.x, self.y, self.z
         vx, vy, vz = self.vx_fct, self.vy_fct, self.vz_fct
-        if callable(self.vx_fct):
-            vx = self.vx_fct(self.X, self.Y, self.Z)
-        if callable(self.vy_fct):
-            vy = self.vy_fct(self.X, self.Y, self.Z)
-        if callable(self.vz_fct):
-            vz = self.vz_fct(self.X, self.Y, self.Z)
-        fig.graphs[graph].graph.quiver(self.X, self.Y, self.Z, vx, vy, vz, length=0.1, normalize=True, linewidth=self.linewidth, label=self.label, color=self.color)
+        if callable(self.vx_fct) and callable(self.vy_fct) and callable(self.vz_fct):
+            xs, ys, zs = np.meshgrid(xs, ys, zs)
+            vx = self.vx_fct(xs, ys, zs)
+            vy = self.vy_fct(xs, ys, zs)
+            vz = self.vz_fct(xs, ys, zs)
+        fig.graphs[graph].graph.quiver(xs, ys, zs, vx, vy, vz, length=0.1, normalize=True, linewidth=self.linewidth, label=self.label, color=self.color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         fig.graphs[graph].test_graph_3d()
