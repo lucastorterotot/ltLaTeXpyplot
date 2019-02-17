@@ -564,7 +564,6 @@ class ltPlotContour2d:
         self.x = x
         self.y = y
         self.z_fct = z_fct
-        self.X, self.Y = np.meshgrid(x, y)
         self.cmap = cmap
         self.levels = levels
         self.clabel = clabel
@@ -582,12 +581,14 @@ class ltPlotContour2d:
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         z_fct = self.z_fct
+        xs, ys = self.x, self.y
         if callable(self.z_fct):
-            z_fct = self.z_fct(self.X, self.Y)
+            xs, ys = np.meshgrid(xs, ys)
+            z_fct = self.z_fct(xs, ys)
         if self.levels is not None :
-            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap, levels=self.levels)
+            current_contour=fig.graphs[graph].graph.contour(xs, ys, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap, levels=self.levels)
         else:
-            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap)
+            current_contour=fig.graphs[graph].graph.contour(xs, ys, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap)
         if fig.graphs[graph].show_cmap_legend:
             add_colorbar(current_contour, fig.graphs[graph])
         if self.clabel :
@@ -601,7 +602,6 @@ class ltPlotScalField:
         self.x = x
         self.y = y
         self.z_fct = z_fct
-        self.X, self.Y = np.meshgrid(x, y)
         self.cmap = cmap
         self.color = color
         self.alpha = alpha
@@ -628,10 +628,7 @@ class ltPlotScalField:
     def _plot2d(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        z_fct, = self.z_fct
-        if callable(self.z_fct):
-            z_fct = self.z_fct(self.X, self.Y)
-        imshow = fig.graphs[graph].graph.imshow(z_fct, cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
+        imshow = fig.graphs[graph].graph.imshow(self.z_fct, cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
         if fig.graphs[graph].show_cmap_legend:
             add_colorbar(imshow, fig.graphs[graph])
 
@@ -736,11 +733,12 @@ class ltPlotVectField2d:
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         vx, vy = self.vx_fct, self.vy_fct
-        if callable(self.vx_fct):
-            vx = self.vx_fct(self.X, self.Y)
-        if callable(self.vy_fct):
-            vy = self.vy_fct(self.X, self.Y)
-        fig.graphs[graph].graph.quiver(self.X, self.Y, vx, vy, linewidth=self.linewidth, label=self.label, color=self.color)
+        xs, ys = self.x, self.y
+        if callable(self.vx_fct) and callable(self.vy_fct):
+            xs, ys = self.X, self.Y
+            vx = self.vx_fct(xs, ys)
+            vy = self.vy_fct(xs, ys)
+        fig.graphs[graph].graph.quiver(xs, ys, vx, vy, linewidth=self.linewidth, label=self.label, color=self.color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         if color is None:
