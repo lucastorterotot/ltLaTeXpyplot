@@ -722,7 +722,7 @@ class ltPlotSurf:
             add_colorbar(m, fig.graphs[graph])
         
 class ltPlotVectField2d:
-    def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
+    def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
         self.label = label
         self.x = x
         self.y = y
@@ -737,6 +737,10 @@ class ltPlotVectField2d:
         self.dashes_fieldline = dashes_fieldline
         self.linewidth_fieldline = linewidth_fieldline
 
+        self.cmap = cmap
+        self.use_cmap = use_cmap
+        self.C_fct = C_fct
+
     def plot(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
@@ -746,7 +750,21 @@ class ltPlotVectField2d:
             xs, ys = np.meshgrid(xs, ys)
             vx = self.vx_fct(xs, ys)
             vy = self.vy_fct(xs, ys)
-        fig.graphs[graph].graph.quiver(xs, ys, vx, vy, linewidth=self.linewidth, label=self.label, color=self.color)
+        color = self.color
+        if self.use_cmap:
+            C_fct_eff = self.C_fct
+            if callable(self.C_fct):
+                C_fct_eff = self.C_fct(xs, ys).flatten()
+            if self.C_fct is None:
+                C_fct_eff = ((vx**2+vy**2)**.5).flatten()
+            norm = mpl.colors.Normalize()
+            norm.autoscale(C_fct_eff)
+            color = getattr(mpl.cm, self.cmap)(norm(C_fct_eff))
+        fig.graphs[graph].graph.quiver(xs, ys, vx, vy, linewidth=self.linewidth, label=self.label, color=color)
+        if fig.graphs[graph].show_cmap_legend:
+            m = mpl.cm.ScalarMappable(cmap=getattr(mpl.cm, self.cmap), norm=norm)
+            m.set_array([])
+            add_colorbar(m, fig.graphs[graph])
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         if color is None:
@@ -766,8 +784,8 @@ class ltPlotVectField2d:
         
         
 class ltPlotVectField3d(ltPlotVectField2d):
-    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, norm_xyz=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
-        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, norm_xy=norm_xyz, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
+    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None, norm_xyz=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
+        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, color=color, cmap=cmap, use_cmap=use_cmap, C_fct=C_fct, norm_xy=norm_xyz, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
         self.z = z
         self.vz_fct = vz_fct
 
@@ -782,7 +800,17 @@ class ltPlotVectField3d(ltPlotVectField2d):
             vx = self.vx_fct(xs, ys, zs)
             vy = self.vy_fct(xs, ys, zs)
             vz = self.vz_fct(xs, ys, zs)
-        fig.graphs[graph].graph.quiver(xs, ys, zs, vx, vy, vz, length=0.1, normalize=True, linewidth=self.linewidth, label=self.label, color=self.color)
+        color = self.color
+        if self.use_cmap:
+            C_fct_eff = self.C_fct
+            if callable(self.C_fct):
+                C_fct_eff = self.C_fct(xs, ys, zs).flatten()
+            if self.C_fct is None:
+                C_fct_eff = ((vx**2+vy**2+vz**2)**.5).flatten()
+            norm = mpl.colors.Normalize()
+            norm.autoscale(C_fct_eff)
+            color = getattr(mpl.cm, self.cmap)(norm(C_fct_eff))
+        fig.graphs[graph].graph.quiver(xs, ys, zs, vx, vy, vz, length=0.1, normalize=True, linewidth=self.linewidth, label=self.label, color=color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         fig.graphs[graph].test_graph_3d()
