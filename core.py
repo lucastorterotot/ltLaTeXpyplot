@@ -602,7 +602,6 @@ class ltPlotScalField:
         self.x = x
         self.y = y
         self.z_fct = z_fct
-        self.X, self.Y = np.meshgrid(x, y)
         self.cmap = cmap
         self.color = color
         self.alpha = alpha
@@ -629,7 +628,12 @@ class ltPlotScalField:
     def _plot2d(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        imshow = fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
+        z_fct = self.z_fct
+        xs, ys = self.x, self.y
+        if callable(self.z_fct):
+            xs, ys = np.meshgrid(xs, ys)
+            z_fct = self.z_fct(xs, ys)
+        imshow = fig.graphs[graph].graph.imshow(z_fct, cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
         if fig.graphs[graph].show_cmap_legend:
             add_colorbar(imshow, fig.graphs[graph])
 
