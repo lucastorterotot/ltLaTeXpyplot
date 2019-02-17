@@ -660,7 +660,6 @@ class ltPlotSurf:
                 return p
         self.theta = theta
         self.phi = phi
-        self.Theta, self.Phi = np.meshgrid(theta, phi)
         self.x_fct = x_fct
         self.y_fct = y_fct
         self.z_fct = z_fct
@@ -687,9 +686,14 @@ class ltPlotSurf:
 
     def _plot3d(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
-        x = self.x_fct(self.Theta, self.Phi)
-        y = self.y_fct(self.Theta, self.Phi)
-        z = self.z_fct(self.Theta, self.Phi)
+        x, y, z = self.x_fct, self.y_fct, self.z_fct
+        theta, phi = np.meshgrid(self.theta, self.phi)
+        if callable(x) :
+            x = x(theta, phi)
+        if callable(y) :
+            y = y(theta, phi)
+        if callable(z) :
+            z = z(theta, phi)
         ax = fig.graphs[graph].graph
         if self.norm_xy :
             ax.set_aspect('equal', adjustable='box')
@@ -702,11 +706,11 @@ class ltPlotSurf:
                 ax.plot([xb], [yb], [zb], 'w')
         method = ax.plot_surface
         if self.use_cmap:
-            C_fct_eff = self.z_fct
-            if self.C_fct is not None :
-                C_fct_eff = self.C_fct
-            norm = mpl.colors.Normalize(vmin=C_fct_eff(self.Theta, self.Phi).min().min(), vmax=C_fct_eff(self.Theta, self.Phi).max().max())
-            facecolors = getattr(mpl.cm, self.cmap)(norm(C_fct_eff(self.Theta, self.Phi)))
+            C_fct_eff = z
+            if callable(self.C_fct):
+                C_fct_eff = self.C_fct(theta, phi)
+            norm = mpl.colors.Normalize(vmin=C_fct_eff.min().min(), vmax=C_fct_eff.max().max())
+            facecolors = getattr(mpl.cm, self.cmap)(norm(C_fct_eff))
             surf = method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap, facecolors=facecolors)
         else:
             surf = method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, color=self.color, edgecolors=self.color)
