@@ -581,10 +581,13 @@ class ltPlotContour2d:
     def plot(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
+        z_fct = self.z_fct
+        if callable(self.z_fct):
+            z_fct = self.z_fct(self.X, self.Y)
         if self.levels is not None :
-            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=self.linewidths, cmap=self.cmap, levels=self.levels)
+            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap, levels=self.levels)
         else:
-            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, self.z_fct(self.X, self.Y), origin='lower', linewidths=self.linewidths, cmap=self.cmap)
+            current_contour=fig.graphs[graph].graph.contour(self.X, self.Y, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap)
         if fig.graphs[graph].show_cmap_legend:
             add_colorbar(current_contour, fig.graphs[graph])
         if self.clabel :
@@ -625,7 +628,10 @@ class ltPlotScalField:
     def _plot2d(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        imshow = fig.graphs[graph].graph.imshow(self.z_fct(self.X, self.Y), cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
+        z_fct, = self.z_fct
+        if callable(self.z_fct):
+            z_fct = self.z_fct(self.X, self.Y)
+        imshow = fig.graphs[graph].graph.imshow(z_fct, cmap=self.cmap, extent=(min(self.x), max(self.x), min(self.y), max(self.y)), origin='lower', alpha=self.alpha)
         if fig.graphs[graph].show_cmap_legend:
             add_colorbar(imshow, fig.graphs[graph])
 
@@ -729,7 +735,12 @@ class ltPlotVectField2d:
     def plot(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        fig.graphs[graph].graph.quiver(self.X, self.Y, self.vx_fct(self.X, self.Y), self.vy_fct(self.X, self.Y), linewidth=self.linewidth, label=self.label, color=self.color)
+        vx, vy = self.vx_fct, self.vy_fct
+        if callable(self.vx_fct):
+            vx = self.vx_fct(self.X, self.Y)
+        if callable(self.vy_fct):
+            vy = self.vy_fct(self.X, self.Y)
+        fig.graphs[graph].graph.quiver(self.X, self.Y, vx, vy, linewidth=self.linewidth, label=self.label, color=self.color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         if color is None:
@@ -759,7 +770,14 @@ class ltPlotVectField3d(ltPlotVectField2d):
         fig.graphs[graph].test_graph_3d()
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        fig.graphs[graph].graph.quiver(self.X, self.Y, self.Z, self.vx_fct(self.X, self.Y, self.Z), self.vy_fct(self.X, self.Y, self.Z), self.vz_fct(self.X, self.Y, self.Z), length=0.1, normalize=True, linewidth=self.linewidth, label=self.label, color=self.color)
+        vx, vy, vz = self.vx_fct, self.vy_fct, self.vz_fct
+        if callable(self.vx_fct):
+            vx = self.vx_fct(self.X, self.Y, self.Z)
+        if callable(self.vy_fct):
+            vy = self.vy_fct(self.X, self.Y, self.Z)
+        if callable(self.vz_fct):
+            vz = self.vz_fct(self.X, self.Y, self.Z)
+        fig.graphs[graph].graph.quiver(self.X, self.Y, self.Z, vx, vy, vz, length=0.1, normalize=True, linewidth=self.linewidth, label=self.label, color=self.color)
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         fig.graphs[graph].test_graph_3d()
