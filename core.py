@@ -811,6 +811,10 @@ class ltPlotVectField3d(ltPlotVectField2d):
             norm.autoscale(C_fct_eff)
             color = getattr(mpl.cm, self.cmap)(norm(C_fct_eff))
         fig.graphs[graph].graph.quiver(xs, ys, zs, vx, vy, vz, length=0.1, normalize=True, linewidth=self.linewidth, label=self.label, color=color)
+        if fig.graphs[graph].show_cmap_legend:
+            m = mpl.cm.ScalarMappable(cmap=getattr(mpl.cm, self.cmap), norm=norm)
+            m.set_array([])
+            add_colorbar(m, fig.graphs[graph])
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         fig.graphs[graph].test_graph_3d()
