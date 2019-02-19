@@ -407,25 +407,30 @@ class ltPlotFct3d(ltPlotFct):
 
         
 class ltPlotPts(ltPlotFct):
-    def __init__(self, x, y, xerr=None, yerr=None, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, linewidth=linewidths['plotpts'], elinewidth=linewidths['plotpts_e'], capsize=linewidths['capsize'], capthick=linewidths['capthick']):
+    def __init__(self, x, y, xerr=None, yerr=None, label=None, color=color_default, cmap=cmap_default, marker=marker_pts_default, markersize=marker_size_default, linewidth=linewidths['plotpts'], elinewidth=linewidths['plotpts_e'], capsize=linewidths['capsize'], capthick=linewidths['capthick'], surface=None, alpha=None):
         ltPlotFct.__init__(self, x, y, label=label, color=color, marker=marker, markersize=markersize, linewidth=linewidth)
         self.xerr = xerr
         self.yerr = yerr
         self.elinewidth = elinewidth
         self.capthick = capthick
         self.capsize = capsize
+        self.surface = surface
+        self.alpha = alpha
+        self.cmap = cmap
 
     def plot(self, fig, graph):
-        fig.graphs[graph].graph.errorbar(self.x, self.y, xerr=self.xerr, yerr=self.yerr, marker=self.marker, markersize=self.markersize, fmt=' ', linewidth=self.linewidth, elinewidth=self.elinewidth,capsize=self.capsize,capthick=self.capthick,color=self.color,label=self.label)
+        if self.surface is None:
+            fig.graphs[graph].graph.errorbar(self.x, self.y, xerr=self.xerr, yerr=self.yerr, marker=self.marker, markersize=self.markersize, fmt=' ', linewidth=self.linewidth, elinewidth=self.elinewidth,capsize=self.capsize,capthick=self.capthick,color=self.color,label=self.label)
+        else :
+            fig.graphs[graph].graph.scatter(self.x, self.y, s=self.surface, c=self.color, marker=self.marker, cmap=self.cmap, alpha=self.alpha)
         
 
 class ltPlotPts3d(ltPlotPts):
-    def __init__(self, x, y, z, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, cmap=None, norm_xy=True, norm_xyz=True):
-        ltPlotPts.__init__(self, x, y, label=label, color=color, marker=marker, markersize=markersize)
+    def __init__(self, x, y, z, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, cmap=None, norm_xy=True, norm_xyz=True, surface=None, alpha=None):
+        ltPlotPts.__init__(self, x, y, label=label, color=color, cmap=cmap, marker=marker, markersize=markersize, surface=surface, alpha=alpha)
         self.z = z
         self.norm_xy = norm_xy or norm_xyz
         self.norm_xyz = norm_xyz
-        self.cmap=cmap
 
     def plot(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
@@ -442,7 +447,10 @@ class ltPlotPts3d(ltPlotPts):
             Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
             for xb, yb, zb in zip(Xb, Yb, Zb):
                 ax.plot([xb], [yb], [zb], 'w')
-        ax.scatter(x, y, z, c=self.color, marker=self.marker, s=self.markersize, label=self.label, cmap=self.cmap)
+        markersize = self.markersize
+        if self.surface is not None:
+            markersize = self.surface
+        ax.scatter(x, y, z, c=self.color, marker=self.marker, s=markersize, label=self.label, cmap=self.cmap, alpha=self.alpha)
 
         
 class ltPlotRegLin(ltPlotPts):
