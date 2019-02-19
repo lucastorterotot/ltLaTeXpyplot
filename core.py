@@ -565,6 +565,56 @@ class ltPlotRegLin(ltPlotPts):
     def plot_pts(self, fig, graph):
         self.points.plot(fig, graph)
 
+
+class ltPlotHist:
+    def __init__(self, x, bins=None, range=None, weights=None, cumulative=False, bottom=None, histtype='bar', align='mid', orientation='vertical', rwidth=None, log=False, color=color_default, label=None, stacked=False):
+        self.x = [x]
+        self.bins = bins
+        self.range = range
+        if weights is None:
+            weights = np.zeros(len(x))
+            weights += 1
+        self.weights = [weights]
+        self.cumulative = cumulative
+        self.bottom = bottom
+        self.histtype = histtype
+        self.align = align
+        self.orientation = orientation
+        self.rwidth = rwidth
+        self.log = log
+        self.color = [color]
+        self.label = [label]
+        self.stacked = stacked
+
+    def stack(self, others):
+        self.stacked = True
+        for attr_key in ['x', 'label', 'color', 'weights']:
+            attr = getattr(self, attr_key)
+            for other in others:
+                attr += getattr(other, attr_key)
+            setattr(self, attr_key, attr)
+
+    def get_integral(self):
+        result = 0
+        for k in range(len(self.weights)):
+            for l in range(len(self.weights[k])):
+                result += self.weights[k][l]
+        result *= len(self.weights)
+        return result
+
+    def scale(self, value):
+        for k in range(len(self.weights)):
+            self.weights[k] *= value
+
+    def set_integral(self, value):
+        integral = self.get_integral()
+        self.scale(value/integral)
+
+    def plot(self, fig, graph):
+        n, bins, patches = fig.graphs[graph].graph.hist(self.x, bins=self.bins, range=self.range, density=False, weights=self.weights, cumulative=self.cumulative, bottom=self.bottom, histtype=self.histtype, align=self.align, orientation=self.orientation, rwidth=self.rwidth, log=self.log, color=self.color, label=self.label, stacked=self.stacked)
+        self.n = n
+        self.bins = bins
+        self.patches = patches
         
 class ltPlotContour2d:
     def __init__(self, x, y, z_fct, cmap=cmap_default, levels=None, label=None, clabel=False, norm_xy=True, linewidths=linewidths['contour2d']):
