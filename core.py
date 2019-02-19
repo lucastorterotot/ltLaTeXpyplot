@@ -726,7 +726,7 @@ class ltPlotSurf:
             surf = method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, color=self.color, edgecolors=self.color)
         if not self.linewidth == 0 :
             surf.set_facecolor((1,1,1,0))
-        if fig.graphs[graph].show_cmap_legend:
+        if fig.graphs[graph].show_cmap_legend and self.use_cmap:
             m = mpl.cm.ScalarMappable(cmap=getattr(mpl.cm, self.cmap), norm=norm)
             m.set_array([])
             add_colorbar(m, fig.graphs[graph])
