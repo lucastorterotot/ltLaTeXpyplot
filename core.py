@@ -570,6 +570,8 @@ class ltPlotHist:
     def __init__(self, x, bins=None, range=None, weights=None, cumulative=False, bottom=None, histtype='bar', align='mid', orientation='vertical', rwidth=None, log=False, color=color_default, label=None, stacked=False):
         self.x = [x]
         self.bins = bins
+        if not isinstance(bins, list) and bins is not None:
+            self.bins = np.linspace(x.min(), x.max(), bins+1)
         self.range = range
         if weights is None:
             weights = np.zeros(len(x))
@@ -598,8 +600,14 @@ class ltPlotHist:
         result = 0
         for k in range(len(self.weights)):
             for l in range(len(self.weights[k])):
-                result += self.weights[k][l]
-        result *= len(self.weights)
+                x_value = self.x[k][l]
+                if x_value >= self.bins[-1]:
+                    index = len(self.bins)-1
+                else:
+                    index = next(x[0] for x in enumerate(self.bins) if x[1] >= x_value)
+                bin_width = self.bins[index]-self.bins[index-1]
+                result += self.weights[k][l] * bin_width
+        # result *= len(self.weights)
         return result
 
     def scale(self, value):
