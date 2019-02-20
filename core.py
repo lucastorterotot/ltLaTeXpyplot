@@ -567,12 +567,11 @@ class ltPlotRegLin(ltPlotPts):
 
 
 class ltPlotHist:
-    def __init__(self, x, bins=None, range=None, weights=None, cumulative=False, bottom=None, histtype='bar', align='mid', orientation='vertical', rwidth=None, log=False, color=color_default, label=None, stacked=False):
+    def __init__(self, x, bins=None, bin_range=None, weights=None, cumulative=False, bottom=None, histtype='bar', align='mid', orientation='vertical', rwidth=None, log=False, color=color_default, label=None, stacked=False):
         self.x = [x]
         self.bins = bins
-        if not isinstance(bins, list) and bins is not None:
-            self.bins = np.linspace(x.min(), x.max(), bins+1)
-        self.range = range
+        self.set_binning()
+        self.bin_range = bin_range
         if weights is None:
             weights = np.zeros(len(x))
             weights += 1
@@ -588,6 +587,19 @@ class ltPlotHist:
         self.label = [label]
         self.stacked = stacked
 
+    def set_binning(self):
+        self.binning = self.bins
+        if not isinstance(self.bins, list) and self.bins is not None:
+            if getattr(self,  'bin_range', None) is None:
+                x_min = self.x[0][0]
+                x_max = self.x[0][0]
+                for x in self.x:
+                    x_min = min([x_min, x.min()])
+                    x_max = max([x_max, x.max()])
+                    self.binning = np.linspace(x.min(), x.max(), self.bins+1)
+            else:
+                self.binning = np.linspace(self.bin_range[0], self.bin_range[1], self.bins+1)
+
     def stack(self, others):
         self.stacked = True
         for attr_key in ['x', 'label', 'color', 'weights']:
@@ -595,17 +607,19 @@ class ltPlotHist:
             for other in others:
                 attr += getattr(other, attr_key)
             setattr(self, attr_key, attr)
+        self.set_binning()
 
     def get_integral(self):
+        self.set_binning()
         result = 0
         for k in range(len(self.weights)):
             for l in range(len(self.weights[k])):
                 x_value = self.x[k][l]
-                if x_value >= self.bins[-1]:
-                    index = len(self.bins)-1
+                if x_value >= self.binning[-1]:
+                    index = len(self.binning)-1
                 else:
-                    index = next(x[0] for x in enumerate(self.bins) if x[1] >= x_value)
-                bin_width = self.bins[index]-self.bins[index-1]
+                    index = next(x[0] for x in enumerate(self.binning) if x[1] >= x_value)
+                bin_width = self.binning[index]-self.binning[index-1]
                 result += self.weights[k][l] * bin_width
         # result *= len(self.weights)
         return result
@@ -619,7 +633,7 @@ class ltPlotHist:
         self.scale(value/integral)
 
     def plot(self, fig, graph):
-        n, bins, patches = fig.graphs[graph].graph.hist(self.x, bins=self.bins, range=self.range, density=False, weights=self.weights, cumulative=self.cumulative, bottom=self.bottom, histtype=self.histtype, align=self.align, orientation=self.orientation, rwidth=self.rwidth, log=self.log, color=self.color, label=self.label, stacked=self.stacked)
+        n, bins, patches = fig.graphs[graph].graph.hist(self.x, bins=self.bins, range=self.bin_range, density=False, weights=self.weights, cumulative=self.cumulative, bottom=self.bottom, histtype=self.histtype, align=self.align, orientation=self.orientation, rwidth=self.rwidth, log=self.log, color=self.color, label=self.label, stacked=self.stacked)
         self.n = n
         self.bins = bins
         self.patches = patches
