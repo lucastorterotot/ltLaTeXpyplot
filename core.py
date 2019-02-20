@@ -914,6 +914,23 @@ class ltPlotVectField2d:
             return self.vx_fct(x, y), self.vy_fct(x, y)
         line_xy = odeint(_field, point, T).transpose()
         fig.graphs[graph].graph.plot(line_xy[0], line_xy[1], label=label, color=color, dashes=dashes, linewidth=self.linewidth_fieldline)
+
+    def plot_streamplot(self, fig, graph, start_points=None, density='undef', color=None, **kwargs):
+        if color is None:
+            color = self.color_fieldline
+        if density == 'undef':
+            density=1
+            if start_points is not None:
+                density = len(start_points)
+        if self.norm_xy :
+            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
+        vx, vy = self.vx_fct, self.vy_fct
+        xs, ys = self.x, self.y
+        if callable(self.vx_fct) and callable(self.vy_fct):
+            xs, ys = np.meshgrid(xs, ys)
+            vx = self.vx_fct(xs, ys)
+            vy = self.vy_fct(xs, ys)
+        fig.graphs[graph].graph.streamplot(xs, ys, vx, vy, start_points=start_points, density=density, color=color, linewidth=self.linewidth_fieldline, **kwargs)
         
         
 class ltPlotVectField3d(ltPlotVectField2d):
