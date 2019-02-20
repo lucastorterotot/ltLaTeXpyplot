@@ -647,7 +647,10 @@ class ltPlotHist:
         
 
     def plot(self, fig, graph):
-        n, bins, patches = fig.graphs[graph].graph.hist(self.x, bins=self.bins, range=self.range, density=False, weights=self.weights, cumulative=self.cumulative, bottom=self.bottom, histtype=self.histtype, align=self.align, orientation=self.orientation, rwidth=self.rwidth, log=self.log, color=self.color, label=self.label, stacked=self.stacked)
+        label = self.label
+        if len(self.label)==1:
+            label = self.label[0]
+        n, bins, patches = fig.graphs[graph].graph.hist(self.x, bins=self.bins, range=self.range, density=False, weights=self.weights, cumulative=self.cumulative, bottom=self.bottom, histtype=self.histtype, align=self.align, orientation=self.orientation, rwidth=self.rwidth, log=self.log, color=self.color, label=label, stacked=self.stacked)
         self.n = n
         self.bins = bins
         self.patches = patches
@@ -679,7 +682,6 @@ class ltPlotHist:
                 if value >= self.binning[k] and value < self.binning[k+1]:
                     Nerry += 1
                     Werry += weight
-                    print(weight)
             erry[k] = np.sqrt(ys[k]*Werry/Nerry)
         if not yerr:
             erry = None
