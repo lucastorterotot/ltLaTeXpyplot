@@ -567,7 +567,7 @@ class ltPlotRegLin(ltPlotPts):
 
 
 class ltPlotHist:
-    def __init__(self, x, bins=None, range=None, weights=None, cumulative=False, bottom=None, histtype='bar', align='mid', orientation='vertical', rwidth=None, log=False, color=color_default, label=None, stacked=False):
+    def __init__(self, x, bins=None, range=None, weights=None, cumulative=False, color=color_default, label=None, show_uncert=False):
         self.x = [x]
         self.bins = bins
         self.set_binning()
@@ -577,17 +577,11 @@ class ltPlotHist:
             weights += 1
         self.weights = [weights]
         self.cumulative = cumulative
-        self.bottom = bottom
-        self.histtype = histtype
-        self.align = align
-        self.orientation = orientation
-        self.rwidth = rwidth
-        self.log = log
-        self.color = [color]
-        self.label = [label]
-        self.stacked = stacked
-        self.n = None
-        self.patches = None
+        self.color = color
+        self.label = label
+        self.show_uncert = show_uncert
+        self.y = None
+        self.erry = None
 
     def set_binning(self):
         self.binning = self.bins
@@ -603,8 +597,7 @@ class ltPlotHist:
                 self.binning = np.linspace(self.range[0], self.range[1], self.bins+1)
 
     def stack(self, others):
-        self.stacked = True
-        for attr_key in ['x', 'label', 'color', 'weights']:
+        for attr_key in ['x', 'weights']:
             attr = getattr(self, attr_key)
             for other in others:
                 attr += getattr(other, attr_key)
@@ -644,19 +637,8 @@ class ltPlotHist:
                     index = next(x[0] for x in enumerate(self.binning) if x[1] >= x_value)
                 bin_width = self.binning[index]-self.binning[index-1]
                 self.weights[k][l] *= 1/bin_width
-        
 
-    def plot(self, fig, graph):
-        label = self.label
-        if len(self.label)==1:
-            label = self.label[0]
-        n, bins, patches = fig.graphs[graph].graph.hist(self.x, bins=self.bins, range=self.range, density=False, weights=self.weights, cumulative=self.cumulative, bottom=self.bottom, histtype=self.histtype, align=self.align, orientation=self.orientation, rwidth=self.rwidth, log=self.log, color=self.color, label=label, stacked=self.stacked)
-        self.n = n
-        self.bins = bins
-        self.patches = patches
-        self.set_binning()
-
-    def plot_pts(self, fig, graph, yerr=True, xerr=True):
+    def compute(self):
         values = []
         weights = []
         for x in self.x:
@@ -664,16 +646,14 @@ class ltPlotHist:
         for w in self.weights:
             weights = weights + [val for val in w]
         hist, bin_edges = np.histogram(values, bins=self.bins, range=self.range, weights=weights, density=False)
-        self.n = [hist]
+        if self.cumulative:
+            for k in range(1,len(hist)):
+                hist[k] += hist[k-1]
+        self.y = hist
         self.bins = bin_edges
         self.set_binning()
-        ys = hist
-        xs = np.zeros(len(ys))
-        erry = np.zeros(len(ys))
-        errx = np.zeros(len(ys))
-        for k in range(len(ys)):
-            xs[k] = (self.binning[k+1]+self.binning[k])/2
-            errx[k] = (self.binning[k+1]-self.binning[k])/2
+        erry = np.zeros(len(hist))
+        for k in range(len(hist)):
             Nerry = 0
             Werry = 0
             for l in range(len(values)):
@@ -682,12 +662,60 @@ class ltPlotHist:
                 if value >= self.binning[k] and value < self.binning[k+1]:
                     Nerry += 1
                     Werry += weight
-            erry[k] = np.sqrt(ys[k]*Werry/Nerry)
-        if not yerr:
-            erry = None
-        if not xerr:
-            errx = None
-        fig.addplot(ltPlotPts(xs, ys, yerr=erry, xerr=errx, marker='o', color=self.color[0], capsize=0, label=self.label[0]), graph)
+                if self.cumulative and value < self.binning[k]:
+                    Nerry += 1
+                    Werry += weight
+            if Nerry == 0 :
+                erry[k] = 0
+            else:
+                erry[k] = np.sqrt(hist[k]*Werry/Nerry)
+        self.erry = erry
+
+    def plot(self, fig, graph):
+        self.compute()
+        label_passed = False
+        _min = 0
+        if fig.graphs[graph].y_scaling=='log':
+            if fig.graphs[graph].y_min is not None:
+                _min = fig.graphs[graph].y_min
+            else:
+                _min = min([value-1 for value in self.y if not value ==0 ])
+                if _min == 0:
+                    _min += 1
+        for k in range(len(self.y)):
+            if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
+                label = None
+                if not label_passed:
+                    label = self.label
+                    label_passed = True
+                fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [_min, _min, self.y[k], self.y[k]], color=self.color, linewidth=0, clip_path=None, label=label)
+                if self.show_uncert:
+                    up_unc =self.y[k]+self.erry[k]
+                    down_unc = self.y[k]-self.erry[k]
+                    if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
+                        down_unc = _min
+                    fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
+            
+    def plot_pts(self, fig, graph, yerr=True, xerr=True, marker='o'):
+        self.compute()
+        erry = self.erry
+        xs = np.zeros(len(self.y))
+        errx = np.zeros(len(self.y))
+        for k in range(len(xs)):
+            xs[k] = (self.binning[k+1]+self.binning[k])/2
+            errx[k] = (self.binning[k+1]-self.binning[k])/2
+            if not xerr:
+                errx[k] = None
+            if not yerr:
+                erry[k] = None
+        label_passed = False
+        for k in range(len(self.y)):
+            if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
+                label = None
+                if not label_passed:
+                    label = self.label
+                    label_passed = True
+                fig.addplot(ltPlotPts(xs[k], self.y[k], yerr=erry[k], xerr=errx[k], marker=marker, color=self.color, capsize=0, label=label), graph)
         
 class ltPlotContour2d:
     def __init__(self, x, y, z_fct, cmap=cmap_default, levels=None, label=None, clabel=False, norm_xy=True, linewidths=linewidths['contour2d']):
