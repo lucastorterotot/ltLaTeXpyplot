@@ -943,9 +943,11 @@ class ltPlotVectField2d:
         line_xy = odeint(_field, point, T).transpose()
         fig.graphs[graph].graph.plot(line_xy[0], line_xy[1], label=label, color=color, dashes=dashes, linewidth=self.linewidth_fieldline)
 
-    def plot_streamplot(self, fig, graph, start_points=None, density='undef', color=None, **kwargs):
+    def plot_streamplot(self, fig, graph, start_points=None, density='undef', color=None, linewidth=None, **kwargs):
         if color is None:
             color = self.color_fieldline
+        if linewidth is None:
+            linewidth = self.linewidth_fieldline
         if density == 'undef':
             density=1
             if start_points is not None:
@@ -958,7 +960,13 @@ class ltPlotVectField2d:
             xs, ys = np.meshgrid(xs, ys)
             vx = self.vx_fct(xs, ys)
             vy = self.vy_fct(xs, ys)
-        fig.graphs[graph].graph.streamplot(xs, ys, vx, vy, start_points=start_points, density=density, color=color, linewidth=self.linewidth_fieldline, **kwargs)
+        if callable(color):
+            color = color(xs, ys)
+        if callable(linewidth):
+            linewidth = linewidth(xs, ys)
+        strm = fig.graphs[graph].graph.streamplot(xs, ys, vx, vy, start_points=start_points, density=density, color=color, linewidth=linewidth, **kwargs)
+        if fig.graphs[graph].show_cmap_legend:
+            add_colorbar(strm.lines, fig.graphs[graph])
         
         
 class ltPlotVectField3d(ltPlotVectField2d):
