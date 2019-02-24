@@ -675,32 +675,33 @@ class ltPlotHist:
 
     def plot(self, fig, graph):
         self.compute()
-        label_passed = False
         _min = 0
         if fig.graphs[graph].y_scaling=='log':
             if fig.graphs[graph].y_min is not None:
                 _min = fig.graphs[graph].y_min
             else:
                 _min = min([value-1 for value in self.y if not value ==0 ])
-                if _min == 0:
-                    _min += 1
+                if _min <= 0:
+                    _min = 1
+        if self.fill:
+            linewidth=0
+        else:
+            linewidth=linewidths['plotfct']
+        binning_seq = [self.binning[-1],self.binning[0]]
+        mini = min([max([self.y.min(), _min]), _min])
+        y_sequence = [mini, mini]
         for k in range(len(self.y)):
-            if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
-                label = None
-                if not label_passed:
-                    label = self.label
-                    label_passed = True
-                if self.fill:
-                    linewidth=0
-                else:
-                    linewidth=linewidths['plotfct']
-                fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [_min, _min, self.y[k], self.y[k]], color=self.color, linewidth=linewidth, clip_path=None, label=label, fill=self.fill)
-                if self.show_uncert:
+            binning_seq += [self.binning[k], self.binning[k+1]]
+            y_sequence += [max([self.y[k], _min]), max([self.y[k], _min])]
+        fig.graphs[graph].graph.fill(binning_seq, y_sequence, color=self.color, linewidth=linewidth, clip_path=None, label=self.label, fill=self.fill)
+        if self.show_uncert:
+            for k in range(len(self.y)):
+                if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
                     up_unc =self.y[k]+self.erry[k]
                     down_unc = self.y[k]-self.erry[k]
-                    if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
-                        down_unc = _min
-                    fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
+                if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
+                    down_unc = _min
+                fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
             
     def plot_pts(self, fig, graph, yerr=True, xerr=True, marker='o'):
         self.compute()
