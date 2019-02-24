@@ -567,7 +567,7 @@ class ltPlotRegLin(ltPlotPts):
 
 
 class ltPlotHist:
-    def __init__(self, x, bins=None, range=None, weights=None, cumulative=False, color=color_default, label=None, show_uncert=False):
+    def __init__(self, x, bins=None, range=None, weights=None, cumulative=False, color=color_default, label=None, show_uncert=False, fill=True, linewidth=linewidths['plotfct']):
         self.x = [x]
         self.bins = bins
         self.set_binning()
@@ -582,6 +582,8 @@ class ltPlotHist:
         self.show_uncert = show_uncert
         self.y = None
         self.erry = None
+        self.fill = fill
+        self.linewidth = linewidth
 
     def set_binning(self):
         self.binning = self.bins
@@ -688,7 +690,11 @@ class ltPlotHist:
                 if not label_passed:
                     label = self.label
                     label_passed = True
-                fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [_min, _min, self.y[k], self.y[k]], color=self.color, linewidth=0, clip_path=None, label=label)
+                if self.fill:
+                    linewidth=0
+                else:
+                    linewidth=linewidths['plotfct']
+                fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [_min, _min, self.y[k], self.y[k]], color=self.color, linewidth=linewidth, clip_path=None, label=label, fill=self.fill)
                 if self.show_uncert:
                     up_unc =self.y[k]+self.erry[k]
                     down_unc = self.y[k]-self.erry[k]
