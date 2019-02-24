@@ -699,9 +699,9 @@ class ltPlotHist:
                 if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
                     up_unc =self.y[k]+self.erry[k]
                     down_unc = self.y[k]-self.erry[k]
-                if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
-                    down_unc = _min
-                fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
+                    if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
+                        down_unc = _min
+                    fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
             
     def plot_pts(self, fig, graph, yerr=True, xerr=True, marker='o'):
         self.compute()
