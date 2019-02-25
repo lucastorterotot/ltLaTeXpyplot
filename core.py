@@ -606,6 +606,13 @@ class ltPlotHist:
             setattr(self, attr_key, attr)
         self.set_binning()
 
+    def plot_stack(self, fig, graph, others):
+        histos = [self]+others
+        for hist in histos:
+            index = histos.index(hist)
+            hist.stack(histos[index+1:])
+            hist.plot(fig, graph)
+            
     def get_integral(self):
         self.set_binning()
         result = 0
