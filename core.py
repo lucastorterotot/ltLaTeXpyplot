@@ -607,6 +607,7 @@ class ltPlotHist:
         self.set_binning()
 
     def plot_stack(self, fig, graph, others, set_integral=None, scale=None):
+        do_uncert, self.show_uncert = self.show_uncert, False
         histos = [self]+others
         if set_integral is not None:
             integral_stacked = 0
@@ -620,7 +621,19 @@ class ltPlotHist:
             index = histos.index(hist)
             hist.stack(histos[index+1:])
             hist.plot(fig, graph)
-            
+        if do_uncert:
+            self._plot_uncerts(fig, graph)
+        self.show_uncert = do_uncert
+
+    def _plot_uncerts(self, fig, graph):
+        for k in range(len(self.y)):
+            if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
+                up_unc =self.y[k]+self.erry[k]
+                down_unc = self.y[k]-self.erry[k]
+                if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
+                    down_unc = _min
+                fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
+        
     def get_integral(self):
         self.set_binning()
         result = 0
@@ -710,13 +723,7 @@ class ltPlotHist:
             y_sequence += [max([self.y[k], _min]), max([self.y[k], _min])]
         fig.graphs[graph].graph.fill(binning_seq, y_sequence, color=self.color, linewidth=linewidth, clip_path=None, label=self.label, fill=self.fill)
         if self.show_uncert:
-            for k in range(len(self.y)):
-                if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
-                    up_unc =self.y[k]+self.erry[k]
-                    down_unc = self.y[k]-self.erry[k]
-                    if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
-                        down_unc = _min
-                    fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
+            self._plot_uncerts(fig, graph)
             
     def plot_pts(self, fig, graph, yerr=True, xerr=True, marker='o'):
         self.compute()
