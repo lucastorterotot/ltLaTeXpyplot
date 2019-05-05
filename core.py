@@ -28,7 +28,7 @@ marker_size_default = 4
 color_default = 'C0'
 marker_pts_default = '+'
 dashes_default=[]
-cmap_default = 'inferno'
+cmap_default = 'plasma'
 
 linewidths = {
     'grid' : .5,
