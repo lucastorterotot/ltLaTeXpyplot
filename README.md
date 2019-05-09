@@ -10,10 +10,9 @@ This package for Python 3.x provides tools to produce `pgf` figures to be used w
 
 1. Get this repository
 ```
-mkdir -p ~/python/ltLaTeXpyplot
-cd ~/python/ltLaTeXpyplot
-git init
-git remote add ltLaTeXpyplot https://github.com/lucastorterotot/ltLaTeXpyplot.git -f -t master
+mkdir -p ~/python
+cd ~/python
+git clone git@github.com:lucastorterotot/ltLaTeXpyplot.git --origin lucas
 ```
 2. Add the directory to your python path: add the following line to your `~/.bashrc`:
 ```
