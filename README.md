@@ -25,4 +25,4 @@ sudo apt-get install python3-numpy python3-scipy python3-matplotlib
 
 ## Usage
 
-See the [test example](https://github.com/lucastorterotot/ltLaTeXpyplot/blob/master/test.py).
+See the examples [in this directory](https://github.com/lucastorterotot/ltLaTeXpyplot/tree/master/examples/).
