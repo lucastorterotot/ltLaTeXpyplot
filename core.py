@@ -764,6 +764,30 @@ class ltPlotContour2d:
 
     def plot_contour(self, fig, graph):
         self.plot(fig, graph)
+
+    def plot_contourf(self, fig, graph):
+        aspect='auto'
+        if self.norm_xy :
+            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
+            aspect='equal'
+        z_fct = self.z_fct
+        xs, ys = self.x, self.y
+        if callable(self.z_fct):
+            xs, ys = np.meshgrid(xs, ys)
+            z_fct = self.z_fct(xs, ys)
+        if self.levels is None:
+            levels = mpl.ticker.MaxNLocator(nbins=15).tick_values(z_fct.min(), z_fct.max())
+        else:
+            levels = self.levels
+        dx = self.x[1]-self.x[0]
+        dy = self.y[1]-self.y[0]
+        imshow = fig.graphs[graph].graph.contourf(xs + dx/2,
+                ys + dy/2,
+                z_fct,
+                levels = levels,
+                cmap = self.cmap)
+        if fig.graphs[graph].show_cmap_legend:
+            add_colorbar(imshow, fig.graphs[graph])
         
     def plot(self, fig, graph):
         if self.norm_xy :
@@ -811,7 +835,11 @@ class ltPlotScalField:
 
     def plot_contour(self, fig, graph):
         _contour = ltPlotContour2d(self.x, self.y, self.z_fct, cmap=self.cmap, label=self.label, norm_xy=self.norm_xy)
-        _contour.plot(fig, graph)
+        _contour.plot_contour(fig, graph)    
+
+    def plot_contourf(self, fig, graph):
+        _contour = ltPlotContour2d(self.x, self.y, self.z_fct, cmap=self.cmap, label=self.label, norm_xy=self.norm_xy)
+        _contour.plot_contourf(fig, graph)       
             
     def _plot2d(self, fig, graph):
         aspect='auto'
