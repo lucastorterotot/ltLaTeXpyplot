@@ -105,7 +105,11 @@ def axes_comma(x, pos):  # formatter function takes tick label and tick position
 axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
 def add_colorbar(plot, ltGraph):
-    clb = plt.colorbar(plot, ax=ltGraph.graph)
+    if ltGraph.projection == '3d':
+        shrink = .75
+    else:
+        shrink = 1.
+    clb = plt.colorbar(plot, shrink=shrink, ax=ltGraph.graph)
     clb_FR_ticks = []
     for tick in clb.get_ticks():
         clb_FR_ticks.append('\\num{'+str(tick)+'}')
