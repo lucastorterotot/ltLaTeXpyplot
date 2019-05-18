@@ -27,7 +27,7 @@ fig.addgraph('graph2', show_cmap_legend=True, position=212, title='Scalar field 
 cmap = 'PiYG'
 
 # Insert object in plots
-field = lt.ltPlotScalField(x, y, z_fct=z_fct, norm_xy=False, cmap=cmap)
+field = lt.ltPlotScalField(x, y, z_fct=z_fct, norm_xy=False, cmap=cmap, Nlevels=15)
 field.plot(fig, 'graph1')
 field.plot_contourf(fig, 'graph2')
 

@@ -751,7 +751,7 @@ class ltPlotHist:
                 fig.addplot(ltPlotPts(xs[k], self.y[k], yerr=erry[k], xerr=errx[k], marker=marker, color=self.color, capsize=0, label=label), graph)
         
 class ltPlotScalField:
-    def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, levels=None, Nlevels=15, color=color_default, label=None, clabel=False, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield'], linewidths=linewidths['contour2d']):
+    def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, levels=None, Nlevels=None, color=color_default, label=None, clabel=False, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield'], linewidths=linewidths['contour2d']):
         self.label = label
         self.x = x
         self.y = y
