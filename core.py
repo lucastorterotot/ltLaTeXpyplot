@@ -750,35 +750,62 @@ class ltPlotHist:
                     label_passed = True
                 fig.addplot(ltPlotPts(xs[k], self.y[k], yerr=erry[k], xerr=errx[k], marker=marker, color=self.color, capsize=0, label=label), graph)
         
-class ltPlotContour2d:
-    def __init__(self, x, y, z_fct, cmap=cmap_default, levels=None, label=None, clabel=False, norm_xy=True, linewidths=linewidths['contour2d']):
+class ltPlotScalField:
+    def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, levels=None, Nlevels=15, color=color_default, label=None, clabel=False, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield'], linewidths=linewidths['contour2d']):
         self.label = label
         self.x = x
         self.y = y
         self.z_fct = z_fct
         self.cmap = cmap
-        self.levels = levels
         self.clabel = clabel
-        self.norm_xy = norm_xy
+        self.levels = levels
+        self.Nlevels = Nlevels
+        self.color = color
+        self.alpha = alpha
+        self.alpha_3d = alpha_3d
+        self.norm_xy = norm_xy or norm_xyz
+        self.norm_xyz = norm_xyz
+        self.use_cmap = use_cmap
+        self.linewidth = linewidth
         self.linewidths = linewidths
+        self.C_fct = C_fct
+
+    def plot(self, fig, graph):
+        if fig.graphs[graph].projection == '3d':
+            self._plot3d(fig, graph)
+        else :
+            self._plot2d(fig, graph)
 
     def plot_field(self, fig, graph):
-        _field = ltPlotScalField(self.x, self.y, self.z_fct, cmap=self.cmap, label=self.label, norm_xy=self.norm_xy, use_cmap=True)
-        _field.plot(fig, graph)
-
-    def plot_contour(self, fig, graph):
         self.plot(fig, graph)
 
-    def plot_contourf(self, fig, graph):
-        aspect='auto'
+    def _plot_contour_init(self, fig, graph):
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-            aspect='equal'
         z_fct = self.z_fct
         xs, ys = self.x, self.y
         if callable(self.z_fct):
             xs, ys = np.meshgrid(xs, ys)
             z_fct = self.z_fct(xs, ys)
+        if self.levels is None :
+            if self.Nlevels is not None:
+                self.levels = mpl.ticker.MaxNLocator(nbins=self.Nlevels).tick_values(z_fct.min(), z_fct.max())
+        return xs, ys, z_fct
+
+    def plot_contour(self, fig, graph):
+        xs, ys, z_fct = self._plot_contour_init(fig, graph)
+        if self.levels is not None :
+            current_contour=fig.graphs[graph].graph.contour(xs, ys, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap, levels=self.levels)
+        else:
+            current_contour=fig.graphs[graph].graph.contour(xs, ys, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap)
+        if fig.graphs[graph].show_cmap_legend:
+            add_colorbar(current_contour, fig.graphs[graph])
+        if self.clabel :
+            fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt=r'${value}$'.format(value='%1.1f'), fontsize=pgf_with_latex['legend.fontsize']-1)
+        current_contour=0 
+
+    def plot_contourf(self, fig, graph): 
+        xs, ys, z_fct = self._plot_contour_init(fig, graph)
         if self.levels is None:
             levels = mpl.ticker.MaxNLocator(nbins=15).tick_values(z_fct.min(), z_fct.max())
         else:
@@ -791,59 +818,7 @@ class ltPlotContour2d:
                 levels = levels,
                 cmap = self.cmap)
         if fig.graphs[graph].show_cmap_legend:
-            add_colorbar(imshow, fig.graphs[graph])
-        
-    def plot(self, fig, graph):
-        if self.norm_xy :
-            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        z_fct = self.z_fct
-        xs, ys = self.x, self.y
-        if callable(self.z_fct):
-            xs, ys = np.meshgrid(xs, ys)
-            z_fct = self.z_fct(xs, ys)
-        if self.levels is not None :
-            current_contour=fig.graphs[graph].graph.contour(xs, ys, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap, levels=self.levels)
-        else:
-            current_contour=fig.graphs[graph].graph.contour(xs, ys, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap)
-        if fig.graphs[graph].show_cmap_legend:
-            add_colorbar(current_contour, fig.graphs[graph])
-        if self.clabel :
-            fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt=r'${value}$'.format(value='%1.1f'), fontsize=pgf_with_latex['legend.fontsize']-1)
-        current_contour=0
-
-        
-class ltPlotScalField:
-    def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, color=color_default, label=None, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield']):
-        self.label = label
-        self.x = x
-        self.y = y
-        self.z_fct = z_fct
-        self.cmap = cmap
-        self.color = color
-        self.alpha = alpha
-        self.alpha_3d = alpha_3d
-        self.norm_xy = norm_xy or norm_xyz
-        self.norm_xyz = norm_xyz
-        self.use_cmap = use_cmap
-        self.linewidth = linewidth
-        self.C_fct = C_fct
-
-    def plot(self, fig, graph):
-        if fig.graphs[graph].projection == '3d':
-            self._plot3d(fig, graph)
-        else :
-            self._plot2d(fig, graph)
-
-    def plot_field(self, fig, graph):
-        self.plot(fig, graph)
-
-    def plot_contour(self, fig, graph):
-        _contour = ltPlotContour2d(self.x, self.y, self.z_fct, cmap=self.cmap, label=self.label, norm_xy=self.norm_xy)
-        _contour.plot_contour(fig, graph)    
-
-    def plot_contourf(self, fig, graph):
-        _contour = ltPlotContour2d(self.x, self.y, self.z_fct, cmap=self.cmap, label=self.label, norm_xy=self.norm_xy)
-        _contour.plot_contourf(fig, graph)       
+            add_colorbar(imshow, fig.graphs[graph])   
             
     def _plot2d(self, fig, graph):
         aspect='auto'
