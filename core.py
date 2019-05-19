@@ -787,9 +787,8 @@ class ltPlotScalField:
         if callable(self.z_fct):
             xs, ys = np.meshgrid(xs, ys)
             z_fct = self.z_fct(xs, ys)
-        if self.levels is None :
-            if self.Nlevels is not None:
-                self.levels = mpl.ticker.MaxNLocator(nbins=self.Nlevels).tick_values(z_fct.min(), z_fct.max())
+        if self.levels is None and self.Nlevels is not None:
+            self.levels = mpl.ticker.MaxNLocator(nbins=self.Nlevels).tick_values(z_fct.min(), z_fct.max())
         return xs, ys, z_fct
 
     def plot_contour(self, fig, graph):
@@ -806,17 +805,10 @@ class ltPlotScalField:
 
     def plot_contourf(self, fig, graph): 
         xs, ys, z_fct = self._plot_contour_init(fig, graph)
-        if self.levels is None:
-            levels = mpl.ticker.MaxNLocator(nbins=15).tick_values(z_fct.min(), z_fct.max())
+        if self.levels is not None:
+            imshow = fig.graphs[graph].graph.contourf(xs, ys, z_fct, cmap = self.cmap, levels = self.levels)
         else:
-            levels = self.levels
-        dx = self.x[1]-self.x[0]
-        dy = self.y[1]-self.y[0]
-        imshow = fig.graphs[graph].graph.contourf(xs + dx/2,
-                ys + dy/2,
-                z_fct,
-                levels = levels,
-                cmap = self.cmap)
+            imshow = fig.graphs[graph].graph.contourf(xs, ys, z_fct, cmap = self.cmap)
         if fig.graphs[graph].show_cmap_legend:
             add_colorbar(imshow, fig.graphs[graph])   
             
