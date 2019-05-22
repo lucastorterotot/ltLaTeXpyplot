@@ -351,7 +351,10 @@ class ltPlotFct:
     def __init__(self, x, y, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct']):
         self.label = label
         self.x = x
-        self.y = y
+        if callable(y):
+            self.y = y(x)
+        else:
+            self.y = y
         self.color = color
         self.dashes = dashes
         self.marker = marker
@@ -388,7 +391,10 @@ class ltPlotFct:
 class ltPlotFct3d(ltPlotFct):
     def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct'], norm_xy=True, norm_xyz=True):
         ltPlotFct.__init__(self, x, y, label=label, color=color, dashes=dashes, marker=marker, markersize=markersize, linewidth=linewidth)
-        self.z = z
+        if callable(z):
+            self.z = z(x,y)
+        else:
+            self.z = z
         self.norm_xy = norm_xy or norm_xyz
         self.norm_xyz = norm_xyz
 
@@ -432,7 +438,10 @@ class ltPlotPts(ltPlotFct):
 class ltPlotPts3d(ltPlotPts):
     def __init__(self, x, y, z, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, cmap=None, norm_xy=True, norm_xyz=True, surface=None, alpha=None):
         ltPlotPts.__init__(self, x, y, label=label, color=color, cmap=cmap, marker=marker, markersize=markersize, surface=surface, alpha=alpha)
-        self.z = z
+        if callable(z):
+            self.z = z(x,y)
+        else:
+            self.z = z
         self.norm_xy = norm_xy or norm_xyz
         self.norm_xyz = norm_xyz
 
