@@ -102,6 +102,9 @@ def axes_comma(x, pos):  # formatter function takes tick label and tick position
     string += '}}'
     return string
 
+def ltPlotPieautopct(x, unit='%', maxdec=1):
+    return '\\SI{{'+str(round(x,maxdec))+'}}{'+unit+'}'
+
 axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
 def add_colorbar(plot, ltGraph):
@@ -577,7 +580,38 @@ class ltPlotRegLin(ltPlotPts):
 
     def plot_pts(self, fig, graph):
         self.points.plot(fig, graph)
+    
+class ltPlotPie:
+    def __init__(self, sizes, explode=None, labels=None, colors=None, autopct=None, pctdistance=.6, shadow=True, labeldistance=1.1, startangle=90, counterclock=True, wedgeprops=None, textprops=None, frame=False, rotatelabels=False, norm_xy=True):
+        self.sizes = sizes
+        self.explode = explode
+        self.labels = labels
+        self.colors = colors
+        if autopct is not None:
+            self.autopct = autopct
+        else:
+            self.autopct = ltPlotPieautopct
+        self.pctdistance = pctdistance
+        self.shadow = shadow
+        self.labeldistance = labeldistance
+        self.startangle = startangle
+        self.counterclock = counterclock
+        self.wedgeprops = wedgeprops
+        self.textprops = textprops
+        self.frame = frame
+        self.rotatelabels = rotatelabels
+        self.norm_xy = norm_xy
 
+    def plot(self, fig, graph):
+        ax = fig.graphs[graph].graph
+        plt.setp(ax.get_xticklabels(), visible=False)
+        plt.setp(ax.get_yticklabels(), visible=False)
+        ax.tick_params(direction='in',which='major',bottom=0, top=0, left=0, right=0, width=linewidths['majorticks'])
+        ax.tick_params(direction='in',which='minor',bottom=0, top=0, left=0, right=0, width=linewidths['minorticks'])
+        if self.norm_xy:
+            ax.axis('equal')
+        ax.pie(self.sizes, explode = self.explode, labels = self.labels, colors = self.colors, autopct = self.autopct, pctdistance = self.pctdistance, shadow = self.shadow, labeldistance = self.labeldistance, startangle = self.startangle, counterclock = self.counterclock, wedgeprops = self.wedgeprops, textprops = self.textprops, frame = self.frame, rotatelabels = self.rotatelabels)
+        
 
 class ltPlotHist:
     def __init__(self, x, bins=None, range=None, weights=None, cumulative=False, color=color_default, label=None, show_uncert=False, fill=True, linewidth=linewidths['plotfct']):
