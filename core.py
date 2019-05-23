@@ -167,6 +167,9 @@ class ltFigure:
         else:
             raise NameError('Figure {} already has a graph named {}.'.format(self.name, name))
 
+    def addtwingraph(self, name, twin_of, axis='x', **kwargs):
+        self.addgraph(name, twin_of=twin_of, twin_common_axis=axis, **kwargs)
+
     def testgraph(self, name, position=111):
         if not name in self.graphs.keys():
             self.addgraph(name, position=position)
@@ -180,6 +183,7 @@ class ltFigure:
         
 class ltGraph:
     def __init__(self, fig, name, title=None,
+                 twin_of=None, twin_common_axis='x', 
                  x_label=None, y_label=None, z_label=None,
                  x_scaling='linear', y_scaling='linear', z_scaling='linear', projection='rectilinear',
                  x_min=None, x_max=None, y_min=None, y_max=None, z_min=None, z_max=None,
@@ -197,6 +201,8 @@ class ltGraph:
                  share_x=None, share_y=None):
         self.fig = fig
         self.name = name
+        self.twin_of = twin_of
+        self.twin_common_axis = twin_common_axis
         self.title = title
         self.x_label = x_label
         self.y_label = y_label
@@ -242,8 +248,25 @@ class ltGraph:
         self.share_x = share_x
         self.share_y = share_y
 
-        self.graph = fig.fig.add_subplot(position, projection=projection, sharex=share_x, sharey=share_y)        
-
+        if self.twin_of is None:
+            self.graph = fig.fig.add_subplot(position, projection=projection, sharex=share_x, sharey=share_y)
+        elif self.twin_of in self.fig.graphs.keys():
+            if self.twin_common_axis == 'x':
+                self.graph = fig.graphs[self.twin_of].graph.twinx()
+            elif self.twin_common_axis == 'y':
+                self.graph = fig.graphs[self.twin_of].graph.twiny()
+        else:
+            error_string = '\n' + '  You tried to make a twin graph but it failed. Aborting...'\
+                           + '\n'\
+                           + '    Graph name: '+self.name\
+                           + '\n'\
+                           + '    Supposed twin of: '+self.twin_of\
+                           + '\n'\
+                           + '    Can be twin of: '
+            for key in self.fig.graphs.keys():
+                error_string += '\n\t'+key
+            raise RuntimeError(error_string)
+        
         if show_grid:
             self.graph.grid(linewidth=linewidths['grid'])
         if show_x_axis and not (projection=='3d' or x_min is None or x_max is None):
@@ -258,13 +281,19 @@ class ltGraph:
         if not z_ticks:
             plt.setp(self.graph.get_zticklabels(), visible=False)
 
-        if self.projection == 'polar':
-            self.graph.tick_params(direction='in',which='major', width=linewidths['majorticks'])
-            self.graph.tick_params(direction='in',which='minor', width=linewidths['minorticks'])
-        else:
-            self.graph.tick_params(direction='in',which='major',bottom=1, top=1, left=1, right=1, width=linewidths['majorticks'])
-            self.graph.tick_params(direction='in',which='minor',bottom=1, top=1, left=1, right=1, width=linewidths['minorticks'])
-
+        for ticks_category in ['major', 'minor']:
+            if self.projection == 'polar':
+                self.graph.tick_params(direction='in', which=ticks_category, width=linewidths[ticks_category+'ticks'])
+            else:
+                self.graph.tick_params(
+                    direction='in',
+                    which=ticks_category,
+                    bottom=(self.twin_of is None or self.twin_common_axis is not 'y'),
+                    top=1,
+                    left=(self.twin_of is None or self.twin_common_axis is not 'x'),
+                    right=1,
+                    width=linewidths[ticks_category+'ticks']
+                )
 
     def update(self):
         if self.title is not None:
@@ -606,8 +635,8 @@ class ltPlotPie:
         ax = fig.graphs[graph].graph
         plt.setp(ax.get_xticklabels(), visible=False)
         plt.setp(ax.get_yticklabels(), visible=False)
-        ax.tick_params(direction='in',which='major',bottom=0, top=0, left=0, right=0, width=linewidths['majorticks'])
-        ax.tick_params(direction='in',which='minor',bottom=0, top=0, left=0, right=0, width=linewidths['minorticks'])
+        for ticks_category in ['major', 'minor']:
+            ax.tick_params(direction='in', which=ticks_category, bottom=0, top=0, left=0, right=0, width=linewidths[ticks_category+'ticks'])
         if self.norm_xy:
             ax.axis('equal')
         ax.pie(self.sizes, explode = self.explode, labels = self.labels, colors = self.colors, autopct = self.autopct, pctdistance = self.pctdistance, shadow = self.shadow, labeldistance = self.labeldistance, startangle = self.startangle, counterclock = self.counterclock, wedgeprops = self.wedgeprops, textprops = self.textprops, frame = self.frame, rotatelabels = self.rotatelabels)
@@ -1158,10 +1187,18 @@ class ltPlotNMR:
             
             fig.graphs[graph].graph.plot(delta, spectrum_integral, color='black', linewidth=self.integral_linewidth ,label=None)
         fig.graphs[graph].graph.plot(delta, spectrum, color=color, linewidth=self.linewidth , label=None, dashes=self.dashes)
+        
+        for ticks_category in ['major', 'minor']:
+            fig.graphs[graph].graph.tick_params(
+                direction='in',
+                which=ticks_category,
+                bottom=(fig.graphs[graph].twin_of is None or fig.graphs[graph].twin_common_axis is not 'y'),
+                top=0,
+                left=0,
+                right=0,
+                width=linewidths[ticks_category+'ticks']
+            )
             
-        fig.graphs[graph].graph.tick_params(direction='in',which='major',bottom=1, top=0, left=0, right=0, width=linewidths['majorticks'])
-        fig.graphs[graph].graph.tick_params(direction='in',which='minor',bottom=1, top=0, left=0, right=0, width=linewidths['minorticks'])
-
         if fig.graphs[graph].x_label is None :
             fig.graphs[graph].graph.set_xlabel("$\\delta$ (ppm)")
 
