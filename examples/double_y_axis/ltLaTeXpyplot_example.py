@@ -26,5 +26,14 @@ sin = lt.ltPlotPts(t, s2, color='r', marker='.')
 sin.plot(fig, 'graph2')
 exp.plot(fig, 'graph1')
 
+ax1 = fig.graphs['graph1'].graph
+ax1.set_ylabel(fig.graphs['graph1'].y_label, color='b')
+ax1.tick_params('y', colors='b', which='major')
+ax1.tick_params('y', colors='b', which='minor')
+ax2 = fig.graphs['graph2'].graph
+ax2.set_ylabel(fig.graphs['graph2'].y_label, color='r')
+ax2.tick_params('y', colors='r', which='major')
+ax2.tick_params('y', colors='r', which='minor')
+
 # Save figure
 fig.save(format='pdf')  
