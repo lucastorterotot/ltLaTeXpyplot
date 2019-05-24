@@ -380,7 +380,18 @@ class ltGraph:
 
             
 class ltPlotFct:
-    def __init__(self, x, y, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct']):
+    def __init__(self,
+                 x, y,
+                 label=None,
+                 color=color_default,
+                 dashes=dashes_default,
+                 marker=None, markersize=marker_size_default,
+                 linewidth=linewidths['plotfct'],
+                 Fs=1,
+                 Nfft=256,
+                 pad_to=None,
+                 noverlap=None,
+                 cmap=cmap_default):
         self.label = label
         self.x = x
         if callable(y):
@@ -393,6 +404,11 @@ class ltPlotFct:
         self.markersize = marker_size_default if marker is not None else None
         self.TF_computed = False
         self.linewidth = linewidth
+        self.Fs = Fs
+        self.Nfft = Nfft
+        self.pad_to = pad_to
+        self.noverlap = noverlap
+        self.cmap = cmap
 
     def plot(self, fig, graph):
         fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=self.linewidth, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
@@ -419,6 +435,14 @@ class ltPlotFct:
         if not self.TF_computed:
             self.compute_TF(**kwargs)
         self.TF.plot(fig, graph)
+
+    def plot_TFrp(self, fig, graph, **kwargs):
+        ax = fig.graphs[graph].graph
+        if self.pad_to is None:
+            self.pad_to = self.Nfft
+        if self.noverlap is None:
+            self.noverlap = int(self.Nfft/2)
+        ax.specgram(self.y, Fs=self.Fs, cmap=self.cmap, NFFT=self.Nfft, pad_to=self.pad_to, noverlap=self.noverlap, **kwargs)
         
 class ltPlotFct3d(ltPlotFct):
     def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct'], norm_xy=True, norm_xyz=True):
