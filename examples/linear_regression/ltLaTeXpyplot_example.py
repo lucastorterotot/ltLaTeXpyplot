@@ -10,7 +10,7 @@ import scipy as sc
 import ltLaTeXpyplot.core as lt
 
 # Create figure
-fig = lt.ltFigure(name='reglin-fig')
+fig = lt.ltFigure(name='fig')
 
 # Define what to plot
 # data
@@ -29,6 +29,4 @@ fig.addgraph('graph1', x_label='$\\varepsilon$', y_label='$f(\\varepsilon)$', sh
 reg.plot(fig, 'graph1', lang='EN')
 
 # Sauvegarder la figure
-fig.save()
-
 fig.save(format='pdf')
