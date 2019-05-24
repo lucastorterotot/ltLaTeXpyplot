@@ -594,11 +594,11 @@ class ltPlotRegLin(ltPlotPts):
         self.points = ltPlotPts(x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize, linewidth=self.linewidth, elinewidth=self.elinewidth, capsize=self.capsize, capthick=self.capthick)
         self.reglin = ltPlotFct(x_aj, y_aj, label=label_reg, color=color_reg, dashes=dashes, linewidth=self.linewidth)
         
-    def plot(self, fig, graph):
-        self.plot_reg(fig, graph)
+    def plot(self, fig, graph, lang=lang):
+        self.plot_reg(fig, graph, lang=lang)
         self.plot_pts(fig, graph)
 
-    def plot_reg(self, fig, graph):
+    def plot_reg(self, fig, graph, lang=lang):
         self.reglin.plot(fig, graph)
         if self.give_info:
             x_info = 0.5
