@@ -10,7 +10,7 @@ r_on_a0_max ={
     '1x' : 6,
     '2x' : 15,
     '3x' : 30}
-r_on_a0_MAX = max([r_on_a0_max[key] for key in r_on_a0_max.keys()])
+r_on_a0_MAX = max([value for value in r_on_a0_max.values()])
 
 def R10(r):
     u = Z*r/a0

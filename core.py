@@ -152,8 +152,8 @@ class ltFigure:
     def update(self):
         if self.title is not None:
             self.fig.suptitle(self.title, fontsize=pgf_with_latex["font.size"]+.95)
-        for graph in self.graphs.keys():
-            self.graphs[graph].update()
+        for graph in self.graphs.values():
+            graph.update()
         if self.tight_layout :
             self.fig.tight_layout()
 
@@ -162,7 +162,7 @@ class ltFigure:
         self.fig.savefig('{}-pyplot.{}'.format(self.name, format),bbox_inches='tight')
 
     def addgraph(self, name, **kwargs):
-        if not name in self.graphs.keys():
+        if not name in self.graphs:
             self.graphs[name] = ltGraph(self, name, **kwargs)
         else:
             raise NameError('Figure {} already has a graph named {}.'.format(self.name, name))
@@ -171,7 +171,7 @@ class ltFigure:
         self.addgraph(name, twin_of=twin_of, twin_common_axis=axis, **kwargs)
 
     def testgraph(self, name, position=111):
-        if not name in self.graphs.keys():
+        if not name in self.graphs:
             self.addgraph(name, position=position)
             print('Warning, auto-generated graph at position {}'.format(position))
             print('with name {}'.format(name))
@@ -250,7 +250,7 @@ class ltGraph:
 
         if self.twin_of is None:
             self.graph = fig.fig.add_subplot(position, projection=projection, sharex=share_x, sharey=share_y)
-        elif self.twin_of in self.fig.graphs.keys():
+        elif self.twin_of in self.fig.graphs:
             if self.twin_common_axis == 'x':
                 self.graph = fig.graphs[self.twin_of].graph.twinx()
             elif self.twin_common_axis == 'y':
@@ -263,7 +263,7 @@ class ltGraph:
                            + '    Supposed twin of: '+self.twin_of\
                            + '\n'\
                            + '    Can be twin of: '
-            for key in self.fig.graphs.keys():
+            for key in self.fig.graphs:
                 error_string += '\n\t'+key
             raise RuntimeError(error_string)
         

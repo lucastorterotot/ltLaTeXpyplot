@@ -12,16 +12,15 @@ phi = np.arange(-np.pi*(1+1./steps),np.pi*(1+1./steps),np.pi/steps)
 
 print('  Creating orbitals: Ylm representations...')
 
-ntot = len(data.Y_fcts_R.keys()) + len(data.Y_fcts_C.keys())
+ntot = len(data.Y_fcts_R) + len(data.Y_fcts_C)
 ncur = 0
 for dic in [data.Y_fcts_R, data.Y_fcts_C]:
-    for key in dic.keys():
+    for key, Ylm in dic.items():
         cmap = 'coolwarm'
         if key in ['s', '00']:
             cmap += '_r'
         ncur += 1
         fig = lt.ltFigure(name='orbitale-'+key, height_width_ratio=1)
-        Ylm = dic[key]
         def R_fct(theta, phi):
             return (np.absolute(Ylm(theta, phi)))**2
         def C_fct(theta, phi):
