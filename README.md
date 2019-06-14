@@ -8,15 +8,13 @@ This package for Python 3.x provides tools to produce easily `pgf` figures to be
 
 ## Installation
 
-1. Get this repository
+1. Go in a directory where you want to install this repository and clone it:
 ```
-mkdir -p ~/python
-cd ~/python
 git clone git@github.com:lucastorterotot/ltLaTeXpyplot.git --origin lucas
 ```
-2. Add the directory to your python path by adding the `~/python/` directory in the python path:
+2. Run the provided installation script:
 ```
-echo 'export PYTHONPATH=~/python/:$PYTHONPATH' >> ~/.bashrc
+./ltLaTeXpyplot/install
 ```
 3. You may want to install the following Python3 modules:
 ```
