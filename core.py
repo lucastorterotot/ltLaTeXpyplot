@@ -245,11 +245,17 @@ class ltGraph:
         self.position = position
         self.show_cmap_legend = show_cmap_legend
         self.cmap_label = cmap_label
-        self.share_x = share_x
-        self.share_y = share_y
+        if isinstance(share_x , str):
+            self.share_x = fig.graphs[share_x].graph
+        else:
+            self.share_x = share_x
+        if isinstance(share_y , str):
+            self.share_y = fig.graphs[share_y].graph
+        else:
+            self.share_y = share_y
 
         if self.twin_of is None:
-            self.graph = fig.fig.add_subplot(position, projection=projection, sharex=share_x, sharey=share_y)
+            self.graph = fig.fig.add_subplot(position, projection=projection, sharex=self.share_x, sharey=self.share_y)
         elif self.twin_of in self.fig.graphs:
             if self.twin_common_axis == 'x':
                 self.graph = fig.graphs[self.twin_of].graph.twinx()
