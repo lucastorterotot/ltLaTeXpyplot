@@ -536,6 +536,23 @@ class ltPlotRegLin(ltPlotPts):
         self.give_info = give_info
         self.info_placement = info_placement
         self.verbose = verbose
+
+        xerr_for_reg = xerr
+        yerr_for_reg = yerr
+
+        if len(xerr_for_reg) == 2:
+                if len(xerr_for_reg[0]) == len(x) and len(xerr_for_reg[1]) == len(x):
+                    xerr_for_reg = (
+                        np.array(xerr_for_reg[0])
+                        + np.array(xerr_for_reg[1])
+                    )/2
+
+        if len(yerr_for_reg) == 2:
+                if len(yerr_for_reg[0]) == len(x) and len(yerr_for_reg[1]) == len(x):
+                    yerr_for_reg = (
+                        np.array(yerr_for_reg[0])
+                        + np.array(yerr_for_reg[1])
+                    )/2
         
         # linear function to adjust
         def f(x,p):
@@ -549,7 +566,7 @@ class ltPlotRegLin(ltPlotPts):
 
         # difference to data
         def residual(p, y, x):
-            return (y-f(x,p))/np.sqrt(yerr**2 + (Dx_f(x,p)*xerr)**2)
+            return (y-f(x,p))/np.sqrt(yerr_for_reg**2 + (Dx_f(x,p)*xerr_for_reg)**2)
 
         # initial estimation
         # usually OK but sometimes one need to give a different
