@@ -681,7 +681,7 @@ class ltPlotHist:
         self.label = label
         self.show_uncert = show_uncert
         self.y = None
-        self.erry = None
+        self.yerr = None
         self.fill = fill
         self.linewidth = linewidth
 
@@ -728,8 +728,8 @@ class ltPlotHist:
     def _plot_uncerts(self, fig, graph):
         for k in range(len(self.y)):
             if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
-                up_unc =self.y[k]+self.erry[k]
-                down_unc = self.y[k]-self.erry[k]
+                up_unc =self.y[k]+self.yerr[k]
+                down_unc = self.y[k]-self.yerr[k]
                 if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
                     down_unc = _min
                 fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
@@ -782,24 +782,24 @@ class ltPlotHist:
         self.y = hist
         self.bins = bin_edges
         self.set_binning()
-        erry = np.zeros(len(hist))
+        yerr = np.zeros(len(hist))
         for k in range(len(hist)):
-            Nerry = 0
-            Werry = 0
+            Nyerr = 0
+            Wyerr = 0
             for l in range(len(values)):
                 value = values[l]
                 weight = weights[l]
                 if value >= self.binning[k] and value < self.binning[k+1]:
-                    Nerry += 1
-                    Werry += weight
+                    Nyerr += 1
+                    Wyerr += weight
                 if self.cumulative and value < self.binning[k]:
-                    Nerry += 1
-                    Werry += weight
-            if Nerry == 0 :
-                erry[k] = 0
+                    Nyerr += 1
+                    Wyerr += weight
+            if Nyerr == 0 :
+                yerr[k] = 0
             else:
-                erry[k] = np.sqrt(hist[k]*Werry/Nerry)
-        self.erry = erry
+                yerr[k] = np.sqrt(hist[k]*Wyerr/Nyerr)
+        self.yerr = yerr
 
     def plot(self, fig, graph):
         self.compute()
@@ -827,16 +827,16 @@ class ltPlotHist:
             
     def plot_pts(self, fig, graph, yerr=True, xerr=True, marker='o'):
         self.compute()
-        erry = self.erry
+        yerr = self.yerr
         xs = np.zeros(len(self.y))
-        errx = np.zeros(len(self.y))
+        xerr = np.zeros(len(self.y))
         for k in range(len(xs)):
             xs[k] = (self.binning[k+1]+self.binning[k])/2
-            errx[k] = (self.binning[k+1]-self.binning[k])/2
+            xerr[k] = (self.binning[k+1]-self.binning[k])/2
             if not xerr:
-                errx[k] = None
+                xerr[k] = None
             if not yerr:
-                erry[k] = None
+                yerr[k] = None
         label_passed = False
         for k in range(len(self.y)):
             if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
@@ -844,7 +844,7 @@ class ltPlotHist:
                 if not label_passed:
                     label = self.label
                     label_passed = True
-                fig.addplot(ltPlotPts(xs[k], self.y[k], yerr=erry[k], xerr=errx[k], marker=marker, color=self.color, capsize=0, label=label), graph)
+                fig.addplot(ltPlotPts(xs[k], self.y[k], yerr=yerr[k], xerr=xerr[k], marker=marker, color=self.color, capsize=0, label=label), graph)
         
 class ltPlotScalField:
     def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, levels=None, Nlevels=None, color=color_default, label=None, clabel=False, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield'], linewidths=linewidths['contour2d']):
