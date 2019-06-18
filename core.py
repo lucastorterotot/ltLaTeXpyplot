@@ -181,14 +181,6 @@ class ltFigure:
         plot.plot(self, name)
 
     def addinsetgraph(self, name, inset_of, inset_axes = 'upper right', indicate_inset_zoom=True, x_ticks = False, y_ticks = False, **kwargs):
-        if inset_axes == 'upper right':
-            inset_axes = [0.5, 0.5, 0.47, 0.47]
-        elif inset_axes == 'upper left':
-            inset_axes = [0.03, 0.5, 0.5, 0.47]
-        elif inset_axes == 'lower right':
-            inset_axes = [0.5, 0.03, 0.47, 0.5]
-        elif inset_axes == 'lower left':
-            inset_axes = [0.03, 0.03, 0.5, 0.5]
         self.addgraph(name, inset_of=inset_of, inset_axes=inset_axes, indicate_inset_zoom=indicate_inset_zoom, x_ticks = x_ticks, y_ticks = y_ticks, **kwargs)
 
         
@@ -278,7 +270,38 @@ class ltGraph:
                 self.graph = fig.graphs[self.twin_of].graph.twiny()
         elif self.inset_of in self.fig.graphs:
             ax = fig.graphs[self.inset_of].graph
-            self.graph = ax.inset_axes(self.inset_axes)
+            if hasattr(ax, 'inset_axes'):
+                if inset_axes == 'upper right':
+                    inset_axes = [0.5, 0.5, 0.47, 0.47]
+                elif inset_axes == 'upper left':
+                    inset_axes = [0.03, 0.5, 0.5, 0.47]
+                elif inset_axes == 'lower right':
+                    inset_axes = [0.5, 0.03, 0.47, 0.5]
+                elif inset_axes == 'lower left':
+                    inset_axes = [0.03, 0.03, 0.5, 0.5]
+                self.graph = ax.inset_axes(self.inset_axes)
+            else :
+                from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+                if self.inset_axes == 'upper right':
+                    self.inset_axes = [0.5, 0.5, 0.47, 0.47]
+                    inset_axes_loc = 1
+                elif self.inset_axes == 'upper left':
+                    self.inset_axes = [0.03, 0.5, 0.5, 0.47]
+                    inset_axes_loc = 2
+                elif self.inset_axes == 'lower right':
+                    self.inset_axes = [0.5, 0.03, 0.47, 0.5]
+                    inset_axes_loc = 4
+                elif self.inset_axes == 'lower left':
+                    self.inset_axes = [0.03, 0.03, 0.5, 0.5]
+                    inset_axes_loc = 3
+                else:
+                    inset_axes_loc = 1
+                width = self.inset_axes[2]*100
+                height = self.inset_axes[3]*100
+                self.graph = inset_axes(ax,
+                   width="{}%".format(width),
+                   height="{}%".format(height),  # height : 1 inch
+                   loc=inset_axes_loc)
         else:
             error_string = '\n' + '  You tried to make a twin graph but it failed. Aborting...'\
                            + '\n'\
@@ -386,7 +409,9 @@ class ltGraph:
                 self.graph.zaxis.set_minor_formatter(axes_format_comma)
 
         if self.inset_of is not None and self.indicate_inset_zoom :
-            self.fig.graphs[self.inset_of].graph.indicate_inset_zoom(self.graph)
+            ax = self.fig.graphs[self.inset_of].graph
+            if hasattr(ax, 'indicate_inset_zoom'):
+                ax.indicate_inset_zoom(self.graph)
 
     def fill_between(self, x, y1, y2, alpha=.5, **kwargs):
         self.graph.fill_between(x, y1, y2, alpha=alpha, **kwargs)
