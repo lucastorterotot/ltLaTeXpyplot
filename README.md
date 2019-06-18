@@ -20,6 +20,11 @@ git clone git@github.com:lucastorterotot/ltLaTeXpyplot.git --origin lucas
 ```
 sudo apt-get install python3-numpy python3-scipy python3-matplotlib
 ```
+4. You might want the most up-to-date version of matplotlib:
+```
+sudo apt-get install python3-pip
+python3 -m pip install matplotlib --upgrade
+```
 
 ## Usage
 
