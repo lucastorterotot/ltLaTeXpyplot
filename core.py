@@ -180,10 +180,22 @@ class ltFigure:
         self.testgraph(name)
         plot.plot(self, name)
 
+    def addinsetgraph(self, name, inset_of, inset_axes = 'upper right', indicate_inset_zoom=True, x_ticks = False, y_ticks = False, **kwargs):
+        if inset_axes == 'upper right':
+            inset_axes = [0.5, 0.5, 0.47, 0.47]
+        elif inset_axes == 'upper left':
+            inset_axes = [0.03, 0.5, 0.5, 0.47]
+        elif inset_axes == 'lower right':
+            inset_axes = [0.5, 0.03, 0.47, 0.5]
+        elif inset_axes == 'lower left':
+            inset_axes = [0.03, 0.03, 0.5, 0.5]
+        self.addgraph(name, inset_of=inset_of, inset_axes=inset_axes, indicate_inset_zoom=indicate_inset_zoom, x_ticks = x_ticks, y_ticks = y_ticks, **kwargs)
+
         
 class ltGraph:
     def __init__(self, fig, name, title=None,
                  twin_of=None, twin_common_axis='x', 
+                 inset_of=None, inset_axes=None, indicate_inset_zoom=True,
                  x_label=None, y_label=None, z_label=None,
                  x_scaling='linear', y_scaling='linear', z_scaling='linear', projection='rectilinear',
                  x_min=None, x_max=None, y_min=None, y_max=None, z_min=None, z_max=None,
@@ -203,6 +215,9 @@ class ltGraph:
         self.name = name
         self.twin_of = twin_of
         self.twin_common_axis = twin_common_axis
+        self.inset_of = inset_of
+        self.inset_axes = inset_axes
+        self.indicate_inset_zoom = indicate_inset_zoom
         self.title = title
         self.x_label = x_label
         self.y_label = y_label
@@ -254,13 +269,16 @@ class ltGraph:
         else:
             self.share_y = share_y
 
-        if self.twin_of is None:
+        if self.twin_of is None and self.inset_of is None:
             self.graph = fig.fig.add_subplot(position, projection=projection, sharex=self.share_x, sharey=self.share_y)
         elif self.twin_of in self.fig.graphs:
             if self.twin_common_axis == 'x':
                 self.graph = fig.graphs[self.twin_of].graph.twinx()
             elif self.twin_common_axis == 'y':
                 self.graph = fig.graphs[self.twin_of].graph.twiny()
+        elif self.inset_of in self.fig.graphs:
+            ax = fig.graphs[self.inset_of].graph
+            self.graph = ax.inset_axes(self.inset_axes)
         else:
             error_string = '\n' + '  You tried to make a twin graph but it failed. Aborting...'\
                            + '\n'\
@@ -268,7 +286,7 @@ class ltGraph:
                            + '\n'\
                            + '    Supposed twin of: '+self.twin_of\
                            + '\n'\
-                           + '    Can be twin of: '
+                           + '    Can be twin or inset of: '
             for key in self.fig.graphs:
                 error_string += '\n\t'+key
             raise RuntimeError(error_string)
@@ -366,6 +384,9 @@ class ltGraph:
                 self.graph.zaxis.set_major_formatter(axes_format_comma)
             if self.comma_z_minor :
                 self.graph.zaxis.set_minor_formatter(axes_format_comma)
+
+        if self.inset_of is not None and self.indicate_inset_zoom :
+            self.fig.graphs[self.inset_of].graph.indicate_inset_zoom(self.graph)
 
     def fill_between(self, x, y1, y2, alpha=.5, **kwargs):
         self.graph.fill_between(x, y1, y2, alpha=alpha, **kwargs)
