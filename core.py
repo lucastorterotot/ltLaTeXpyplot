@@ -144,7 +144,7 @@ class ltFigure:
 
         self.figsize = [self.fig_width_inches, self.fig_height_inches]
 
-        plt.clf() # TODO check that there is no conflict with other figures
+        #plt.clf() # TODO check that there is no conflict with other figures
         self.fig = plt.figure(figsize=self.figsize)
         self.graphs = {}
         self.tight_layout = tight_layout
