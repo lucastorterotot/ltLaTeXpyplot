@@ -33,7 +33,7 @@ field = lt.ltPlotScalField(xs, ys, z_fct = zs, cmap='viridis')
 fig.addgraph('graph1')
 
 x1, x2, y1, y2 = -1.5, -0.9, -2.5, -1.9
-fig.addinsetgraph('graph2', 'graph1', inset_axes = 'upper right', x_min = x1, x_max = x2, y_min = y1, y_max = y2)
+fig.addinsetgraph('graph2', 'graph1', inset_pos = 'upper right', x_min = x1, x_max = x2, y_min = y1, y_max = y2)
 
 # Insert object in plots
 field.plot(fig, 'graph1')

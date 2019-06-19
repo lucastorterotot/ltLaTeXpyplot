@@ -180,14 +180,14 @@ class ltFigure:
         self.testgraph(name)
         plot.plot(self, name)
 
-    def addinsetgraph(self, name, inset_of, inset_axes = 'upper right', indicate_inset_zoom=True, x_ticks = False, y_ticks = False, **kwargs):
-        self.addgraph(name, inset_of=inset_of, inset_axes=inset_axes, indicate_inset_zoom=indicate_inset_zoom, x_ticks = x_ticks, y_ticks = y_ticks, **kwargs)
+    def addinsetgraph(self, name, inset_of, inset_pos = 'upper right', indicate_inset_zoom=True, x_ticks = False, y_ticks = False, **kwargs):
+        self.addgraph(name, inset_of=inset_of, inset_pos=inset_pos, indicate_inset_zoom=indicate_inset_zoom, x_ticks = x_ticks, y_ticks = y_ticks, **kwargs)
 
         
 class ltGraph:
     def __init__(self, fig, name, title=None,
                  twin_of=None, twin_common_axis='x', 
-                 inset_of=None, inset_axes=None, indicate_inset_zoom=True,
+                 inset_of=None, inset_pos=None, indicate_inset_zoom=True,
                  x_label=None, y_label=None, z_label=None,
                  x_scaling='linear', y_scaling='linear', z_scaling='linear', projection='rectilinear',
                  x_min=None, x_max=None, y_min=None, y_max=None, z_min=None, z_max=None,
@@ -208,7 +208,7 @@ class ltGraph:
         self.twin_of = twin_of
         self.twin_common_axis = twin_common_axis
         self.inset_of = inset_of
-        self.inset_axes = inset_axes
+        self.inset_pos = inset_pos
         self.indicate_inset_zoom = indicate_inset_zoom
         self.title = title
         self.x_label = x_label
@@ -270,38 +270,30 @@ class ltGraph:
                 self.graph = fig.graphs[self.twin_of].graph.twiny()
         elif self.inset_of in self.fig.graphs:
             ax = fig.graphs[self.inset_of].graph
+            if self.inset_pos == 'upper right':
+                self.inset_pos = [0.5, 0.5, 0.47, 0.47]
+                inset_loc = 1
+            elif self.inset_pos == 'upper left':
+                self.inset_pos = [0.03, 0.5, 0.5, 0.47]
+                inset_loc = 2
+            elif self.inset_pos == 'lower right':
+                self.inset_pos = [0.5, 0.03, 0.47, 0.5]
+                inset_loc = 4
+            elif self.inset_pos == 'lower left':
+                self.inset_pos = [0.03, 0.03, 0.5, 0.5]
+                inset_loc = 3
+            else:
+                inset_loc = 1
             if hasattr(ax, 'inset_axes'):
-                if inset_axes == 'upper right':
-                    inset_axes = [0.5, 0.5, 0.47, 0.47]
-                elif inset_axes == 'upper left':
-                    inset_axes = [0.03, 0.5, 0.5, 0.47]
-                elif inset_axes == 'lower right':
-                    inset_axes = [0.5, 0.03, 0.47, 0.5]
-                elif inset_axes == 'lower left':
-                    inset_axes = [0.03, 0.03, 0.5, 0.5]
-                self.graph = ax.inset_axes(self.inset_axes)
+                self.graph = ax.inset_axes(self.inset_pos)
             else :
                 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-                if self.inset_axes == 'upper right':
-                    self.inset_axes = [0.5, 0.5, 0.47, 0.47]
-                    inset_axes_loc = 1
-                elif self.inset_axes == 'upper left':
-                    self.inset_axes = [0.03, 0.5, 0.5, 0.47]
-                    inset_axes_loc = 2
-                elif self.inset_axes == 'lower right':
-                    self.inset_axes = [0.5, 0.03, 0.47, 0.5]
-                    inset_axes_loc = 4
-                elif self.inset_axes == 'lower left':
-                    self.inset_axes = [0.03, 0.03, 0.5, 0.5]
-                    inset_axes_loc = 3
-                else:
-                    inset_axes_loc = 1
-                width = self.inset_axes[2]*100
-                height = self.inset_axes[3]*100
+                width = self.inset_pos[2]*100
+                height = self.inset_pos[3]*100
                 self.graph = inset_axes(ax,
                    width="{}%".format(width),
                    height="{}%".format(height),  # height : 1 inch
-                   loc=inset_axes_loc)
+                   loc=inset_loc)
         else:
             error_string = '\n' + '  You tried to make a twin graph but it failed. Aborting...'\
                            + '\n'\
