@@ -274,13 +274,13 @@ class ltGraph:
                 self.inset_pos = [0.5, 0.5, 0.47, 0.47]
                 inset_loc = 1
             elif self.inset_pos == 'upper left':
-                self.inset_pos = [0.03, 0.5, 0.5, 0.47]
+                self.inset_pos = [0.03, 0.5, 0.47, 0.47]
                 inset_loc = 2
             elif self.inset_pos == 'lower right':
-                self.inset_pos = [0.5, 0.03, 0.47, 0.5]
+                self.inset_pos = [0.5, 0.03, 0.47, 0.47]
                 inset_loc = 4
             elif self.inset_pos == 'lower left':
-                self.inset_pos = [0.03, 0.03, 0.5, 0.5]
+                self.inset_pos = [0.03, 0.03, 0.47, 0.47]
                 inset_loc = 3
             else:
                 inset_loc = 1
