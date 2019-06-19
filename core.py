@@ -321,6 +321,7 @@ class ltGraph:
                     inset_loc = 7
                 else:
                     inset_loc = 1
+            self._inset_loc = inset_loc
             if hasattr(ax, 'inset_axes'):
                 self.graph = ax.inset_axes(self.inset_pos)
             else :
@@ -485,10 +486,24 @@ class ltGraph:
                     ylim = ax.get_ylim()
                     Dx = xlim[1] - xlim[0]
                     Dy = ylim[1] - ylim[0]
-                    x0 = self.inset_pos[0] * Dx + xlim[0]
-                    y0 = self.inset_pos[1] * Dy + ylim[0]
-                    x1 = (self.inset_pos[0] + self.inset_pos[2]) * Dx + xlim[0]
-                    y1 = (self.inset_pos[1] + self.inset_pos[3]) * Dy + ylim[0]
+                    dx = self.inset_pos[2]
+                    dy = self.inset_pos[3]
+                    centers = {
+                        '1' : (.97-dx/2, .97-dy/2),
+                        '2' : (.03+dx/2, .97-dy/2),
+                        '3' : (.03+dx/2, .03+dy/2),
+                        '4' : (.97-dx/2, .03+dy/2),
+                        '5' : (.97-dx/2, .5),
+                        '6' : (.03+dx/2, .5),
+                        '7' : (.97-dx/2, .5),
+                        '8' : (.5, .03+dy/2),
+                        '9' : (.5, .97-dy/2),
+                        '10': (.5, .5),
+                        }
+                    x0 = (centers[str(self._inset_loc)][0] - dx/2) * Dx + xlim[0]
+                    x1 = (centers[str(self._inset_loc)][0] + dx/2) * Dx + xlim[0]
+                    y0 = (centers[str(self._inset_loc)][1] - dy/2) * Dy + ylim[0]
+                    y1 = (centers[str(self._inset_loc)][1] + dy/2) * Dy + ylim[0]
                     import matplotlib.transforms as mtransforms
                     pos = mtransforms.Bbox(np.array([[x0, y0], [x1, y1]]))
                     bboxins = pos#.transformed(ax.figure.transFigure)
