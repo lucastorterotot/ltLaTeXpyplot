@@ -300,44 +300,27 @@ class ltGraph:
             elif self.inset_pos == 'center':
                 self.inset_pos = [0.235, 0.235, 0.47, 0.47]
                 inset_loc = 10
-            elif self.inset_pos[0] < .235 and self.inset_pos[1] < .235:
-                self.inset_pos[0] = .03
-                self.inset_pos[1] = .03
-                inset_loc = 3
-            elif self.inset_pos[0] < .235 and self.inset_pos[1] < .5:
-                self.inset_pos[0] = .03
-                self.inset_pos[1] = .235
-                inset_loc = 6
-            elif self.inset_pos[0] < .235 and self.inset_pos[1] >= .5:
-                self.inset_pos[0] = .03
-                self.inset_pos[1] = .5
-                inset_loc = 2
-            elif self.inset_pos[0] < .5 and self.inset_pos[1] < .235:
-                self.inset_pos[0] = .235
-                self.inset_pos[1] = .03
-                inset_loc = 8
-            elif self.inset_pos[0] < .5 and self.inset_pos[1] < .5:
-                self.inset_pos[0] = .235
-                self.inset_pos[1] = .235
-                inset_loc = 10
-            elif self.inset_pos[0] < .5 and self.inset_pos[1] >= .5:
-                self.inset_pos[0] = .235
-                self.inset_pos[1] = .5
-                inset_loc = 9
-            elif self.inset_pos[0] >= .5 and self.inset_pos[1] < .235:
-                self.inset_pos[0] = .5
-                self.inset_pos[1] = .03
-                inset_loc = 4
-            elif self.inset_pos[0] >= .5 and self.inset_pos[1] < .5:
-                self.inset_pos[0] = .5
-                self.inset_pos[1] = .235
-                inset_loc = 7
-            elif self.inset_pos[0] >= .5 and self.inset_pos[1] >= .5:
-                self.inset_pos[0] = .5
-                self.inset_pos[1] = .5
-                inset_loc = 1
-            else:
-                inset_loc = 1
+            else :
+                inset_center_x = self.inset_pos[0] + self.inset_pos[2]/2
+                inset_center_y = self.inset_pos[1] + self.inset_pos[3]/2
+                if inset_center_x < 1/3 and inset_center_y < 1/3:
+                    inset_loc = 3
+                elif inset_center_x < 1/3 and inset_center_y < 2/3:
+                    inset_loc = 6
+                elif inset_center_x < 1/3 and inset_center_y >= 2/3:
+                    inset_loc = 2
+                elif inset_center_x < 2/3 and inset_center_y < 1/3:
+                    inset_loc = 8
+                elif inset_center_x < 2/3 and inset_center_y < 2/3:
+                    inset_loc = 10
+                elif inset_center_x < 2/3 and inset_center_y >= 2/3:
+                    inset_loc = 9
+                elif inset_center_x >= 2/3 and inset_center_y < 1/3:
+                    inset_loc = 4
+                elif inset_center_x >= 2/3 and inset_center_y < 2/3:
+                    inset_loc = 7
+                else:
+                    inset_loc = 1
             if hasattr(ax, 'inset_axes'):
                 self.graph = ax.inset_axes(self.inset_pos)
             else :
