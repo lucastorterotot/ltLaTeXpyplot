@@ -276,18 +276,66 @@ class ltGraph:
             elif self.inset_pos == 'upper left':
                 self.inset_pos = [0.03, 0.5, 0.47, 0.47]
                 inset_loc = 2
-            elif self.inset_pos == 'lower right':
-                self.inset_pos = [0.5, 0.03, 0.47, 0.47]
-                inset_loc = 4
             elif self.inset_pos == 'lower left':
                 self.inset_pos = [0.03, 0.03, 0.47, 0.47]
                 inset_loc = 3
-            elif self.inset_pos[0] < .5 and self.inset_pos[1] >= .5:
-                inset_loc = 2
-            elif self.inset_pos[0] < .5 and self.inset_pos[1] < .5:
-                inset_loc = 3
-            elif self.inset_pos[0] >= .5 and self.inset_pos[1] < .5:
+            elif self.inset_pos == 'lower right':
+                self.inset_pos = [0.5, 0.03, 0.47, 0.47]
                 inset_loc = 4
+            elif self.inset_pos == 'right':
+                self.inset_pos = [0.5, 0.235, 0.47, 0.47]
+                inset_loc = 5
+            elif self.inset_pos == 'center left':
+                self.inset_pos = [0.03, 0.235, 0.47, 0.47]
+                inset_loc = 6
+            elif self.inset_pos == 'center right':
+                self.inset_pos = [0.5, 0.235, 0.47, 0.47]
+                inset_loc = 7
+            elif self.inset_pos == 'lower center':
+                self.inset_pos = [0.235, 0.03, 0.47, 0.47]
+                inset_loc = 8
+            elif self.inset_pos == 'upper center':
+                self.inset_pos = [0.235, 0.5, 0.47, 0.47]
+                inset_loc = 9
+            elif self.inset_pos == 'center':
+                self.inset_pos = [0.235, 0.235, 0.47, 0.47]
+                inset_loc = 10
+            elif self.inset_pos[0] < .235 and self.inset_pos[1] < .235:
+                self.inset_pos[0] = .03
+                self.inset_pos[1] = .03
+                inset_loc = 3
+            elif self.inset_pos[0] < .235 and self.inset_pos[1] < .5:
+                self.inset_pos[0] = .03
+                self.inset_pos[1] = .235
+                inset_loc = 6
+            elif self.inset_pos[0] < .235 and self.inset_pos[1] >= .5:
+                self.inset_pos[0] = .03
+                self.inset_pos[1] = .5
+                inset_loc = 2
+            elif self.inset_pos[0] < .5 and self.inset_pos[1] < .235:
+                self.inset_pos[0] = .235
+                self.inset_pos[1] = .03
+                inset_loc = 8
+            elif self.inset_pos[0] < .5 and self.inset_pos[1] < .5:
+                self.inset_pos[0] = .235
+                self.inset_pos[1] = .235
+                inset_loc = 10
+            elif self.inset_pos[0] < .5 and self.inset_pos[1] >= .5:
+                self.inset_pos[0] = .235
+                self.inset_pos[1] = .5
+                inset_loc = 9
+            elif self.inset_pos[0] >= .5 and self.inset_pos[1] < .235:
+                self.inset_pos[0] = .5
+                self.inset_pos[1] = .03
+                inset_loc = 4
+            elif self.inset_pos[0] >= .5 and self.inset_pos[1] < .5:
+                self.inset_pos[0] = .5
+                self.inset_pos[1] = .235
+                inset_loc = 7
+            elif self.inset_pos[0] >= .5 and self.inset_pos[1] >= .5:
+                self.inset_pos[0] = .5
+                self.inset_pos[1] = .5
+                inset_loc = 1
             else:
                 inset_loc = 1
             if hasattr(ax, 'inset_axes'):
@@ -451,15 +499,19 @@ class ltGraph:
                                     zorder=zorder, edgecolor=edgecolor, alpha=alpha)]
                             ax.add_patch(connects[-1])
                     # decide which two of the lines to keep visible....
-                    x0 = self.inset_pos[0]
-                    y0 = self.inset_pos[1]
-                    x1 = x0 + self.inset_pos[2]
-                    y1 = y0 + self.inset_pos[3]
+                    xlim = ax.get_xlim()
+                    ylim = ax.get_ylim()
+                    Dx = xlim[1] - xlim[0]
+                    Dy = ylim[1] - ylim[0]
+                    x0 = self.inset_pos[0] * Dx + xlim[0]
+                    y0 = self.inset_pos[1] * Dy + ylim[0]
+                    x1 = (self.inset_pos[0] + self.inset_pos[2]) * Dx + xlim[0]
+                    y1 = (self.inset_pos[1] + self.inset_pos[3]) * Dy + ylim[0]
                     import matplotlib.transforms as mtransforms
                     pos = mtransforms.Bbox(np.array([[x0, y0], [x1, y1]]))
-                    bboxins = pos.transformed(ax.figure.transFigure)
+                    bboxins = pos#.transformed(ax.figure.transFigure)
                     rectbbox = mtransforms.Bbox.from_bounds(
-                        *bounds).transformed(transform)
+                        *bounds)#.transformed(transform)
                     x0 = rectbbox.x0 < bboxins.x0
                     x1 = rectbbox.x1 < bboxins.x1
                     y0 = rectbbox.y0 < bboxins.y0
