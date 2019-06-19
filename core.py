@@ -282,6 +282,12 @@ class ltGraph:
             elif self.inset_pos == 'lower left':
                 self.inset_pos = [0.03, 0.03, 0.47, 0.47]
                 inset_loc = 3
+            elif self.inset_pos[0] < .5 and self.inset_pos[1] >= .5:
+                inset_loc = 2
+            elif self.inset_pos[0] < .5 and self.inset_pos[1] < .5:
+                inset_loc = 3
+            elif self.inset_pos[0] >= .5 and self.inset_pos[1] < .5:
+                inset_loc = 4
             else:
                 inset_loc = 1
             if hasattr(ax, 'inset_axes'):
