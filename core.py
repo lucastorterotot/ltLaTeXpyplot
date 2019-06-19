@@ -445,8 +445,7 @@ class ltGraph:
                 # inspired from https://github.com/matplotlib/matplotlib/blob/master/lib/matplotlib/axes/_axes.py
                 xlim = self.graph.get_xlim()
                 ylim = self.graph.get_ylim()
-                rect = [xlim[0], ylim[0], xlim[1] - xlim[0], ylim[1] - ylim[0]]
-                bounds = rect
+                bounds = [xlim[0], ylim[0], xlim[1] - xlim[0], ylim[1] - ylim[0]]
                 transform=None
                 facecolor='none'
                 edgecolor='0.5'
