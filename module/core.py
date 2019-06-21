@@ -22,8 +22,6 @@ from mpl_toolkits.mplot3d import Axes3D
 
 ### Defining global variables for this package
 
-lang = 'FR'
-
 marker_size_default = 4
 color_default = 'C0'
 marker_pts_default = '+'
@@ -80,9 +78,6 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
     }
 
 pgf_with_latex['pgf.preamble'] += [r"\SIproductsign{\!\times\!}\SIunitsep{\,}\SIunitdot{{\fontfamily{cmr}\cdot}}"]
-if lang == 'FR':
-    pgf_with_latex['pgf.preamble'] += [r"\SIdecimalsign{,}\SIthousandsep{\,}"]
-
 mpl.rcParams.update(pgf_with_latex)
 
 ### Defining usefull tools
@@ -132,7 +127,11 @@ def factorial (x):
 ### Package core
 
 class ltFigure:
-    def __init__(self, name='fig', title=None, page_width_cm=17, width_frac=.8, height_width_ratio=1./golden, tight_layout=False):
+    def __init__(self,
+                 name='fig', title=None,
+                 page_width_cm=17, width_frac=.8,
+                 height_width_ratio=1./golden, tight_layout=False,
+                 lang = 'FR'):
         self.name = name
         self.title = title
         self.page_width_cm = page_width_cm
@@ -149,7 +148,17 @@ class ltFigure:
         self.graphs = {}
         self.tight_layout = tight_layout
 
+        self.lang = lang
+
     def update(self):
+        pgf_preamble = pgf_with_latex['pgf.preamble']
+        if self.lang == 'FR':
+            pgf_preamble = pgf_preamble+[
+                r"\SIdecimalsign{,}\SIthousandsep{\,}"
+            ]
+        mpl_updater = {'pgf.preamble' : pgf_preamble}
+        mpl.rcParams.update(mpl_updater)
+        
         if self.title is not None:
             self.fig.suptitle(self.title, fontsize=pgf_with_latex["font.size"]+.95)
         for graph in self.graphs.values():
@@ -195,9 +204,9 @@ class ltGraph:
                  y_ticks=True, y_ticks_min=None, y_ticks_max=None, y_ticks_step=None,
                  z_ticks=True, z_ticks_min=None, z_ticks_max=None, z_ticks_step=None,
                  minorticks=True,
-                 comma_x_major=(lang == 'FR'), comma_x_minor=False,
-                 comma_y_major=(lang == 'FR'), comma_y_minor=False,
-                 comma_z_major=(lang == 'FR'), comma_z_minor=False,
+                 comma_x_major=None, comma_x_minor=False,
+                 comma_y_major=None, comma_y_minor=False,
+                 comma_z_major=None, comma_z_minor=False,
                  show_grid=False, show_x_axis=False, show_y_axis=False,
                  show_legend=False, legend_location='best', legend_on_side=False,
                  show_cmap_legend=False, cmap_label=None,
@@ -238,10 +247,16 @@ class ltGraph:
         self.z_ticks_step = z_ticks_step
         self.minorticks = minorticks
         self.comma_x_major = comma_x_major
-        self.comma_x_minor = comma_x_minor
+        if comma_x_major is None:
+            self.comma_x_major = (self.fig.lang == 'FR')
         self.comma_y_major = comma_y_major
-        self.comma_y_minor = comma_y_minor
+        if comma_y_major is None:
+            self.comma_y_major = (self.fig.lang == 'FR')
         self.comma_z_major = comma_z_major
+        if comma_z_major is None:
+            self.comma_z_major = (self.fig.lang == 'FR')
+        self.comma_x_minor = comma_x_minor
+        self.comma_y_minor = comma_y_minor
         self.comma_z_minor = comma_z_minor
         self.show_grid = show_grid
         self.show_x_axis = show_x_axis
@@ -745,10 +760,7 @@ class ltPlotRegLin(ltPlotPts):
         chi2r = np.sum(np.square(residual(popt,y,x)))/(x.size-popt.size)
 
         if self.verbose:
-            if lang == 'FR':
-                print('  Regression lineaire :')
-            else :
-                print('  Linear regression :')
+            print('  Linear regression :')
             print('    f(x) = a * x + b')
             print('    a = {} ;'.format(popt[0]))
             print('    b = {}.'.format(popt[1]))
@@ -768,11 +780,15 @@ class ltPlotRegLin(ltPlotPts):
         self.points = ltPlotPts(x, y, xerr, yerr, label=label, color=color, marker=marker, markersize=markersize, linewidth=self.linewidth, elinewidth=self.elinewidth, capsize=self.capsize, capthick=self.capthick)
         self.reglin = ltPlotFct(x_aj, y_aj, label=label_reg, color=color_reg, dashes=dashes, linewidth=self.linewidth)
         
-    def plot(self, fig, graph, lang=lang):
+    def plot(self, fig, graph, lang=None):
+        if lang is None:
+            lang = fig.lang
         self.plot_reg(fig, graph, lang=lang)
         self.plot_pts(fig, graph)
 
-    def plot_reg(self, fig, graph, lang=lang):
+    def plot_reg(self, fig, graph, lang=None):
+        if lang is None:
+            lang = fig.lang
         self.reglin.plot(fig, graph)
         if self.give_info:
             x_info = 0.5
