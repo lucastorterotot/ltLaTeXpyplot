@@ -3,7 +3,7 @@
 
 import numpy as np
 
-import ltLaTeXpyplot.core as lt
+import ltLaTeXpyplot as lt
 import ltLaTeXpyplot.data.orbitals.orbitals_data as data # uses the orbital data of this package
 
 steps = 50

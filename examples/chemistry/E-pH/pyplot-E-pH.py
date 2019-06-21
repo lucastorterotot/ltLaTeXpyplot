@@ -4,7 +4,7 @@
 import numpy as np
 import scipy as sc
 
-import ltLaTeXpyplot.core as lt
+import ltLaTeXpyplot as lt
 
 # Create figure
 fig = lt.ltFigure(name='EpH-fig')

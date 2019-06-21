@@ -3,7 +3,7 @@
 
 import numpy as np
 
-import ltLaTeXpyplot.core as lt
+import ltLaTeXpyplot as lt
 import ltLaTeXpyplot.data.orbitals.orbitals_data as data # uses the orbital data of this package
 
 r_on_a0 = np.arange(0,data.r_on_a0_MAX,0.1)

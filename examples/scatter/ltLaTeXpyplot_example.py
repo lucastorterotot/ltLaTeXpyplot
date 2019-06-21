@@ -4,7 +4,7 @@
 import numpy as np
 import scipy as sc
 
-import ltLaTeXpyplot.core as lt
+import ltLaTeXpyplot as lt
 
 # Create figure
 fig = lt.ltFigure(name='fig', height_width_ratio=.725, width_frac=120.59/112.05)
