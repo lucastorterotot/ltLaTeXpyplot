@@ -10,7 +10,7 @@ This package for Python 3.x provides tools to produce easily `pgf` figures to be
 
 1. Go in a directory where you want to install this repository and clone it:
 ```
-git clone git@github.com:lucastorterotot/ltLaTeXpyplot.git --origin lucas
+git clone git@gitlab.com:lucastorterotot/ltLaTeXpyplot.git --origin lucas
 ```
 2. Run the provided installation script:
 ```
@@ -23,4 +23,4 @@ sudo apt-get install python3-numpy python3-scipy python3-matplotlib
 
 ## Usage
 
-See the examples [in this directory](https://github.com/lucastorterotot/ltLaTeXpyplot/tree/master/examples/).
+See the examples [in this directory](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/tree/master/examples).
