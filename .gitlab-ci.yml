@@ -1,11 +1,8 @@
 stages:
   - test
 
-before_script:
-  - ls -lrt
-  - apt-get update && apt-get install python3-numpy python3-scipy python3-matplotlib
-
 test:
   stage: test
   script:
-  - echo "OK"
+    - cd examples/
+    - for file in $(find $(pwd) -type f -iname ltLaTeXpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltLaTeXpyplot_example.py ; done
