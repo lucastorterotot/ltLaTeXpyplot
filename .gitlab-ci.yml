@@ -2,7 +2,8 @@ stages:
   - test
 
 before_script:
-  - apt-get update && apt-get install python3 python3-numpy python3-scipy python3-matplotlib
+  - ls -lrt
+  - apt-get update && apt-get install python3-numpy python3-scipy python3-matplotlib
 
 test:
   stage: test
