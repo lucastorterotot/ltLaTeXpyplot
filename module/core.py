@@ -117,6 +117,20 @@ def add_colorbar(plot, ltGraph):
     if ltGraph.cmap_label is not None:
         clb.ax.set_title(ltGraph.cmap_label, fontsize=pgf_with_latex['axes.labelsize'])
 
+import six
+def set_aspect(ax, aspect, adjustable=None, anchor=None):
+    if (isinstance(aspect, six.string_types)
+        and aspect in ('equal', 'auto')):
+        ax._aspect = aspect
+    else:
+        ax._aspect = float(aspect)  # raise ValueError if necessary
+
+    if adjustable is not None:
+        ax.set_adjustable(adjustable)
+    if anchor is not None:
+        ax.set_anchor(anchor)
+    ax.stale = True
+        
 def normalize_3d(plot, ltGraph, x, y, z):
     print('uses 3d')
     ax = ltGraph.graph
@@ -126,18 +140,13 @@ def normalize_3d(plot, ltGraph, x, y, z):
         max_range_z = np.array([z.max() -z.min()]).max()/2
         try:
             ax.set_aspect('equal')
-            if plot.norm_xyz :
-                max_range = np.array([max_range_xy, max_range_z]).max()
-                max_range_xy = max_range
-                max_range_z  = max_range
         except NotImplementedError:
-            if plot.norm_xyz :
-                pos = ltGraph.graph.get_position()
-                ratio_z = (pos.x1-pos.x0)/(pos.y1-pos.y0)
-                if ratio_z >= 1 :
-                    max_range_z *= 1/ratio_z
-                else:
-                    max_range_xy *= ratio_z
+            set_aspect(ax, 'equal')
+            ax._aspect = 'auto'
+        if plot.norm_xyz :
+            max_range = np.array([max_range_xy, max_range_z]).max()
+            max_range_xy = max_range
+            max_range_z  = max_range
         Xb = max_range_xy*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
         Yb = max_range_xy*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
         Zb = max_range_z*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
