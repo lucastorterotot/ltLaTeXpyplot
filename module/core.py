@@ -617,7 +617,7 @@ class ltPlotFct:
         ax.specgram(self.y, Fs=self.Fs, cmap=self.cmap, NFFT=self.Nfft, pad_to=self.pad_to, noverlap=self.noverlap, **kwargs)
         
 class ltPlotFct3d(ltPlotFct):
-    def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct'], norm_xy=True, norm_xyz=True):
+    def __init__(self, x, y, z, label=None, color=color_default, dashes=dashes_default, marker=None, markersize=marker_size_default, linewidth=linewidths['plotfct'], norm_xy=True, norm_xyz=False):
         ltPlotFct.__init__(self, x, y, label=label, color=color, dashes=dashes, marker=marker, markersize=markersize, linewidth=linewidth)
         if callable(z):
             self.z = z(x,y)
@@ -664,7 +664,7 @@ class ltPlotPts(ltPlotFct):
         
 
 class ltPlotPts3d(ltPlotPts):
-    def __init__(self, x, y, z, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, cmap=None, norm_xy=True, norm_xyz=True, surface=None, alpha=None):
+    def __init__(self, x, y, z, label=None, color=color_default, marker=marker_pts_default, markersize=marker_size_default, cmap=None, norm_xy=True, norm_xyz=False, surface=None, alpha=None):
         ltPlotPts.__init__(self, x, y, label=label, color=color, cmap=cmap, marker=marker, markersize=markersize, surface=surface, alpha=alpha)
         if callable(z):
             self.z = z(x,y)
@@ -1120,7 +1120,7 @@ class ltPlotScalField:
 
 
 class ltPlotSurf:
-    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, C_fct=None, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=True, use_cmap=False, linewidth=linewidths['surface']):
+    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, C_fct=None, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=False, use_cmap=False, linewidth=linewidths['surface']):
         if R_fct is not None:
             def x_fct(t, p):
                 return R_fct(t, p) * np.sin(t) * np.cos(p)
@@ -1284,11 +1284,13 @@ class ltPlotVectField2d:
         
         
 class ltPlotVectField3d(ltPlotVectField2d):
-    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None, norm_xyz=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
-        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, color=color, cmap=cmap, use_cmap=use_cmap, C_fct=C_fct, norm_xy=norm_xyz, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
+    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None, norm_xy=True, norm_xyz=False, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
+        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, color=color, cmap=cmap, use_cmap=use_cmap, C_fct=C_fct, norm_xy=norm_xy, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
         self.z = z
         self.vz_fct = vz_fct
-
+        self.norm_xy = norm_xy or norm_xyz
+        self.norm_xyz = norm_xyz
+         
     def plot(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
         if self.norm_xy :
