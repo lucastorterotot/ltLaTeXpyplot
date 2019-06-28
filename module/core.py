@@ -118,21 +118,31 @@ def add_colorbar(plot, ltGraph):
         clb.ax.set_title(ltGraph.cmap_label, fontsize=pgf_with_latex['axes.labelsize'])
 
 def normalize_3d(plot, ltGraph, x, y, z):
+    print('uses 3d')
     ax = ltGraph.graph
+    plot.norm_xyz = True
     if plot.norm_xy or plot.norm_xyz :
         max_range_xy = np.array([x.max() -x.min(), y.max() -y.min()]).max()/2
         max_range_z = np.array([z.max() -z.min()]).max()/2
-        if plot.norm_xyz :
-            if ltGraph.fig.height_width_ratio > 1 :
-                max_range_z *= ltGraph.fig.height_width_ratio
-            else:
-                max_range_xy *= 1/ltGraph.fig.height_width_ratio
-        mid_x = (x.max()+x.min()) * 0.5
-        mid_y = (y.max()+y.min()) * 0.5
-        mid_z = (z.max()+z.min()) * 0.5
-        ax.set_xlim(mid_x - max_range_xy, mid_x + max_range_xy)
-        ax.set_ylim(mid_y - max_range_xy, mid_y + max_range_xy)
-        ax.set_zlim(mid_z - max_range_z, mid_z + max_range_z)
+        try:
+            ax.set_aspect('equal')
+            if plot.norm_xyz :
+                max_range = np.array([max_range_xy, max_range_z]).max()
+                max_range_xy = max_range
+                max_range_z  = max_range
+        except NotImplementedError:
+            if plot.norm_xyz :
+                pos = ltGraph.graph.get_position()
+                ratio_z = (pos.x1-pos.x0)/(pos.y1-pos.y0)
+                if ratio_z >= 1 :
+                    max_range_z *= 1/ratio_z
+                else:
+                    max_range_xy *= ratio_z
+        Xb = max_range_xy*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
+        Yb = max_range_xy*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
+        Zb = max_range_z*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
+        for xb, yb, zb in zip(Xb, Yb, Zb):
+            ax.plot([xb], [yb], [zb], 'w')
         
 def factorial (x):
     result = 1

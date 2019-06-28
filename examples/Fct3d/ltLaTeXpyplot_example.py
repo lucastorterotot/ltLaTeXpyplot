@@ -13,7 +13,7 @@ fig = lt.ltFigure(name='fig')
 time = np.linspace(0,100,100)
 x = np.sin(time/10)
 y = np.cos(time/10)
-z = time/time.max()
+z = 2*time/time.max()
 
 fct = lt.ltPlotFct3d(x, y, z, label='F1', color='C3')
 

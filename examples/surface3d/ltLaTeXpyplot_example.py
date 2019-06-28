@@ -41,7 +41,7 @@ def z_fct(X, Y):
 def C_fct(x, y):
     return x-y
 
-surf1 = lt.ltPlotSurf(X, Y, z_fct=z_fct, C_fct=C_fct, norm_xyz=False, use_cmap=True)
+surf1 = lt.ltPlotSurf(X, Y, z_fct=z_fct, C_fct=C_fct, norm_xyz=True, use_cmap=True)
 surf2 = lt.ltPlotSurf(X, Y, z_fct=z_fct, C_fct=C_fct, norm_xyz=False, use_cmap=True, linewidth=.5, alpha=1)
     
 # Define graphs
