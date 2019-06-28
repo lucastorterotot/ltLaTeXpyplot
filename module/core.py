@@ -120,16 +120,19 @@ def add_colorbar(plot, ltGraph):
 def normalize_3d(plot, ltGraph, x, y, z):
     ax = ltGraph.graph
     if plot.norm_xy or plot.norm_xyz :
-        z_factor = 0
-        max_range = np.array([x.max(), -x.min(), y.max(), -y.min()]).max()
+        max_range_xy = np.array([x.max() -x.min(), y.max() -y.min()]).max()/2
+        max_range_z = np.array([z.max() -z.min()]).max()/2
         if plot.norm_xyz :
-            z_factor = 1
-            max_range = np.array([max_range, z.max(), -z.min()]).max()
-        Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
-        Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
-        Zb = z_factor*0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
-        for xb, yb, zb in zip(Xb, Yb, Zb):
-            ax.plot([xb], [yb], [zb], 'w')
+            if ltGraph.fig.height_width_ratio > 1 :
+                max_range_z *= ltGraph.fig.height_width_ratio
+            else:
+                max_range_xy *= 1/ltGraph.fig.height_width_ratio
+        mid_x = (x.max()+x.min()) * 0.5
+        mid_y = (y.max()+y.min()) * 0.5
+        mid_z = (z.max()+z.min()) * 0.5
+        ax.set_xlim(mid_x - max_range_xy, mid_x + max_range_xy)
+        ax.set_ylim(mid_y - max_range_xy, mid_y + max_range_xy)
+        ax.set_zlim(mid_z - max_range_z, mid_z + max_range_z)
         
 def factorial (x):
     result = 1
