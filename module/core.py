@@ -632,8 +632,8 @@ class ltPlotFct3d(ltPlotFct):
         y = self.y
         z = self.z
         ax = fig.graphs[graph].graph
-        if self.norm_xy :
-            ax.set_aspect('equal', adjustable='box')
+        # if self.norm_xy :
+        #     ax.set_aspect('equal', adjustable='box')
         if self.norm_xyz :
             max_range = np.array([x.max(), -x.min(), y.max(), -y.min(), z.max(), -z.min()]).max()
             Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
@@ -679,8 +679,8 @@ class ltPlotPts3d(ltPlotPts):
         y = self.y
         z = self.z
         ax = fig.graphs[graph].graph
-        if self.norm_xy :
-            ax.set_aspect('equal', adjustable='box')
+        # if self.norm_xy :
+        #     ax.set_aspect('equal', adjustable='box')
         if self.norm_xyz :
             max_range = np.array([x.max(), -x.min(), y.max(), -y.min(), z.max(), -z.min()]).max()
             Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
@@ -1170,8 +1170,8 @@ class ltPlotSurf:
         if callable(z) :
             z = z(theta, phi)
         ax = fig.graphs[graph].graph
-        if self.norm_xy :
-            ax.set_aspect('equal', adjustable='box')
+        # if self.norm_xy :
+        #     ax.set_aspect('equal', adjustable='box')
         if self.norm_xyz :
             max_range = np.array([x.max(), -x.min(), y.max(), -y.min(), z.max(), -z.min()]).max()
             Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
@@ -1291,8 +1291,8 @@ class ltPlotVectField3d(ltPlotVectField2d):
 
     def plot(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
-        if self.norm_xy :
-            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
+        # if self.norm_xy :
+        #     fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         xs, ys, zs = self.x, self.y, self.z
         vx, vy, vz = self.vx_fct, self.vy_fct, self.vz_fct
         if callable(self.vx_fct) and callable(self.vy_fct) and callable(self.vz_fct):
@@ -1324,8 +1324,8 @@ class ltPlotVectField3d(ltPlotVectField2d):
             label = self.label_fieldline
         if dashes is None:
             dashes = self.dashes_fieldline
-        if self.norm_xy :
-            fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
+        # if self.norm_xy :
+        #     fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         T = np.linspace(startT, endT, stepT)
         def _field(p, t):
             x, y, z = p
