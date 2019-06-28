@@ -437,7 +437,7 @@ class ltGraph:
             if self.z_ticks_min is not None and self.z_ticks_max is not None :
                 self.graph.zaxis.set_ticks(np.arange(self.z_ticks_min,self.z_ticks_max+self.z_ticks_step/10.,self.z_ticks_step))
 
-        if self.minorticks :
+        if self.minorticks and not self.projection=='3d':
             self.graph.minorticks_on()
         if self.comma_y_major :
             self.graph.yaxis.set_major_formatter(axes_format_comma)
