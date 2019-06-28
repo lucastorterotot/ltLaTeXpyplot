@@ -116,7 +116,21 @@ def add_colorbar(plot, ltGraph):
     clb.ax.tick_params(labelsize=pgf_with_latex['xtick.labelsize'])
     if ltGraph.cmap_label is not None:
         clb.ax.set_title(ltGraph.cmap_label, fontsize=pgf_with_latex['axes.labelsize'])
-          
+
+def normalize_3d(plot, ltGraph, x, y, z):
+    ax = ltGraph.graph
+    if plot.norm_xy or plot.norm_xyz :
+        z_factor = 0
+        max_range = np.array([x.max(), -x.min(), y.max(), -y.min()]).max()
+        if plot.norm_xyz :
+            z_factor = 1
+            max_range = np.array([max_range, z.max(), -z.min()]).max()
+        Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
+        Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
+        Zb = z_factor*0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
+        for xb, yb, zb in zip(Xb, Yb, Zb):
+            ax.plot([xb], [yb], [zb], 'w')
+        
 def factorial (x):
     result = 1
     if x > 1:
@@ -632,15 +646,7 @@ class ltPlotFct3d(ltPlotFct):
         y = self.y
         z = self.z
         ax = fig.graphs[graph].graph
-        # if self.norm_xy :
-        #     ax.set_aspect('equal', adjustable='box')
-        if self.norm_xyz :
-            max_range = np.array([x.max(), -x.min(), y.max(), -y.min(), z.max(), -z.min()]).max()
-            Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
-            Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
-            Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
-            for xb, yb, zb in zip(Xb, Yb, Zb):
-                ax.plot([xb], [yb], [zb], 'w')
+        normalize_3d(self, fig.graphs[graph], x, y, z)
         ax.plot(x, y, z, color=self.color, linewidth=self.linewidth, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
 
         
@@ -679,15 +685,7 @@ class ltPlotPts3d(ltPlotPts):
         y = self.y
         z = self.z
         ax = fig.graphs[graph].graph
-        # if self.norm_xy :
-        #     ax.set_aspect('equal', adjustable='box')
-        if self.norm_xyz :
-            max_range = np.array([x.max(), -x.min(), y.max(), -y.min(), z.max(), -z.min()]).max()
-            Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
-            Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
-            Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
-            for xb, yb, zb in zip(Xb, Yb, Zb):
-                ax.plot([xb], [yb], [zb], 'w')
+        normalize_3d(self, fig.graphs[graph], x, y, z)
         markersize = self.markersize
         if self.surface is not None:
             markersize = self.surface
@@ -1170,15 +1168,7 @@ class ltPlotSurf:
         if callable(z) :
             z = z(theta, phi)
         ax = fig.graphs[graph].graph
-        # if self.norm_xy :
-        #     ax.set_aspect('equal', adjustable='box')
-        if self.norm_xyz :
-            max_range = np.array([x.max(), -x.min(), y.max(), -y.min(), z.max(), -z.min()]).max()
-            Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
-            Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
-            Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
-            for xb, yb, zb in zip(Xb, Yb, Zb):
-                ax.plot([xb], [yb], [zb], 'w')
+        normalize_3d(self, fig.graphs[graph], x, y, z)
         method = ax.plot_surface
         if self.use_cmap:
             C_fct_eff = z
@@ -1284,19 +1274,19 @@ class ltPlotVectField2d:
         
         
 class ltPlotVectField3d(ltPlotVectField2d):
-    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None, norm_xyz=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
-        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, color=color, cmap=cmap, use_cmap=use_cmap, C_fct=C_fct, norm_xy=norm_xyz, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
+    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None, norm_xy=True, norm_xyz=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
+        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, color=color, cmap=cmap, use_cmap=use_cmap, C_fct=C_fct, norm_xy=norm_xy, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
         self.z = z
         self.vz_fct = vz_fct
+        self.norm_xy = norm_xy or norm_xyz
+        self.norm_xyz = norm_xyz
 
     def plot(self, fig, graph):
         fig.graphs[graph].test_graph_3d()
-        # if self.norm_xy :
-        #     fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
-        xs, ys, zs = self.x, self.y, self.z
+        xs, ys, zs = np.meshgrid(self.x, self.y, self.z)
+        normalize_3d(self, fig.graphs[graph], xs, ys, zs)
         vx, vy, vz = self.vx_fct, self.vy_fct, self.vz_fct
         if callable(self.vx_fct) and callable(self.vy_fct) and callable(self.vz_fct):
-            xs, ys, zs = np.meshgrid(xs, ys, zs)
             vx = self.vx_fct(xs, ys, zs)
             vy = self.vy_fct(xs, ys, zs)
             vz = self.vz_fct(xs, ys, zs)
@@ -1324,13 +1314,12 @@ class ltPlotVectField3d(ltPlotVectField2d):
             label = self.label_fieldline
         if dashes is None:
             dashes = self.dashes_fieldline
-        # if self.norm_xy :
-        #     fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
         T = np.linspace(startT, endT, stepT)
         def _field(p, t):
             x, y, z = p
             return self.vx_fct(x, y, z), self.vy_fct(x, y, z), self.vz_fct(x, y, z)
         line_xyz = odeint(_field, point, T).transpose()
+        normalize_3d(self, fig.graphs[graph], line_xyz[0], line_xyz[1], line_xyz[2])
         fig.graphs[graph].graph.plot(line_xyz[0], line_xyz[1], line_xyz[2], label=label, color=color, dashes=dashes, linewidth=self.linewidth_fieldline)
 
         
