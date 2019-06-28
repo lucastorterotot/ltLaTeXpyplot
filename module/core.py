@@ -82,8 +82,8 @@ mpl.rcParams.update(pgf_with_latex)
 
 ### Defining usefull tools
 
-def axes_comma(x, pos):  # formatter function takes tick label and tick position
-    s = str(x)
+def axes_comma(value, pos):  # formatter function takes tick label and tick position
+    s = str(np.round(value, 6))
     string = '\\num{{'
     if '.' in s:
         ind = s.index('.')
@@ -110,7 +110,7 @@ def add_colorbar(plot, ltGraph):
     clb = plt.colorbar(plot, shrink=shrink, ax=ltGraph.graph)
     clb_FR_ticks = []
     for tick in clb.get_ticks():
-        clb_FR_ticks.append('\\num{'+str(tick)+'}')
+        clb_FR_ticks.append(axes_comma(tick, 0))
     clb.set_ticks(clb.get_ticks())
     clb.set_ticklabels(clb_FR_ticks)
     clb.ax.tick_params(labelsize=pgf_with_latex['xtick.labelsize'])
