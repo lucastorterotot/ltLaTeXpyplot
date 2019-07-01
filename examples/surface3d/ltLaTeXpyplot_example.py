@@ -7,7 +7,7 @@ import scipy as sc
 import ltLaTeXpyplot as lt
 
 # Create figure
-fig = lt.ltFigure(name='fig', page_width_cm=26, width_frac=1)
+fig = lt.ltFigure(name='fig', page_width_cm=26, width_frac=.6, height_width_ratio=1)
 
 # Define what to plot
 X = np.arange(-5, 5, 0.25)
@@ -29,7 +29,7 @@ fig.save(format='pdf')
 ################################################################################
 
 # Create figure
-fig2 = lt.ltFigure(name='fig2', height_width_ratio=1, tight_layout=True)
+fig2 = lt.ltFigure(name='fig2', height_width_ratio=.5, tight_layout=True)
 
 # Define what to plot
 X = np.arange(-3, 3, 0.125)
@@ -45,8 +45,8 @@ surf1 = lt.ltPlotSurf(X, Y, z_fct=z_fct, C_fct=C_fct, norm_xyz=False, use_cmap=T
 surf2 = lt.ltPlotSurf(X, Y, z_fct=z_fct, C_fct=C_fct, norm_xyz=False, use_cmap=True, linewidth=.5, alpha=1)
     
 # Define graphs
-fig2.addgraph('graph1', position=221, projection='3d', show_cmap_legend=True, cmap_label='$x-y$')
-fig2.addgraph('graph2', position=222, projection='3d', show_cmap_legend=True, cmap_label='$x-y$')
+fig2.addgraph('graph1', position=121, projection='3d', show_cmap_legend=True, cmap_label='$x-y$')
+fig2.addgraph('graph2', position=122, projection='3d', show_cmap_legend=True, cmap_label='$x-y$')
 
 # Insert objects in graphs
 fig2.addplot(surf1, 'graph1')
