@@ -2,7 +2,7 @@ stages:
   - test
 
 before_script:
-  - apt-get -qq update && apt-get -qq install -y python3 python3-numpy python3-scipy python3-matplotlib python3-pip texlive
+  - apt-get -qq update && apt-get -qq install -y python3 python3-numpy python3-scipy python3-matplotlib python3-pip texlive texlive texlive-latex-extra
   - python3 -m pip install matplotlib --upgrade
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
 
