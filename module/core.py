@@ -142,8 +142,6 @@ def normalize_3d(plot, ltGraph, x, y, z):
         except NotImplementedError:
             set_aspect(ax, 'equal')
             ltGraph.fig.suppressNotImplementedError = True
-            if isinstance(plot, ltPlotSurf):
-                ltGraph.fig.bbox_inches = None
         if plot.norm_xyz :
             max_range = np.array([max_range_xy, max_range_z]).max()
             max_range_xy = max_range
@@ -207,6 +205,9 @@ class ltFigure:
 
     def save(self, format='pgf'):
         self.update()
+        for graph in self.graphs.values():
+            if graph.projection == '3d':
+                self.bbox_inches = None
         if self.suppressNotImplementedError:
             with suppress(NotImplementedError):
                 self._savefig(format=format)
