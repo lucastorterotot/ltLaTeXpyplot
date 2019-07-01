@@ -19,6 +19,7 @@ from matplotlib.patches import FancyArrowPatch
 
 from mpl_toolkits.mplot3d import Axes3D
 
+from contextlib import suppress
 
 ### Defining global variables for this package
 
@@ -130,11 +131,9 @@ def set_aspect(ax, aspect, adjustable=None, anchor=None):
     if anchor is not None:
         ax.set_anchor(anchor)
     ax.stale = True
-        
+
 def normalize_3d(plot, ltGraph, x, y, z):
-    print('uses 3d')
     ax = ltGraph.graph
-    plot.norm_xyz = True
     if plot.norm_xy or plot.norm_xyz :
         max_range_xy = np.array([x.max() -x.min(), y.max() -y.min()]).max()/2
         max_range_z = np.array([z.max() -z.min()]).max()/2
@@ -142,7 +141,7 @@ def normalize_3d(plot, ltGraph, x, y, z):
             ax.set_aspect('equal')
         except NotImplementedError:
             set_aspect(ax, 'equal')
-            ax._aspect = 'auto'
+            ltGraph.fig._suppressNotImplementedError = True
         if plot.norm_xyz :
             max_range = np.array([max_range_xy, max_range_z]).max()
             max_range_xy = max_range
@@ -152,7 +151,7 @@ def normalize_3d(plot, ltGraph, x, y, z):
         Zb = max_range_z*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
         for xb, yb, zb in zip(Xb, Yb, Zb):
             ax.plot([xb], [yb], [zb], 'w')
-        
+
 def factorial (x):
     result = 1
     if x > 1:
@@ -185,6 +184,7 @@ class ltFigure:
         self.tight_layout = tight_layout
 
         self.lang = lang
+        self._suppressNotImplementedError = False
 
     def update(self):
         pgf_preamble = pgf_with_latex['pgf.preamble']
@@ -204,7 +204,18 @@ class ltFigure:
 
     def save(self, format='pgf'):
         self.update()
-        self.fig.savefig('{}-pyplot.{}'.format(self.name, format),bbox_inches='tight')
+        if self._suppressNotImplementedError:
+            with suppress(NotImplementedError):
+                self._savefig(format=format)
+        else:
+            self._savefig(format=format)
+
+    def _savefig(self, format='pgf'):
+        self.fig.savefig(
+            '{}-pyplot.{}'.format(
+                self.name,
+                format),
+            bbox_inches='tight')
 
     def addgraph(self, name, **kwargs):
         if not name in self.graphs:
