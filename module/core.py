@@ -141,7 +141,9 @@ def normalize_3d(plot, ltGraph, x, y, z):
             ax.set_aspect('equal')
         except NotImplementedError:
             set_aspect(ax, 'equal')
-            ltGraph.fig._suppressNotImplementedError = True
+            ltGraph.fig.suppressNotImplementedError = True
+            if isinstance(plot, ltPlotSurf):
+                ltGraph.fig.bbox_inches = None
         if plot.norm_xyz :
             max_range = np.array([max_range_xy, max_range_z]).max()
             max_range_xy = max_range
@@ -184,7 +186,8 @@ class ltFigure:
         self.tight_layout = tight_layout
 
         self.lang = lang
-        self._suppressNotImplementedError = False
+        self.suppressNotImplementedError = False
+        self.bbox_inches = 'tight'
 
     def update(self):
         pgf_preamble = pgf_with_latex['pgf.preamble']
@@ -204,7 +207,7 @@ class ltFigure:
 
     def save(self, format='pgf'):
         self.update()
-        if self._suppressNotImplementedError:
+        if self.suppressNotImplementedError:
             with suppress(NotImplementedError):
                 self._savefig(format=format)
         else:
@@ -215,7 +218,7 @@ class ltFigure:
             '{}-pyplot.{}'.format(
                 self.name,
                 format),
-            bbox_inches='tight')
+            bbox_inches=self.bbox_inches)
 
     def addgraph(self, name, **kwargs):
         if not name in self.graphs:
