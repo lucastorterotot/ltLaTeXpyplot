@@ -8,6 +8,8 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
+  - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
+  - export instal_dir=$(pwd)
 
 cache:
   paths:
@@ -23,12 +25,11 @@ installation:
   script:
     - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
     - python3 -m pip install matplotlib numpy scipy --upgrade
-    - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
-    - export instal_dir=$(pwd)
   cache:
     paths:
       - .cache/pip
       - venv/
+      - /usr/share/texlive/texmf-dist
 
 prod_Fct3d:
   stage: prod
