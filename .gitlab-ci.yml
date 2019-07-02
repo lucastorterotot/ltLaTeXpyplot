@@ -25,6 +25,10 @@ installation:
     - python3 -m pip install matplotlib --upgrade
     - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
     - export instal_dir=$(pwd)
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
 
 prod_Fct3d:
   stage: prod
