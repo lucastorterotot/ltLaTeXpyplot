@@ -83,19 +83,32 @@ mpl.rcParams.update(pgf_with_latex)
 
 ### Defining usefull tools
 
-def axes_comma(value, pos):  # formatter function takes tick label and tick position
-    s = str(np.round(value, 6))
-    string = '\\num{{'
-    if '.' in s:
-        ind = s.index('.')
-        int_part = s[:ind]
-        dec_part = s[ind+1:]
-        string += int_part
-        if dec_part is not '0':
-            string += '.'+dec_part
+def axes_comma(value, pos):
+    # formatter function takes tick label and tick position
+    max_dec = 5
+    min_exp = 6
+    val_str = str(value)
+    if 'e' in val_str:
+        ind = val_str.index('e')
+        signif = float(val_str[:ind])
+        exponent = int(val_str[ind+1:])
     else:
-        string += s    
-    string += '}}'
+        signif = value
+        exponent = 0
+    if signif > 10**(min_exp):
+        signif *= 10**(-min_exp)
+        exponent += min_exp
+        while signif >= 10:
+            signif *= .1
+            exponent += 1
+    signif = np.round(signif, max_dec)
+    if int(signif) == signif:
+        signif = int(signif)
+    if exponent != 0:
+        string = 'e'.join([str(signif), str(exponent)])
+    else:
+        string = str(signif)
+    string = ''.join(['\\num{', string, '}'])
     return string
 
 def ltPlotPieautopct(x, unit='%', maxdec=1):
