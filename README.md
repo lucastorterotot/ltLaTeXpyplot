@@ -16,14 +16,23 @@ git clone git@gitlab.com:lucastorterotot/ltLaTeXpyplot.git --origin lucas
 ```
 ./ltLaTeXpyplot/install
 ```
-3. You may want to install the following Python3 modules:
+3. Install required `Python3` modules:
 ```
-sudo apt-get install python3-numpy python3-scipy python3-matplotlib
+apt-get update
+apt-get install python3-numpy python3-scipy python3-matplotlib
 ```
 4. You might want the most up-to-date version of matplotlib:
 ```
-sudo apt-get install python3-pip
+apt-get install python3-pip
 python3 -m pip install matplotlib --upgrade
+```
+5. As LaTeX rendering is used along with some packages, `texlive` is also required. One could either make a minimal installation with
+```
+apt-get install texlive texlive-latex-extra texlive-science
+```
+or use a full (but heavier) installation with
+```
+apt-get install texlive-full
 ```
 
 ## Usage
