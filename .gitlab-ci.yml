@@ -21,8 +21,8 @@ stages:
 installation:
   stage: build
   script:
-    - apt-get -qq update && apt-get -qq install -y python3-numpy python3-scipy python3-matplotlib texlive texlive-latex-extra texlive-science
-    - python3 -m pip install matplotlib --upgrade
+    - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
+    - python3 -m pip install matplotlib numpy scipy --upgrade
     - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
     - export instal_dir=$(pwd)
   cache:
