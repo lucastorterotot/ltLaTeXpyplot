@@ -12,11 +12,6 @@ before_script:
   - export instal_dir=$(pwd)
   - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
 
-cache:
-  paths:
-    - .cache/pip
-    - venv/
-
 stages:
   - build
   - prod
@@ -25,6 +20,10 @@ installation:
   stage: build
   script:
     - python3 -m pip install matplotlib numpy scipy --upgrade
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
 
 prod_Fct3d:
   stage: prod
