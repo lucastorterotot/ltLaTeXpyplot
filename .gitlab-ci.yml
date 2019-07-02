@@ -10,6 +10,7 @@ before_script:
   - source venv/bin/activate
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
   - export instal_dir=$(pwd)
+  - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
 
 cache:
   paths:
@@ -24,7 +25,7 @@ stages:
 installation:
   stage: build
   script:
-    - apt-get -qq update && apt-get -qq -o dir::cache::archives="apt-cache" install -y texlive texlive-latex-extra texlive-science
+    - apt-get -qq update && apt-get -qq -o dir::cache::archives="$APT_CACHE_DIR" install -y texlive texlive-latex-extra texlive-science
     - python3 -m pip install matplotlib numpy scipy --upgrade
 
 prod_Fct3d:
