@@ -10,7 +10,9 @@ r_on_a0 = np.arange(0,data.r_on_a0_MAX,0.1)
 
 radius = r_on_a0*data.a0
 
-for key, R_fct in data.R_fcts.items():
+to_process = {'30' : data.R_fcts['30'],
+              '21' : data.R_fcts['21']}
+for key, R_fct in to_process.items():
     figs = {
         'R' : lt.ltFigure(name='fig-R'+key, width_frac=.25),
         'R2' : lt.ltFigure(name='fig-R'+key+'_squared', width_frac=.25),

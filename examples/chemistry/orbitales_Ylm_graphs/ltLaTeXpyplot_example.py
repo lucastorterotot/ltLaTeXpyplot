@@ -12,9 +12,12 @@ phi = np.arange(-np.pi*(1+1./steps),np.pi*(1+1./steps),np.pi/steps)
 
 print('  Creating orbitals: Ylm representations...')
 
-ntot = len(data.Y_fcts_R) + len(data.Y_fcts_C)
+to_process = {'dz2' : data.Y_fcts_R['dz2'],
+              '21p' : data.Y_fcts_C['21p']}
+
+ntot = len(to_process)
 ncur = 0
-for dic in [data.Y_fcts_R, data.Y_fcts_C]:
+for dic in [to_process]:
     for key, Ylm in dic.items():
         cmap = 'coolwarm'
         if key in ['s', '00']:

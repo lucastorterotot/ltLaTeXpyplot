@@ -17,12 +17,13 @@ phi = np.arange(-np.pi*(1+1./steps),np.pi*(1+1./steps),np.pi/steps)
 
 print('  Creating orbitals: scatter plots...')
 
-ntot = len(data.orbitals)
+to_process = ['1s', '3dxz']
+
+ntot = len(to_process)
 ncur = 0
 
 size = 2000
-
-for key in data.orbitals:
+for key in to_process:
     cmap = 'coolwarm'
     if key in ['1s', 's', '00'] :
         cmap += '_r'
