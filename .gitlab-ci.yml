@@ -3,16 +3,16 @@ image: python:latest
 variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
-cache:
-  paths:
-    - .cache/pip
-    - venv/
-
 before_script:
   - python -V
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
 
 stages:
   - build
@@ -21,15 +21,23 @@ stages:
 installation:
   stage: build
   script:
-    - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
+    - apt-get -qq update && apt-get -qq install -y python3-numpy python3-scipy python3-matplotlib texlive texlive-latex-extra texlive-science
     - python3 -m pip install matplotlib --upgrade
     - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
     - export instal_dir=$(pwd)
 
-prod_examples:
+prod_Fct3d:
   stage: prod
   script:
-    - for file in $(find $(pwd) -type f -iname ltLaTeXpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltLaTeXpyplot_example.py ; done
+    - cd examples/Fct3d && ./ltLaTeXpyplot_example.py
   artifacts:
     paths:
-      - examples
+    - examples/Fct3d
+
+prod_simple_plot:
+  stage: prod
+  script:
+    - cd examples/simple_plot && ./ltLaTeXpyplot_example.py
+  artifacts:
+    paths:
+    - examples/simple_plot
