@@ -15,8 +15,6 @@ cache:
   paths:
     - .cache/pip
     - venv/
-    - /usr/share/texlive/texmf-dist
-    - /var/lib/texmf
 
 stages:
   - build
@@ -25,14 +23,12 @@ stages:
 installation:
   stage: build
   script:
-    - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
+    - pip install texlive texlive-latex-extra texlive-science
     - python3 -m pip install matplotlib numpy scipy --upgrade
   cache:
     paths:
       - .cache/pip
       - venv/
-      - /usr/share/texlive/texmf-dist
-      - /var/lib/texmf
 
 prod_Fct3d:
   stage: prod
