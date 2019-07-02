@@ -1,13 +1,17 @@
 stages:
-  - test
+  - installation
+  - prod_examples
 
-before_script:
-  - apt-get -qq update && apt-get -qq install -y python3 python3-numpy python3-scipy python3-matplotlib python3-pip texlive texlive-latex-extra texlive-science
-  - python3 -m pip install matplotlib --upgrade
-  - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
+installation:
+  stage: installation
+    - apt-get -qq update && apt-get -qq install -y python3 python3-numpy python3-scipy python3-matplotlib python3-pip texlive texlive-latex-extra texlive-science
+    - python3 -m pip install matplotlib --upgrade
+    - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
+    - export instal_dir=$(pwd)
 
-test:
-  stage: test
+prod_examples:
+  stage: prod_examples
   script:
-    - cd examples/
     - for file in $(find $(pwd) -type f -iname ltLaTeXpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltLaTeXpyplot_example.py ; done
+  dependencies:
+    - installation
