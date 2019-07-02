@@ -10,14 +10,11 @@ before_script:
   - source venv/bin/activate
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
   - export instal_dir=$(pwd)
-  - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
-  - export PATH=$APT_CACHE_DIR:$PATH
 
 cache:
   paths:
     - .cache/pip
     - venv/
-    - apt-cache/
 
 stages:
   - build
@@ -26,17 +23,16 @@ stages:
 installation:
   stage: build
   script:
-    - apt-get -qq update && apt-get -qq -o dir::cache::archives="$APT_CACHE_DIR" install -y texlive texlive-latex-extra texlive-science
+    - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
     - python3 -m pip install matplotlib numpy scipy --upgrade
+  artifacts:
+    paths:
+      - /usr/share/texlive
+    expire_in: 1 week
 
 prod_Fct3d:
   stage: prod
   script:
-    - ls /builds/lucastorterotot/ltLaTeXpyplot/venv
-    - ls /builds/lucastorterotot/ltLaTeXpyplot/venv/*
-    - echo $APT_CACHE_DIR
-    - ls $APT_CACHE_DIR
-    - echo $PATH
     - cd examples/Fct3d && ./ltLaTeXpyplot_example.py
   artifacts:
     paths:
