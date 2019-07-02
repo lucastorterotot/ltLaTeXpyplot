@@ -32,6 +32,11 @@ installation:
 prod_Fct3d:
   stage: prod
   script:
+    - ls /builds/lucastorterotot/ltLaTeXpyplot/venv
+    - ls /builds/lucastorterotot/ltLaTeXpyplot/venv/*
+    - echo $APT_CACHE_DIR
+    - ls $APT_CACHE_DIR
+    - echo $PATH
     - cd examples/Fct3d && ./ltLaTeXpyplot_example.py
   artifacts:
     paths:
