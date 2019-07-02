@@ -9,7 +9,6 @@ before_script:
   - virtualenv venv
   - source venv/bin/activate
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
-  - export instal_dir=$(pwd)
   - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
 
 cache:
@@ -24,20 +23,19 @@ stages:
 installation:
   stage: build
   script:
-    - python3 -m pip install matplotlib numpy scipy --upgrade
+    - python -m pip install matplotlib numpy scipy --upgrade
 
-prod_Fct3d:
+prod_mpl:
   stage: prod
   script:
-    - cd examples/Fct3d && ./ltLaTeXpyplot_example.py
-  artifacts:
-    paths:
-    - examples/Fct3d
+    - cd examples/
+    - for file in $(find $(pwd) -type f -iname matplotlib_example.py) ; do echo $file ; cd $(dirname $file) ; python matplotlib_example.py ; done
 
-prod_simple_plot:
+prod_ltLaTeXpyplot:
   stage: prod
   script:
-    - cd examples/simple_plot && ./ltLaTeXpyplot_example.py
+    - cd examples/
+    - for file in $(find $(pwd) -type f -iname ltLaTeXpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltLaTeXpyplot_example.py ; done
   artifacts:
     paths:
-    - examples/simple_plot
+    - examples/
