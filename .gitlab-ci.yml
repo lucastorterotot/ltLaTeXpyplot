@@ -11,6 +11,7 @@ before_script:
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
   - export instal_dir=$(pwd)
   - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
+  - export PATH=$APT_CACHE_DIR:$PATH
 
 cache:
   paths:
