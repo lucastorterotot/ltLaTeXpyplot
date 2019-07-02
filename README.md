@@ -2,6 +2,8 @@
 
 This package is under development for the moment!
 
+[![pipeline status](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/badges/master/pipeline.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/commits/master)
+
 ## Introduction
 
 This package for Python 3.x provides tools to produce easily `pgf` figures to be used with LaTeX with a pre-defined theme.
