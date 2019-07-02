@@ -34,3 +34,4 @@ prod:
   artifacts:
     paths:
     - examples/
+    expire_in: 10 weeks
