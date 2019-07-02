@@ -9,7 +9,6 @@ before_script:
   - virtualenv venv
   - source venv/bin/activate
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
-  - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
 
 cache:
   paths:
@@ -25,15 +24,10 @@ installation:
   script:
     - python -m pip install matplotlib numpy scipy --upgrade
 
-prod_mpl:
-  stage: prod
-  script:
-    - cd examples/
-    - for file in $(find $(pwd) -type f -iname matplotlib_example.py) ; do echo $file ; cd $(dirname $file) ; python matplotlib_example.py ; done
-
 prod_ltLaTeXpyplot:
   stage: prod
   script:
+    - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
     - cd examples/
     - for file in $(find $(pwd) -type f -iname ltLaTeXpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltLaTeXpyplot_example.py ; done
   artifacts:
