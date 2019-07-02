@@ -10,6 +10,7 @@ before_script:
   - source venv/bin/activate
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
   - export instal_dir=$(pwd)
+  - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
 
 cache:
   paths:
@@ -23,14 +24,7 @@ stages:
 installation:
   stage: build
   script:
-    - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
     - python3 -m pip install matplotlib numpy scipy --upgrade
-  artifacts:
-    paths:
-      - /usr/local/share/texmf
-      - /usr/share/texlive/texmf-dist/
-      - /usr/bin/pdflatex
-    expire_in: 1 week
 
 prod_Fct3d:
   stage: prod
