@@ -3,6 +3,7 @@
 This package is under development for the moment!
 
 [![pipeline status](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/badges/master/pipeline.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/commits/master)
+[![coverage report](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/badges/master/coverage.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/commits/master)
 
 ## Introduction
 
