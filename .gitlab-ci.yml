@@ -35,4 +35,11 @@ prod:
     paths:
     - examples/
     expire_in: 10 weeks
+
+coverage:
+  stage: prod
+  script:
+    - python -m pip install pytest pytest-cov --upgrade
+    - cd $instal_dir/tests
+    - pytest --cov-report term --cov=$instal_dir/module/ *.py
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+\%)$/'
