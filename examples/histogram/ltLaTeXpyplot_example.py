@@ -20,7 +20,7 @@ x = mu + sigma * np.random.randn(437)
 num_bins = 50
     
 # Define graphs
-fig.addgraph('graph1', x_label='Smarts', y_label='Probability density', title='Histogram of IQ: $\mu=100$, $\sigma=15$', y_scaling='log', y_min=.75e-4, y_max=0.05, comma_y_major = False)
+fig.addgraph('graph1', x_label='Smarts', y_label='Probability density', title='Histogram of IQ: $\\mu=100$, $\\sigma=15$', y_scaling='log', y_min=.75e-4, y_max=0.05, comma_y_major = False)
 
 # Insert object in plots
 hist = lt.ltPlotHist(x, bins=num_bins, range=[50,150], fill=True)
