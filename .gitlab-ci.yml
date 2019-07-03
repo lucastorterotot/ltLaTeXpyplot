@@ -35,3 +35,4 @@ prod:
     paths:
     - examples/
     expire_in: 10 weeks
+  coverage: '/Code coverage: ^TOTAL\s+\d+\s+\d+\s+(\d+\%)$'
