@@ -112,7 +112,7 @@ def axes_comma(value, pos):
     return string
 
 def ltPlotPieautopct(x, unit='%', maxdec=1):
-    return '\\SI{{'+str(round(x,maxdec))+'}}{'+unit+'}'
+    return ''.join(['\\SI{', str(round(x,maxdec)), '}{', unit, '}'])
 
 axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
 
