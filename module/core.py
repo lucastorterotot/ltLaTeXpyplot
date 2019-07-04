@@ -617,13 +617,12 @@ class ltGraph:
 
     def test_graph_3d(self):
         if not self.projection == '3d' :
-            raise RuntimeError('\n' + '  You tried to draw a 3d object on a non-3d graph. Aborting...'\
-                               + '\n'\
-                               + '    Graph name: '+self.name\
-                               + '\n'\
-                               + '    Graph projection: '+self.projection
+            raise RuntimeError('\n'.join([
+                '  You tried to draw a 3d object on a non-3d graph. Aborting...',
+                '    Graph name: {}'.format(self.name),
+                '    Graph projection: {}'.format(self.projection),
+            ])
             )
-
             
 class ltPlotFct:
     def __init__(self,
