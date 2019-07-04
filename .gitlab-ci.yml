@@ -25,6 +25,14 @@ installation:
   script:
     - python -m pip install matplotlib numpy scipy --upgrade
 
+coverage:
+  stage: test
+  script:
+    - python -m pip install pytest pytest-cov --upgrade
+    - cd $instal_dir/tests
+    - pytest --cov-report term --cov=$instal_dir/{module/,data/} *.py
+  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+\%)$/'
+
 prod:
   stage: test
   script:
@@ -35,11 +43,3 @@ prod:
     paths:
     - examples/
     expire_in: 10 weeks
-
-coverage:
-  stage: test
-  script:
-    - python -m pip install pytest pytest-cov --upgrade
-    - cd $instal_dir/tests
-    - pytest --cov-report term --cov=$instal_dir/{module/,data/} *.py
-  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+\%)$/'
