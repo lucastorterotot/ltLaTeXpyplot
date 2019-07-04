@@ -1489,7 +1489,7 @@ class ltPlotEpH:
             self.text_color = text_color
         self.linewidth = linewidth
         self.show_species = show_species
-        self.data_file = __import__('ltLaTeXpyplot.data.EpH.'+self.element, fromlist=[''])
+        self.data_file = __import__('ltLaTeXpyplot.data.EpH.{}'.format(self.element), fromlist=[''])
         self.computed = False
 
     def compute(self):
