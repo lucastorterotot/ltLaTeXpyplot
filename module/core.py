@@ -412,17 +412,25 @@ class ltGraph:
                    height="{}%".format(height),  # height : 1 inch
                    loc=inset_loc)
         else:
-            error_string = '\n'.join(
-                [
-                    '',
-                    '  You tried to make a twin graph but it failed. Aborting...',
-                    '    Graph name: {}'.format(self.name),
-                    '    Supposed twin of: {}'.format(self.twin_of),
-                    '    Can be twin or inset of: '
-                ]+[
-                    '\t{}'.format(key) for key in self.fig.graphs
+            raise_type = 'new'
+            if self.twin_of is not None :
+                raise_type = 'twin'
+                link = self.twin_of
+            elif self.inset_of is not None :
+                raise_type = 'inset'
+                link = self.inset_of
+            error_strings = [
+                '',
+                '  You tried to make a {} graph but it failed. Aborting...'.format(raise_type),
+                '    Graph name: {}'.format(self.name)
+            ]
+            if not raise_type == 'new':
+                error_strings += [
+                    '    Supposed {} of: {}'.format(raise_type, link),
+                    '    Can be {} of: '.format(raise_type)
                 ]
-            )
+                error_strings += ['\t{}'.format(key) for key in self.fig.graphs]
+            error_string = '\n'.join(error_strings)
             raise RuntimeError(error_string)
         
         if show_grid:
