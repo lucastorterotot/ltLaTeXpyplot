@@ -18,7 +18,7 @@ cache:
 
 stages:
   - build
-  - prod
+  - test
 
 installation:
   stage: build
@@ -26,7 +26,7 @@ installation:
     - python -m pip install matplotlib numpy scipy --upgrade
 
 prod:
-  stage: prod
+  stage: test
   script:
     - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
     - for file in $(find $instal_dir/examples/ -type f -iname ltLaTeXpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltLaTeXpyplot_example.py ; done
@@ -37,7 +37,7 @@ prod:
     expire_in: 10 weeks
 
 coverage:
-  stage: prod
+  stage: test
   script:
     - python -m pip install pytest pytest-cov --upgrade
     - cd $instal_dir/tests
