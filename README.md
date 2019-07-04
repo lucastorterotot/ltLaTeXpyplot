@@ -4,6 +4,7 @@ This package is under development for the moment!
 
 [![pipeline status](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/badges/master/pipeline.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/pipelines)
 [![coverage report](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/badges/master/coverage.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/-/jobs)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/lucastorterotot/ltLaTeXpyplot.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/commits)
 
 ## Introduction
 
