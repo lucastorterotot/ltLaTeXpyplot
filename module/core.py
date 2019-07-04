@@ -1551,7 +1551,7 @@ class ltPlotEpH:
         if '_' in element:
             index = element.index('_')
             element = element[:index]
-        seps[0].label = '{element}, $C_\\mathrm{{tr}} = \\SI{{{C}}}{{{units}}}$'.format(element=element, C=self.C_tr, units='mol.L^{-1}')
+        seps[0].label = '{element}, $C_\\mathrm{{tr}} = \\SI{{{C}}}{{mol.L^{{-1}}}}$'.format(element=element, C=self.C_tr)
         for sep in seps:
             sep.plot(fig, graph)
             
