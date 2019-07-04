@@ -876,7 +876,11 @@ class ltPlotRegLin(ltPlotPts):
             if lang == 'FR':
                 reglintxt = "R\\'egression lin\\'eaire :"
             ax.text(x_info, y_info,
-                    reglintxt + " $f(x) = ax+b$" + "\n" + '$a = \\num{{ {0:.2e} }} \\pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]) + "\n" + '$b = \\num{{ {0:.2e} }} \\pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1]),
+                    '\n'.join([
+                        '{} $f(x) = ax+b$'.format(reglintxt),
+                        '$a = \\num{{ {0:.2e} }} \\pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]),
+                        '$b = \\num{{ {0:.2e} }} \\pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1])
+                        ]),
                     transform = ax.transAxes, multialignment=multialignment, verticalalignment=verticalalignment, horizontalalignment=horizontalalignment)
 
     def plot_pts(self, fig, graph):
