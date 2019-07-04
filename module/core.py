@@ -105,7 +105,7 @@ def axes_comma(value, pos):
     if int(signif) == signif:
         signif = int(signif)
     if exponent != 0:
-        string = 'e'.join([str(signif), str(exponent)])
+        string = '{}e{}'.format(str(signif), str(exponent))
     else:
         string = str(signif)
     string = ''.join(['\\num{', string, '}'])
