@@ -78,7 +78,7 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
         ]
     }
 
-pgf_with_latex['pgf.preamble'] += [r"\SIproductsign{\!\times\!}\SIunitsep{\,}\SIunitdot{{\fontfamily{cmr}\cdot}}"]
+pgf_with_latex['pgf.preamble'] += [r"\let\origtimes\times \def\times{\!\origtimes\!}\SIproductsign{\times}\SIunitsep{\,}\SIunitdot{{\fontfamily{cmr}\cdot}}"]
 mpl.rcParams.update(pgf_with_latex)
 
 ### Defining usefull tools
