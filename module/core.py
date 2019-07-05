@@ -60,7 +60,7 @@ def figsize(scale,ratio):
 
 pgf_with_latex = {                      # setup matplotlib to use latex for output
     "pgf.texsystem": "pdflatex",        # change this if using xetex or luatex
-    "text.usetex": True,                # use LaTeX to write all text
+    "text.usetex": False,                # use LaTeX to write all text
     "font.family": "serif",
     "font.serif": [],                   # blank entries should cause plots to inherit fonts from the document
     "font.sans-serif": [],
@@ -122,11 +122,11 @@ def add_colorbar(plot, ltGraph):
     else:
         shrink = 1.
     clb = plt.colorbar(plot, shrink=shrink, ax=ltGraph.graph)
-    clb_FR_ticks = []
-    for tick in clb.get_ticks():
-        clb_FR_ticks.append(axes_comma(tick, 0))
-    clb.set_ticks(clb.get_ticks())
-    clb.set_ticklabels(clb_FR_ticks)
+    # clb_FR_ticks = []
+    # for tick in clb.get_ticks():
+    #     clb_FR_ticks.append(axes_comma(tick, 0))
+    # clb.set_ticks(clb.get_ticks())
+    # clb.set_ticklabels(clb_FR_ticks)
     clb.ax.tick_params(labelsize=pgf_with_latex['xtick.labelsize'])
     if ltGraph.cmap_label is not None:
         clb.ax.set_title(ltGraph.cmap_label, fontsize=pgf_with_latex['axes.labelsize'])
@@ -192,6 +192,9 @@ class ltFigure:
         self.figsize = [self.fig_width_inches, self.fig_height_inches]
 
         #plt.clf() # TODO check that there is no conflict with other figures
+        if lang == 'FR':
+            import locale ; locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
+            mpl.rcParams['axes.formatter.use_locale'] = True
         self.fig = plt.figure(figsize=self.figsize)
         self.graphs = {}
         self.tight_layout = tight_layout
@@ -312,13 +315,13 @@ class ltGraph:
         self.minorticks = minorticks
         self.comma_x_major = comma_x_major
         if comma_x_major is None:
-            self.comma_x_major = (self.fig.lang == 'FR')
+            self.comma_x_major = False # (self.fig.lang == 'FR')
         self.comma_y_major = comma_y_major
         if comma_y_major is None:
-            self.comma_y_major = (self.fig.lang == 'FR')
+            self.comma_y_major = False # (self.fig.lang == 'FR')
         self.comma_z_major = comma_z_major
         if comma_z_major is None:
-            self.comma_z_major = (self.fig.lang == 'FR')
+            self.comma_z_major = False # (self.fig.lang == 'FR')
         self.comma_x_minor = comma_x_minor
         self.comma_y_minor = comma_y_minor
         self.comma_z_minor = comma_z_minor
