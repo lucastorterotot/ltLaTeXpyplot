@@ -114,7 +114,7 @@ def num_format(value, pos):
 def ltPlotPieautopct(x, unit='%', maxdec=1):
     return ''.join(['\\SI{', str(round(x,maxdec)), '}{', unit, '}'])
 
-axes_format_comma = tkr.FuncFormatter(num_format)  # make formatter
+num_formatter = tkr.FuncFormatter(num_format)  # make formatter
 
 def add_colorbar(plot, ltGraph):
     if ltGraph.projection == '3d':
@@ -514,18 +514,18 @@ class ltGraph:
         if self.minorticks and not self.projection=='3d':
             self.graph.minorticks_on()
         if self.comma_y_major :
-            self.graph.yaxis.set_major_formatter(axes_format_comma)
+            self.graph.yaxis.set_major_formatter(num_formatter)
         if self.comma_y_minor :
-            self.graph.yaxis.set_minor_formatter(axes_format_comma)
+            self.graph.yaxis.set_minor_formatter(num_formatter)
         if self.comma_x_major :
-            self.graph.xaxis.set_major_formatter(axes_format_comma)
+            self.graph.xaxis.set_major_formatter(num_formatter)
         if self.comma_x_minor :
-            self.graph.xaxis.set_minor_formatter(axes_format_comma)
+            self.graph.xaxis.set_minor_formatter(num_formatter)
         if hasattr(self.graph, 'zaxis'):
             if self.comma_z_major :
-                self.graph.zaxis.set_major_formatter(axes_format_comma)
+                self.graph.zaxis.set_major_formatter(num_formatter)
             if self.comma_z_minor :
-                self.graph.zaxis.set_minor_formatter(axes_format_comma)
+                self.graph.zaxis.set_minor_formatter(num_formatter)
 
         if self.inset_of is not None and self.indicate_inset_zoom :
             ax = self.fig.graphs[self.inset_of].graph
