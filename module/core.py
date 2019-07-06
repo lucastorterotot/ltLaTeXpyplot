@@ -268,9 +268,9 @@ class ltGraph:
                  y_ticks=True, y_ticks_min=None, y_ticks_max=None, y_ticks_step=None,
                  z_ticks=True, z_ticks_min=None, z_ticks_max=None, z_ticks_step=None,
                  minorticks=True,
-                 comma_x_major=None, comma_x_minor=False,
-                 comma_y_major=None, comma_y_minor=False,
-                 comma_z_major=None, comma_z_minor=False,
+                 num_x_major=True, num_x_minor=False,
+                 num_y_major=True, num_y_minor=False,
+                 num_z_major=True, num_z_minor=False,
                  show_grid=False, show_x_axis=False, show_y_axis=False,
                  show_legend=False, legend_location='best', legend_on_side=False,
                  show_cmap_legend=False, cmap_label=None,
@@ -310,18 +310,12 @@ class ltGraph:
         self.z_ticks_max = z_ticks_max
         self.z_ticks_step = z_ticks_step
         self.minorticks = minorticks
-        self.comma_x_major = comma_x_major
-        if comma_x_major is None:
-            self.comma_x_major = (self.fig.lang == 'FR')
-        self.comma_y_major = comma_y_major
-        if comma_y_major is None:
-            self.comma_y_major = (self.fig.lang == 'FR')
-        self.comma_z_major = comma_z_major
-        if comma_z_major is None:
-            self.comma_z_major = (self.fig.lang == 'FR')
-        self.comma_x_minor = comma_x_minor
-        self.comma_y_minor = comma_y_minor
-        self.comma_z_minor = comma_z_minor
+        self.num_x_major = num_x_major
+        self.num_y_major = num_y_major
+        self.num_z_major = num_z_major
+        self.num_x_minor = num_x_minor
+        self.num_y_minor = num_y_minor
+        self.num_z_minor = num_z_minor
         self.show_grid = show_grid
         self.show_x_axis = show_x_axis
         self.show_y_axis = show_y_axis
@@ -513,18 +507,18 @@ class ltGraph:
 
         if self.minorticks and not self.projection=='3d':
             self.graph.minorticks_on()
-        if self.comma_y_major :
+        if self.num_y_major :
             self.graph.yaxis.set_major_formatter(num_formatter)
-        if self.comma_y_minor :
+        if self.num_y_minor :
             self.graph.yaxis.set_minor_formatter(num_formatter)
-        if self.comma_x_major :
+        if self.num_x_major :
             self.graph.xaxis.set_major_formatter(num_formatter)
-        if self.comma_x_minor :
+        if self.num_x_minor :
             self.graph.xaxis.set_minor_formatter(num_formatter)
         if hasattr(self.graph, 'zaxis'):
-            if self.comma_z_major :
+            if self.num_z_major :
                 self.graph.zaxis.set_major_formatter(num_formatter)
-            if self.comma_z_minor :
+            if self.num_z_minor :
                 self.graph.zaxis.set_minor_formatter(num_formatter)
 
         if self.inset_of is not None and self.indicate_inset_zoom :
