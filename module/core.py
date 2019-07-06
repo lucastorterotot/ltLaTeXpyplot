@@ -83,7 +83,7 @@ mpl.rcParams.update(pgf_with_latex)
 
 ### Defining usefull tools
 
-def axes_comma(value, pos):
+def num_format(value, pos):
     # formatter function takes tick label and tick position
     max_dec = 5
     min_exp = 6
@@ -114,7 +114,7 @@ def axes_comma(value, pos):
 def ltPlotPieautopct(x, unit='%', maxdec=1):
     return ''.join(['\\SI{', str(round(x,maxdec)), '}{', unit, '}'])
 
-axes_format_comma = tkr.FuncFormatter(axes_comma)  # make formatter
+num_formatter = tkr.FuncFormatter(num_format)  # make formatter
 
 def add_colorbar(plot, ltGraph):
     if ltGraph.projection == '3d':
@@ -124,7 +124,7 @@ def add_colorbar(plot, ltGraph):
     clb = plt.colorbar(plot, shrink=shrink, ax=ltGraph.graph)
     clb_FR_ticks = []
     for tick in clb.get_ticks():
-        clb_FR_ticks.append(axes_comma(tick, 0))
+        clb_FR_ticks.append(num_format(tick, 0))
     clb.set_ticks(clb.get_ticks())
     clb.set_ticklabels(clb_FR_ticks)
     clb.ax.tick_params(labelsize=pgf_with_latex['xtick.labelsize'])
@@ -268,9 +268,9 @@ class ltGraph:
                  y_ticks=True, y_ticks_min=None, y_ticks_max=None, y_ticks_step=None,
                  z_ticks=True, z_ticks_min=None, z_ticks_max=None, z_ticks_step=None,
                  minorticks=True,
-                 comma_x_major=None, comma_x_minor=False,
-                 comma_y_major=None, comma_y_minor=False,
-                 comma_z_major=None, comma_z_minor=False,
+                 num_x_major=True, num_x_minor=False,
+                 num_y_major=True, num_y_minor=False,
+                 num_z_major=True, num_z_minor=False,
                  show_grid=False, show_x_axis=False, show_y_axis=False,
                  show_legend=False, legend_location='best', legend_on_side=False,
                  show_cmap_legend=False, cmap_label=None,
@@ -310,18 +310,12 @@ class ltGraph:
         self.z_ticks_max = z_ticks_max
         self.z_ticks_step = z_ticks_step
         self.minorticks = minorticks
-        self.comma_x_major = comma_x_major
-        if comma_x_major is None:
-            self.comma_x_major = (self.fig.lang == 'FR')
-        self.comma_y_major = comma_y_major
-        if comma_y_major is None:
-            self.comma_y_major = (self.fig.lang == 'FR')
-        self.comma_z_major = comma_z_major
-        if comma_z_major is None:
-            self.comma_z_major = (self.fig.lang == 'FR')
-        self.comma_x_minor = comma_x_minor
-        self.comma_y_minor = comma_y_minor
-        self.comma_z_minor = comma_z_minor
+        self.num_x_major = num_x_major
+        self.num_y_major = num_y_major
+        self.num_z_major = num_z_major
+        self.num_x_minor = num_x_minor
+        self.num_y_minor = num_y_minor
+        self.num_z_minor = num_z_minor
         self.show_grid = show_grid
         self.show_x_axis = show_x_axis
         self.show_y_axis = show_y_axis
@@ -513,19 +507,19 @@ class ltGraph:
 
         if self.minorticks and not self.projection=='3d':
             self.graph.minorticks_on()
-        if self.comma_y_major :
-            self.graph.yaxis.set_major_formatter(axes_format_comma)
-        if self.comma_y_minor :
-            self.graph.yaxis.set_minor_formatter(axes_format_comma)
-        if self.comma_x_major :
-            self.graph.xaxis.set_major_formatter(axes_format_comma)
-        if self.comma_x_minor :
-            self.graph.xaxis.set_minor_formatter(axes_format_comma)
+        if self.num_y_major :
+            self.graph.yaxis.set_major_formatter(num_formatter)
+        if self.num_y_minor :
+            self.graph.yaxis.set_minor_formatter(num_formatter)
+        if self.num_x_major :
+            self.graph.xaxis.set_major_formatter(num_formatter)
+        if self.num_x_minor :
+            self.graph.xaxis.set_minor_formatter(num_formatter)
         if hasattr(self.graph, 'zaxis'):
-            if self.comma_z_major :
-                self.graph.zaxis.set_major_formatter(axes_format_comma)
-            if self.comma_z_minor :
-                self.graph.zaxis.set_minor_formatter(axes_format_comma)
+            if self.num_z_major :
+                self.graph.zaxis.set_major_formatter(num_formatter)
+            if self.num_z_minor :
+                self.graph.zaxis.set_minor_formatter(num_formatter)
 
         if self.inset_of is not None and self.indicate_inset_zoom :
             ax = self.fig.graphs[self.inset_of].graph

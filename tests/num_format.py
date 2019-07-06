@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from ltLaTeXpyplot.module.core import axes_comma
+from ltLaTeXpyplot.module.core import num_format
 import numpy as np
 
-class Test_axes_comma(unittest.TestCase):
+class Test_num_format(unittest.TestCase):
     exponents = np.linspace(-20,20,41)
     signifs = np.linspace(0.1,1,30)
     values = {}
@@ -16,7 +16,7 @@ class Test_axes_comma(unittest.TestCase):
                     [str(signif), str(int(exponent))]
                 )
             )
-            values[value] = axes_comma(value, None)
+            values[value] = num_format(value, None)
 
     def test_format(self):
         '''test the output has the form \\num{ XXX }'''
