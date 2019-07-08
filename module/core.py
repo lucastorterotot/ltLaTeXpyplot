@@ -4,7 +4,6 @@
 ### Importing packages
 
 import numpy as np
-import scipy as sc
 
 from scipy.constants import golden
 import scipy.optimize as spo

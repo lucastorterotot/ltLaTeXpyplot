@@ -5,7 +5,6 @@
 # https://www.physique-experimentale.com/python/ajustement_de_courbe.py
 
 import numpy as np
-import scipy as sc
 
 import ltLaTeXpyplot as lt
 
