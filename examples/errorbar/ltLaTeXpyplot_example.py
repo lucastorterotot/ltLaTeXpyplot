@@ -19,7 +19,7 @@ error = 0.1 + 0.2 * x
 # Define graphs
 fig.addgraph('graph1', position=211, title='variable, symmetric error', x_ticks = False)
 fig.addgraph('graph2', position=212, title='variable, asymmetric error',
-             share_x='graph1', y_scaling = 'log')
+             share_x='graph1', y_scaling = 'log', num_y_major=False)
 
 # Insert object in plots
 pts1 = lt.ltPlotPts(x, y, yerr = error, marker='o')
