@@ -273,7 +273,7 @@ class ltGraph:
                  show_grid=False, show_x_axis=False, show_y_axis=False,
                  show_legend=False, legend_location='best', legend_on_side=False,
                  show_cmap_legend=False, cmap_label=None,
-                 position=111,
+                 position=[1,1,1],
                  share_x=None, share_y=None):
         self.fig = fig
         self.name = name
@@ -322,6 +322,8 @@ class ltGraph:
         self.legend_location = legend_location
         self.legend_on_side = legend_on_side
         self.position = position
+        if isinstance(position, int) and len(str(position)) == 3:
+            self.position = [int(value) for value in str(position)]
         self.show_cmap_legend = show_cmap_legend
         self.cmap_label = cmap_label
         if isinstance(share_x , str):
@@ -334,7 +336,7 @@ class ltGraph:
             self.share_y = share_y
 
         if self.twin_of is None and self.inset_of is None:
-            self.graph = fig.fig.add_subplot(position, projection=projection, sharex=self.share_x, sharey=self.share_y)
+            self.graph = fig.fig.add_subplot(self.position[0], self.position[1], self.position[2], projection=self.projection, sharex=self.share_x, sharey=self.share_y)
         elif self.twin_of in self.fig.graphs:
             if self.twin_common_axis == 'x':
                 self.graph = fig.graphs[self.twin_of].graph.twinx()
