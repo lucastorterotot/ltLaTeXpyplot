@@ -472,6 +472,11 @@ class ltGraph:
             self.graph.set_zlabel(self.z_label)
 
         if self.show_legend :
+            plots, labels = self.graph.get_legend_handles_labels()
+            for Nlabels in range(len(labels)):
+                Nlabels = len(labels) - Nlabels -1
+                if labels[Nlabels] == 'indicate_inset':
+                    plots[Nlabels].set_label(None)
             if self.legend_on_side:
                 self.graph.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else :
