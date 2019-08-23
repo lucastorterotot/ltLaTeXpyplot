@@ -4,20 +4,25 @@ name="ltLaTeXpyplot python package"
 
 echo "Installing $name..."
 
-instal_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-instal_dir=${instal_dir%"ltLaTeXpyplot"}
+ainstal_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ainstal_dir=${ainstal_dir%"ltLaTeXpyplot"}
 
-if [[ $PYTHONPATH = *$instal_dir* ]] || [[ $(grep -l "$name" ~/.bashrc) = ~/.bashrc ]]
+if [[ $(grep -l "$name" ~/.bashrc) = ~/.bashrc ]]
 then
     echo 'It seems like you already have installed this!'
     echo 'Not changing anything.'
 else
-    if [[ $instal_dir = $HOME* ]]
+    if [[ $ainstal_dir = $HOME* ]]
     then
-        instal_dir=~${instal_dir#$HOME}
+        instal_dir=~${ainstal_dir#$HOME}
+    else
+        instal_dir=$ainstal_dir
     fi
     echo "" >> ~/.bashrc
     echo "# --- add $name ---" >> ~/.bashrc
-    echo "export PYTHONPATH=$instal_dir:"'$PYTHONPATH' >> ~/.bashrc
+    if [[ $PYTHONPATH != *$ainstal_dir* ]]
+    then
+        echo "export PYTHONPATH=$instal_dir:"'$PYTHONPATH' >> ~/.bashrc
+    fi
     echo "Installation completed."
 fi
