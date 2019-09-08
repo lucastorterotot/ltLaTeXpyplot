@@ -36,7 +36,7 @@ coverage:
 prod:
   stage: test
   script:
-    - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science
+    - apt-get -qq update && apt-get -qq install -y texlive-full
     - for file in $(find $instal_dir/examples/ -type f -iname ltLaTeXpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltLaTeXpyplot_example.py ; done
     - for file in $(find $instal_dir/examples/ -type f -iname matplotlib_example.py) ; do echo $file ; cd $(dirname $file) ; python matplotlib_example.py ; done
   artifacts:
