@@ -610,10 +610,10 @@ class ltGraph:
     def fill_between(self, x, y1, y2, alpha=.5, **kwargs):
         self.graph.fill_between(x, y1, y2, alpha=alpha, **kwargs)
 
-    def addarrow(self, x, y, vx, vy):
+    def addarrow(self, x, y, vx, vy, arrowstyle='->', lw=1, mutation_scale=7, mutation_aspect=None):
         self.graph.add_patch(FancyArrowPatch(posA=(x, y), posB=(x+vx, y+vy),
-                                             arrowstyle='->', lw=1, 
-                                             mutation_scale=7, mutation_aspect=None))
+                                             arrowstyle=arrowstyle, lw=lw, 
+                                             mutation_scale=mutation_scale, mutation_aspect=mutation_aspect))
 
     def test_graph_3d(self):
         if not self.projection == '3d' :
