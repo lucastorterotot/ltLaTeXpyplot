@@ -1079,16 +1079,18 @@ class ltPlotHist:
             
     def plot_pts(self, fig, graph, yerr=True, xerr=True, marker='o'):
         self.compute()
-        yerr = self.yerr
+        if yerr:
+            yerr = self.yerr
+        else:
+            yerr = [None for y in self.yerr]
         xs = np.zeros(len(self.y))
-        xerr = np.zeros(len(self.y))
+        _xerr = np.zeros(len(self.y))
         for k in range(len(xs)):
             xs[k] = (self.binning[k+1]+self.binning[k])/2
-            xerr[k] = (self.binning[k+1]-self.binning[k])/2
+            _xerr[k] = (self.binning[k+1]-self.binning[k])/2
             if not xerr:
-                xerr[k] = None
-            if not yerr:
-                yerr[k] = None
+                _xerr[k] = None
+        xerr = _xerr
         label_passed = False
         for k in range(len(self.y)):
             if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
