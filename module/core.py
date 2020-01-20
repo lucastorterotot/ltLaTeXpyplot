@@ -199,6 +199,8 @@ class ltFigure:
         self.suppressNotImplementedError = False
         self.bbox_inches = 'tight'
 
+        self.color_theme_candidate = True
+
     def update(self):
         pgf_preamble = pgf_with_latex['pgf.preamble']
         if self.lang == 'FR':
@@ -225,6 +227,8 @@ class ltFigure:
                 self._savefig(format=format)
         else:
             self._savefig(format=format)
+        if format == 'pgf' and self.color_theme_candidate:
+            self._make_color_theme()
 
     def _savefig(self, format='pgf'):
         self.fig.savefig(
@@ -232,6 +236,11 @@ class ltFigure:
                 self.name,
                 format),
             bbox_inches=self.bbox_inches)
+
+    def _make_color_theme(self):
+        file_to_update = '{}-pyplot.pgf'.format(self.name)
+        import os
+        
 
     def addgraph(self, name, **kwargs):
         if not name in self.graphs:
@@ -658,6 +667,8 @@ class ltPlotFct:
 
     def plot(self, fig, graph):
         fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=self.linewidth, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
     def compute_TF(self, **kwargs):
         ''' This code has been adapted from
@@ -708,6 +719,8 @@ class ltPlotFct3d(ltPlotFct):
         ax = fig.graphs[graph].graph
         normalize_3d(self, fig.graphs[graph], x, y, z)
         ax.plot(x, y, z, color=self.color, linewidth=self.linewidth, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
         
 class ltPlotPts(ltPlotFct):
@@ -727,6 +740,8 @@ class ltPlotPts(ltPlotFct):
             fig.graphs[graph].graph.errorbar(self.x, self.y, xerr=self.xerr, yerr=self.yerr, marker=self.marker, markersize=self.markersize, fmt=' ', linewidth=self.linewidth, elinewidth=self.elinewidth,capsize=self.capsize,capthick=self.capthick,color=self.color,label=self.label)
         else :
             fig.graphs[graph].graph.scatter(self.x, self.y, s=self.surface, c=self.color, marker=self.marker, cmap=self.cmap, alpha=self.alpha)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
         
 
 class ltPlotPts3d(ltPlotPts):
@@ -750,6 +765,8 @@ class ltPlotPts3d(ltPlotPts):
         if self.surface is not None:
             markersize = self.surface
         ax.scatter(x, y, z, c=self.color, marker=self.marker, s=markersize, label=self.label, cmap=self.cmap, alpha=self.alpha)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
         
 class ltPlotRegLin(ltPlotPts):
@@ -843,6 +860,8 @@ class ltPlotRegLin(ltPlotPts):
             lang = fig.lang
         self.plot_reg(fig, graph, lang=lang)
         self.plot_pts(fig, graph)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
     def plot_reg(self, fig, graph, lang=None):
         if lang is None:
@@ -916,6 +935,8 @@ class ltPlotPie:
         if self.norm_xy:
             ax.axis('equal')
         ax.pie(self.sizes, explode = self.explode, labels = self.labels, colors = self.colors, autopct = self.autopct, pctdistance = self.pctdistance, shadow = self.shadow, labeldistance = self.labeldistance, startangle = self.startangle, counterclock = self.counterclock, wedgeprops = self.wedgeprops, textprops = self.textprops, frame = self.frame, rotatelabels = self.rotatelabels)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
         
 
 class ltPlotHist:
@@ -1076,6 +1097,8 @@ class ltPlotHist:
         fig.graphs[graph].graph.fill(binning_seq, y_sequence, color=self.color, linewidth=linewidth, clip_path=None, label=self.label, fill=self.fill)
         if self.show_uncert:
             self._plot_uncerts(fig, graph)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
             
     def plot_pts(self, fig, graph, yerr=True, xerr=True, marker='o'):
         self.compute()
@@ -1099,6 +1122,8 @@ class ltPlotHist:
                     label = self.label
                     label_passed = True
                 fig.addplot(ltPlotPts(xs[k], self.y[k], yerr=yerr[k], xerr=xerr[k], marker=marker, color=self.color, capsize=0, label=label), graph)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
         
 class ltPlotScalField:
     def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, levels=None, Nlevels=None, color=color_default, label=None, clabel=False, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield'], linewidths=linewidths['contour2d']):
@@ -1125,6 +1150,8 @@ class ltPlotScalField:
             self._plot3d(fig, graph)
         else :
             self._plot2d(fig, graph)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
     def plot_field(self, fig, graph):
         self.plot(fig, graph)
@@ -1152,6 +1179,8 @@ class ltPlotScalField:
         if self.clabel :
             fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt=r'${value}$'.format(value='%1.1f'), fontsize=pgf_with_latex['legend.fontsize']-1)
         current_contour=0 
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
     def plot_contourf(self, fig, graph): 
         xs, ys, z_fct = self._plot_contour_init(fig, graph)
@@ -1160,7 +1189,9 @@ class ltPlotScalField:
         else:
             imshow = fig.graphs[graph].graph.contourf(xs, ys, z_fct, cmap = self.cmap)
         if fig.graphs[graph].show_cmap_legend:
-            add_colorbar(imshow, fig.graphs[graph])   
+            add_colorbar(imshow, fig.graphs[graph]) 
+        if self.color != color_default:
+            fig.color_theme_candidate = False  
             
     def _plot2d(self, fig, graph):
         aspect='auto'
@@ -1218,6 +1249,8 @@ class ltPlotSurf:
             self._plot3d(fig, graph)
         else :
             self._plot2d(fig, graph)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
     def _plot2d(self, fig, graph):
         _Surf2d = ltPlotScalField(self.theta, self.phi, z_fct=self.z_fct, cmap=self.cmap, color=self.color, label=self.label, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, alpha=self.alpha, use_cmap=self.use_cmap, linewidth=self.linewidth)
@@ -1296,6 +1329,8 @@ class ltPlotVectField2d:
             m = mpl.cm.ScalarMappable(cmap=getattr(mpl.cm, self.cmap), norm=norm)
             m.set_array([])
             add_colorbar(m, fig.graphs[graph])
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         if color is None:
@@ -1312,6 +1347,8 @@ class ltPlotVectField2d:
             return self.vx_fct(x, y), self.vy_fct(x, y)
         line_xy = odeint(_field, point, T).transpose()
         fig.graphs[graph].graph.plot(line_xy[0], line_xy[1], label=label, color=color, dashes=dashes, linewidth=self.linewidth_fieldline)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
     def plot_streamplot(self, fig, graph, start_points=None, density='undef', color=None, linewidth=None, **kwargs):
         if color is None:
@@ -1337,6 +1374,8 @@ class ltPlotVectField2d:
         strm = fig.graphs[graph].graph.streamplot(xs, ys, vx, vy, start_points=start_points, density=density, color=color, linewidth=linewidth, **kwargs)
         if fig.graphs[graph].show_cmap_legend:
             add_colorbar(strm.lines, fig.graphs[graph])
+        if self.color != color_default:
+            fig.color_theme_candidate = False
         
         
 class ltPlotVectField3d(ltPlotVectField2d):
@@ -1371,6 +1410,8 @@ class ltPlotVectField3d(ltPlotVectField2d):
             m = mpl.cm.ScalarMappable(cmap=getattr(mpl.cm, self.cmap), norm=norm)
             m.set_array([])
             add_colorbar(m, fig.graphs[graph])
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
     def plot_fieldline(self, fig, graph, point, startT, endT, stepT, color=None, label=None, dashes=None):
         fig.graphs[graph].test_graph_3d()
@@ -1387,6 +1428,8 @@ class ltPlotVectField3d(ltPlotVectField2d):
         line_xyz = odeint(_field, point, T).transpose()
         normalize_3d(self, fig.graphs[graph], line_xyz[0], line_xyz[1], line_xyz[2])
         fig.graphs[graph].graph.plot(line_xyz[0], line_xyz[1], line_xyz[2], label=label, color=color, dashes=dashes, linewidth=self.linewidth_fieldline)
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
         
 class ltPlotNMR:
@@ -1474,6 +1517,9 @@ class ltPlotNMR:
         fig.graphs[graph].graph.set_xlim([self.delta_min, self.delta_max])
 
         fig.graphs[graph].graph.invert_xaxis()
+        
+        if self.color != color_default:
+            fig.color_theme_candidate = False
 
         
 class ltPlotEpH:
@@ -1561,3 +1607,6 @@ class ltPlotEpH:
             ax = fig.graphs[graph].graph
             for spe in data.spes:
                 ax.text(spe[0], spe[1], spe[2], color=self.text_color, verticalalignment='center', horizontalalignment='center')
+                
+        if self.color != color_default:
+            fig.color_theme_candidate = False
