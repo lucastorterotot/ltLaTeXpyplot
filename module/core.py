@@ -240,7 +240,11 @@ class ltFigure:
     def _make_color_theme(self):
         file_to_update = '{}-pyplot.pgf'.format(self.name)
         import os
-        
+        os.system("sed -i 's|{}|{}|g' {}".format(
+            'definecolor{currentstroke}{rgb}{0.121569,0.466667,0.705882}',
+            'colorlet{currentstroke}{ltcolor\\\ltcolortheme}',
+            file_to_update
+        ))
 
     def addgraph(self, name, **kwargs):
         if not name in self.graphs:
