@@ -178,7 +178,8 @@ class ltFigure:
                  name='fig', title=None,
                  page_width_cm=17, width_frac=.8,
                  height_width_ratio=1./golden, tight_layout=False,
-                 lang = 'FR'):
+                 lang = 'FR',
+                 auto_color = True):
         self.name = name
         self.title = title
         self.page_width_cm = page_width_cm
@@ -200,6 +201,7 @@ class ltFigure:
         self.bbox_inches = 'tight'
 
         self.color_theme_candidate = True
+        self.auto_color = auto_color
 
     def update(self):
         pgf_preamble = pgf_with_latex['pgf.preamble']
@@ -227,7 +229,7 @@ class ltFigure:
                 self._savefig(format=format)
         else:
             self._savefig(format=format)
-        if format == 'pgf' and self.color_theme_candidate:
+        if format == 'pgf' and self.color_theme_candidate and self.auto_color:
             self._make_color_theme()
 
     def _savefig(self, format='pgf'):
