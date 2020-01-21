@@ -1,14 +1,29 @@
 image: python:latest
 
+variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
 before_script:
   - python -V
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
   - export instal_dir=$(pwd)
-  - python -m pip install matplotlib numpy scipy --upgrade
-  - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science texlive-extra-utils
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
 
 stages:
+  - build
   - test
+
+installation:
+  stage: build
+  script:
+    - python -m pip install matplotlib numpy scipy --upgrade
 
 coverage:
   stage: test
@@ -21,6 +36,7 @@ coverage:
 prod:
   stage: test
   script:
+    - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science texlive-extra-utils
     - for file in $(find $instal_dir/examples/ -type f -iname ltLaTeXpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltLaTeXpyplot_example.py ; done
     - for file in $(find $instal_dir/examples/ -type f -iname matplotlib_example.py) ; do echo $file ; cd $(dirname $file) ; python matplotlib_example.py ; done
   artifacts:
