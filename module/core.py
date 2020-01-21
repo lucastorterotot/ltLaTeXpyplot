@@ -247,6 +247,17 @@ class ltFigure:
             'colorlet{currentstroke}{ltcolor\\\ltcolortheme}',
             file_to_update
         ))
+        os.system("echo 'fi' | cat - {file} > .tmp-{file}~ && mv .tmp-{file}~ {file}".format(
+            file=file_to_update
+        ))
+        os.system("printf '{string}' | cat - {file} > .tmp-{file}~ && mv .tmp-{file}~ {file}".format(
+            string='\\ifx\\undefined\\ltcolortheme\\def\\ltcolortheme{blue}\\definecolor{ltcolorblue}{rgb}{0.121569,0.466667,0.705882}\\',
+            file=file_to_update
+        ))
+        os.system("echo '{string}' | cat - {file} > .tmp-{file}~ && mv .tmp-{file}~ {file}".format(
+            string='%% First make sure the auto color theme will work without the ltstyle package:',
+            file=file_to_update
+        ))
 
     def addgraph(self, name, **kwargs):
         if not name in self.graphs:
