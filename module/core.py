@@ -717,6 +717,7 @@ class ltPlotFct:
         self.TF.plot(fig, graph)
 
     def plot_TFrp(self, fig, graph, **kwargs):
+        fig.color_theme_candidate = False
         ax = fig.graphs[graph].graph
         if self.pad_to is None:
             self.pad_to = self.Nfft
@@ -1181,10 +1182,6 @@ class ltPlotScalField:
         self.C_fct = C_fct
 
     def plot(self, fig, graph):
-        if not isinstance(self.color, str):
-            fig.color_theme_candidate = False
-        elif self.color != color_default:
-            fig.color_theme_candidate = False
         if fig.graphs[graph].projection == '3d':
             self._plot3d(fig, graph)
         else :
@@ -1206,10 +1203,7 @@ class ltPlotScalField:
         return xs, ys, z_fct
 
     def plot_contour(self, fig, graph):
-        if not isinstance(self.color, str):
-            fig.color_theme_candidate = False
-        elif self.color != color_default:
-            fig.color_theme_candidate = False
+        fig.color_theme_candidate = False
         xs, ys, z_fct = self._plot_contour_init(fig, graph)
         if self.levels is not None :
             current_contour=fig.graphs[graph].graph.contour(xs, ys, z_fct, origin='lower', linewidths=self.linewidths, cmap=self.cmap, levels=self.levels)
@@ -1221,11 +1215,8 @@ class ltPlotScalField:
             fig.graphs[graph].graph.clabel(current_contour, inline=1, fmt=r'${value}$'.format(value='%1.1f'), fontsize=pgf_with_latex['legend.fontsize']-1)
         current_contour=0 
 
-    def plot_contourf(self, fig, graph): 
-        if not isinstance(self.color, str):
-            fig.color_theme_candidate = False
-        elif self.color != color_default:
-            fig.color_theme_candidate = False
+    def plot_contourf(self, fig, graph):
+        fig.color_theme_candidate = False
         xs, ys, z_fct = self._plot_contour_init(fig, graph)
         if self.levels is not None:
             imshow = fig.graphs[graph].graph.contourf(xs, ys, z_fct, cmap = self.cmap, levels = self.levels)
@@ -1235,6 +1226,7 @@ class ltPlotScalField:
             add_colorbar(imshow, fig.graphs[graph]) 
             
     def _plot2d(self, fig, graph):
+        fig.color_theme_candidate = False
         aspect='auto'
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
@@ -1249,6 +1241,7 @@ class ltPlotScalField:
             add_colorbar(imshow, fig.graphs[graph])
 
     def _plot3d(self, fig, graph):
+        fig.color_theme_candidate = False
         if self.alpha == 1 :
             self.alpha = self.alpha_3d
         _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, C_fct=self.C_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap, linewidth=self.linewidth)
@@ -1289,6 +1282,8 @@ class ltPlotSurf:
         if not isinstance(self.color, str):
             fig.color_theme_candidate = False
         elif self.color != color_default:
+            fig.color_theme_candidate = False
+        elif self.use_cmap:
             fig.color_theme_candidate = False
         if fig.graphs[graph].projection == '3d':
             self._plot3d(fig, graph)
@@ -1352,6 +1347,8 @@ class ltPlotVectField2d:
         if not isinstance(self.color, str):
             fig.color_theme_candidate = False
         elif self.color != color_default:
+            fig.color_theme_candidate = False
+        elif self.use_cmap:
             fig.color_theme_candidate = False
         if self.norm_xy :
             fig.graphs[graph].graph.set_aspect('equal', adjustable='box')
@@ -1439,6 +1436,8 @@ class ltPlotVectField3d(ltPlotVectField2d):
         if not isinstance(self.color, str):
             fig.color_theme_candidate = False
         elif self.color != color_default:
+            fig.color_theme_candidate = False
+        elif self.use_cmap:
             fig.color_theme_candidate = False
         fig.graphs[graph].test_graph_3d()
         xs, ys, zs = np.meshgrid(self.x, self.y, self.z)
