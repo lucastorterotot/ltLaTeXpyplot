@@ -22,8 +22,8 @@ num_bins = 50
 fig.addgraph('graph1', x_label='Smarts', y_label='Probability density', title='Histogram of IQ: $\\mu=100$, $\\sigma=15$', y_scaling='log', y_min=.75e-4, y_max=0.05, num_y_major = False)
 
 # Insert object in plots
-hist = lt.ltPlotHist(x, bins=num_bins, range=[50,150], fill=True)
-hist.set_integral(1) # get a probability
+hist = lt.ltPlotHist(data=x, bins=num_bins, range=[50,150], fill=True)
+hist.SetIntegral(1) # get a probability
 hist.plot(fig, 'graph1')
 
 # Add fit line

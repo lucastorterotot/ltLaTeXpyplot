@@ -972,25 +972,37 @@ class ltPlotPie:
         
 
 class ltPlotHist:
-    def __init__(self, x, bins=None, range=None, weights=None, cumulative=False, color=color_default, label=None, show_uncert=False, fill=True, linewidth=linewidths['plotfct']):
-        self.x = [x]
+    def __init__(self,
+                 data=None,
+                 weights=None,
+                 bins=None, range=None,
+                 cumulative=False,
+                 color=color_default, label=None,
+                 show_uncert=False, fill=True, linewidth=linewidths['plotfct']):
+        self.entries = []
+        self.weights = []
         self.bins = bins
-        self.set_binning()
         self.range = range
-        if weights is None:
-            weights = np.zeros(len(x))
-            weights += 1
-        self.weights = [weights]
         self.cumulative = cumulative
         self.color = color
         self.label = label
         self.show_uncert = show_uncert
-        self.y = None
-        self.yerr = None
         self.fill = fill
         self.linewidth = linewidth
+        self.x = None
+        self.y = None
+        self.yerr_up = None
+        self.yerr_down = None
+        self.xerr_up = None
+        self.xerr_down = None
+        self.entries_in_bin = None
+        self.weights_in_bin = None
+        self._set_binning()
+        if data is not None:
+            self.Fill(data, weights)
+        self._stacked_hist = None
 
-    def set_binning(self):
+    def _set_binning(self):
         self.binning = self.bins
         if not (isinstance(self.bins, list) or isinstance(self.bins, np.ndarray)) and self.bins is not None:
             if getattr(self,  'range', None) is None:
@@ -1002,116 +1014,141 @@ class ltPlotHist:
                     self.binning = np.linspace(x.min(), x.max(), self.bins+1)
             else:
                 self.binning = np.linspace(self.range[0], self.range[1], self.bins+1)
+        self.x = np.zeros(len(self.binning)-1)
+        self.xerr_up = np.zeros(len(self.binning)-1)
+        self.xerr_down = np.zeros(len(self.binning)-1)
+        if self.y is None:
+            self.y = np.zeros(len(self.binning)-1)
+        if self.yerr_up is None:
+            self.yerr_up = np.zeros(len(self.binning)-1)
+        if self.yerr_down is None:
+            self.yerr_down = np.zeros(len(self.binning)-1)
+        if self.entries_in_bin is None:
+            self.entries_in_bin = np.zeros(len(self.binning)-1)
+        if self.weights_in_bin is None:
+            self.weights_in_bin = np.zeros(len(self.binning)-1)
+        for k in range(len(self.x)):
+            self.x[k] = (self.binning[k+1]+self.binning[k])/2
+            self.xerr_up[k] = (self.binning[k+1]-self.binning[k])/2
+            self.xerr_down[k] = (self.binning[k+1]-self.binning[k])/2
 
-    def stack(self, others):
-        for attr_key in ['x', 'weights']:
-            attr = getattr(self, attr_key)
-            for other in others:
-                attr += getattr(other, attr_key)
-            setattr(self, attr_key, attr)
-        self.set_binning()
-
-    def plot_stack(self, fig, graph, others, set_integral=None, scale=None):
-        do_uncert, self.show_uncert = self.show_uncert, False
-        histos = [self]+others
-        if set_integral is not None:
-            integral_stacked = 0
-            for hist in histos:
-                integral_stacked += hist.get_integral()
-            scale = set_integral/integral_stacked
-        if scale is not None:
-            for hist in histos:
-                hist.scale(scale)
-        for hist in histos:
-            index = histos.index(hist)
-            hist.stack(histos[index+1:])
-            hist.plot(fig, graph)
-        if do_uncert:
-            self._plot_uncerts(fig, graph)
-        self.show_uncert = do_uncert
-
-    def _plot_uncerts(self, fig, graph):
-        for k in range(len(self.y)):
-            if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
-                up_unc =self.y[k]+self.yerr[k]
-                down_unc = self.y[k]-self.yerr[k]
-                if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
-                    down_unc = _min
-                fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
-        
-    def get_integral(self):
-        self.set_binning()
-        result = 0
-        for k in range(len(self.weights)):
-            for l in range(len(self.weights[k])):
-                x_value = self.x[k][l]
-                if x_value >= self.binning[-1]:
-                    index = len(self.binning)-1
-                else:
-                    index = next(x[0] for x in enumerate(self.binning) if x[1] >= x_value)
-                bin_width = self.binning[index]-self.binning[index-1]
-                result += self.weights[k][l] * bin_width
-        return result
-
-    def scale(self, value):
-        for k in range(len(self.weights)):
-            self.weights[k] *= value
-
-    def set_integral(self, value):
-        integral = self.get_integral()
-        self.scale(value/integral)
-
-    def norm_bins(self):
-        self.set_binning()
-        for k in range(len(self.weights)):
-            for l in range(len(self.weights[k])):
-                x_value = self.x[k][l]
-                if x_value >= self.binning[-1]:
-                    index = len(self.binning)-1
-                else:
-                    index = next(x[0] for x in enumerate(self.binning) if x[1] >= x_value)
-                bin_width = self.binning[index]-self.binning[index-1]
-                self.weights[k][l] *= 1/bin_width
-
-    def compute(self):
-        values = []
-        weights = []
-        for x in self.x:
-            values = values + [val for val in x]
-        for w in self.weights:
-            weights = weights + [val for val in w]
-        hist, bin_edges = np.histogram(values, bins=self.bins, range=self.range, weights=weights, density=False)
+    def Fill(self, xs, weights=None):
+        self.entries += [val for val in xs]
+        if weights is None:
+            weights = [1 for val in xs]
+        self.weights += [w for w in weights]
+        hist, bin_edges = np.histogram(self.entries, bins=self.bins, range=self.range, weights=self.weights, density=False)
         if self.cumulative:
             for k in range(1,len(hist)):
                 hist[k] += hist[k-1]
-        self.y = hist
+        self.y = np.zeros(len(hist))
+        for k in range(len(hist)):
+            self.y[k] = hist[k]
+        self.entries_in_bin = np.zeros(len(hist))
+        self.weights_in_bin = np.zeros(len(hist))
+        self.yerr_up = np.zeros(len(hist))
+        self.yerr_down = np.zeros(len(hist))
         self.bins = bin_edges
-        self.set_binning()
-        yerr = np.zeros(len(hist))
+        self._set_binning()
         for k in range(len(hist)):
             Nyerr = 0
             Wyerr = 0
-            for l in range(len(values)):
-                value = values[l]
-                weight = weights[l]
+            for l in range(len(self.entries)):
+                value = self.entries[l]
+                weight = self.weights[l]
                 if value >= self.binning[k] and value < self.binning[k+1]:
                     Nyerr += 1
                     Wyerr += weight
                 if self.cumulative and value < self.binning[k]:
                     Nyerr += 1
                     Wyerr += weight
+            self.entries_in_bin[k] = Nyerr
+            self.weights_in_bin[k] = Wyerr
             if Nyerr == 0 :
-                yerr[k] = 0
+                self.yerr_up[k] = 0
+                self.yerr_down[k] = 0
             else:
-                yerr[k] = np.sqrt(hist[k]*Wyerr/Nyerr)
-        self.yerr = yerr
+                self.yerr_up[k] = np.sqrt(hist[k]*Wyerr/Nyerr)
+                self.yerr_down[k] = np.sqrt(hist[k]*Wyerr/Nyerr)
+
+    def SetBinContent(self, bin, value):
+        self.y[bin] = value
+
+    def SetBinError(self, bin, value):
+        self.SetBinErrorUp(bin, value)
+        self.SetBinErrorDown(bin, value)
+
+    def SetBinErrorUp(self, bin, value):
+        self.yerr_up[bin] = value
+
+    def SetBinErrorDown(self, bin, value):
+        self.yerr_down[bin] = value
+
+    def GetBinContent(self, bin):
+        return self.y[bin]
+
+    def GetBinEntries(self, bin):
+        return self.entries_in_bin[bin]
+
+    def GetBinError(self, bin):
+        return max(
+            self.GetBinErrorUp(bin),
+            self.GetBinErrorDown(bin)
+        )
+
+    def GetBinErrorUp(self, bin):
+        return self.yerr_up[bin]
+
+    def GetBinErrorDown(self, bin):
+        return self.yerr_down[bin]
+        
+    def Integral(self):
+        self._set_binning()
+        result = 0
+        for k in range(len(self.weights)):
+            value = self.entries[k]
+            if value >= self.binning[-1]:
+                index = len(self.binning)-1
+            else:
+                index = next(x[0] for x in enumerate(self.binning) if x[1] >= value)
+            bin_width = self.binning[index]-self.binning[index-1]
+            result += self.weights[k] * bin_width
+        return result
+
+    def Scale(self, value):
+        for k in range(len(self.weights)):
+            self.weights[k] *= value
+        for k in range(len(self.y)):
+            self.y[k] *= value
+        self.weights_in_bin *= value
+        self.yerr_up *= abs(value)
+        self.yerr_down *= abs(value)
+
+    def SetIntegral(self, value):
+        self.Scale(value/self.Integral())
+
+    def NormalizeToBinWidth(self):
+        self._set_binning()
+        for k in range(len(self.weights)):
+            value = self.entries[k]
+            if value >= self.binning[-1]:
+                index = len(self.binning)-1
+            else:
+                index = next(x[0] for x in enumerate(self.binning) if x[1] >= value)
+            bin_width = self.binning[index]-self.binning[index-1]
+            self.weights[k] *= 1/bin_width
+        for k in range(len(self.y)):
+            bin_width = self.binning[k+1]-self.binning[k]
+            self.y[k] *= 1/bin_width
+            self.weights_in_bin[k] *= 1/bin_width
+            self.yerr_up[k] *= 1/bin_width
+            self.yerr_down[k] *= 1/bin_width
 
     def plot(self, fig, graph):
         if not isinstance(self.color, str):
             fig.color_theme_candidate = False
         elif self.color != color_default:
             fig.color_theme_candidate = False
-        self.compute()
         _min = 0
         if fig.graphs[graph].y_scaling=='log':
             if fig.graphs[graph].y_min is not None:
@@ -1133,25 +1170,73 @@ class ltPlotHist:
         fig.graphs[graph].graph.fill(binning_seq, y_sequence, color=self.color, linewidth=linewidth, clip_path=None, label=self.label, fill=self.fill)
         if self.show_uncert:
             self._plot_uncerts(fig, graph)
+
+    def _stack(self, others):
+        import copy
+        self._stacked_hist = copy.copy(self)
+        for other in others:
+            self._stacked_hist.entries.append(other.entries)
+            self._stacked_hist.weights.append(other.weights)
+            if (len(self.y) != len(other.y)):
+                raise ValueError('You try to stack two histograms with different number of bins!')
+            elif any(self.x[k] != other.x[k] for k in range(len(self.x))):
+                raise ValueError('You try to stack two histograms with different binning!')
+            else:
+                for k in range(len(self.y)):
+                    self._stacked_hist.y[k] += other.y[k]
+                    self._stacked_hist.entries_in_bin[k] += other.entries_in_bin[k]
+                    self._stacked_hist.weights_in_bin[k] += other.weights_in_bin[k]
+                    self._stacked_hist.yerr_up[k] = ((self._stacked_hist.yerr_up[k])**2 + (other.yerr_up[k])**2)**.5
+                    self._stacked_hist.yerr_down[k] = ((self._stacked_hist.yerr_down[k])**2 + (other.yerr_down[k])**2)**.5
+                    
+
+    def plot_stack(self, fig, graph, others, SetIntegral=None, scale=None):
+        do_uncert, self.show_uncert = self.show_uncert, False
+        histos = others
+        if self not in others:
+            histos = [self]+others
+        if SetIntegral is not None:
+            integral_stacked = 0
+            for hist in histos:
+                integral_stacked += hist.Integral()
+            scale = SetIntegral/integral_stacked
+        if scale is not None:
+            for hist in histos:
+                hist.Scale(scale)
+        for hist in histos:
+            index = histos.index(hist)
+            hist._stack(histos[index+1:])
+            hist._stacked_hist.plot(fig, graph)
+        if do_uncert:
+            self._stacked_hist._plot_uncerts(fig, graph)
+        self.show_uncert = do_uncert
+
+    def _plot_uncerts(self, fig, graph):
+        for k in range(len(self.y)):
+            if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
+                up_unc = self.y[k]+self.yerr_up[k]
+                down_unc = self.y[k]-self.yerr_down[k]
+                if fig.graphs[graph].y_scaling=='log' and down_unc <= 0:
+                    down_unc = _min
+                fig.graphs[graph].graph.fill([self.binning[k+1],self.binning[k],self.binning[k],self.binning[k+1]], [down_unc, down_unc, up_unc, up_unc], fill=False, hatch='xxxxx', linewidth=0, clip_path=None)
             
     def plot_pts(self, fig, graph, yerr=True, xerr=True, marker='o'):
         if not isinstance(self.color, str):
             fig.color_theme_candidate = False
         elif self.color != color_default:
             fig.color_theme_candidate = False
-        self.compute()
         if yerr:
-            yerr = self.yerr
+            yerr_up = self.yerr_up
+            yerr_down = self.yerr_down
         else:
-            yerr = [None for y in self.yerr]
-        xs = np.zeros(len(self.y))
-        _xerr = np.zeros(len(self.y))
-        for k in range(len(xs)):
-            xs[k] = (self.binning[k+1]+self.binning[k])/2
-            _xerr[k] = (self.binning[k+1]-self.binning[k])/2
-            if not xerr:
-                _xerr[k] = None
-        xerr = _xerr
+            yerr_up = [None for y in self.yerr_up]
+            yerr_down = [None for y in self.yerr_down]
+        if xerr:
+            xerr_up = self.xerr_up
+            xerr_down = self.xerr_down
+        else:
+            xerr_up = [None for x in self.xerr_up]
+            xerr_down = [None for x in self.xerr_down]
         label_passed = False
         for k in range(len(self.y)):
             if not(self.y[k] == 0 and fig.graphs[graph].y_scaling=='log'):
@@ -1159,7 +1244,14 @@ class ltPlotHist:
                 if not label_passed:
                     label = self.label
                     label_passed = True
-                fig.addplot(ltPlotPts(xs[k], self.y[k], yerr=yerr[k], xerr=xerr[k], marker=marker, color=self.color, capsize=0, label=label), graph)
+                fig.addplot(
+                    ltPlotPts(
+                        [self.x[k]], [self.y[k]],
+                        yerr = [[yerr_down[k]], [yerr_up[k]]],
+                        xerr = [[xerr_down[k]], [xerr_up[k]]],
+                        marker=marker, color=self.color,
+                        capsize=0, label=label
+                    ), graph)
         
 class ltPlotScalField:
     def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, levels=None, Nlevels=None, color=color_default, label=None, clabel=False, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield'], linewidths=linewidths['contour2d']):
