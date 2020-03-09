@@ -26,7 +26,7 @@ for n,l in [(3,0),(2,1)]:
         }
     for subkey, fig in figs.items():
         fig.addgraph('graph1', x_min=0, x_max=data.r_on_a0_max['{}x'.format(n)], y_ticks=False, show_x_axis=True)
-        if subkey is not 'R' or n == l+1:
+        if subkey != 'R' or n == l+1:
             fig.graphs['graph1'].y_min = 0
             fig.graphs['graph1'].y_max = 1
         fig.addplot(lt.ltPlotFct(x, ys[subkey]/max(ys[subkey])), 'graph1')
