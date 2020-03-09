@@ -5,6 +5,7 @@ import numpy as np
 
 import ltLaTeXpyplot as lt
 import ltLaTeXpyplot.data.orbitals.orbitals_data as data # uses the orbital data of this package
+import matplotlib.pyplot as plt
 
 steps = 50
 theta = np.arange(0,np.pi*(1+1./steps),np.pi/steps)
@@ -35,5 +36,6 @@ for dic in [data.Y_fcts_R, data.Y_fcts_C]:
         print('    Orbital ', ncur, '/', ntot, ' : '+key)
 
         fig.save(format='png')
+        plt.close()
 
 print('  Orbitals created.')
