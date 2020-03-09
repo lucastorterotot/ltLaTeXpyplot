@@ -475,9 +475,9 @@ class ltGraph:
                 self.graph.tick_params(
                     direction='in',
                     which=ticks_category,
-                    bottom=(self.twin_of is None or self.twin_common_axis is not 'y'),
+                    bottom=(self.twin_of is None or self.twin_common_axis != 'y'),
                     top=1,
-                    left=(self.twin_of is None or self.twin_common_axis is not 'x'),
+                    left=(self.twin_of is None or self.twin_common_axis != 'x'),
                     right=1,
                     width=linewidths[ticks_category+'ticks']
                 )
@@ -492,7 +492,7 @@ class ltGraph:
 
         if self.x_label is not None :
             self.graph.set_xlabel(self.x_label)
-        if self.y_label is not None and self.projection is not 'polar':
+        if self.y_label is not None and self.projection != 'polar':
             self.graph.set_ylabel(self.y_label)
         if self.z_label is not None and self.projection == '3d':
             self.graph.set_zlabel(self.z_label)
@@ -1652,7 +1652,7 @@ class ltPlotNMR:
             fig.graphs[graph].graph.tick_params(
                 direction='in',
                 which=ticks_category,
-                bottom=(fig.graphs[graph].twin_of is None or fig.graphs[graph].twin_common_axis is not 'y'),
+                bottom=(fig.graphs[graph].twin_of is None or fig.graphs[graph].twin_common_axis != 'y'),
                 top=0,
                 left=0,
                 right=0,
