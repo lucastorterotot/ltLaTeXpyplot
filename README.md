@@ -7,8 +7,8 @@ This package is under development for the moment!
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/lucastorterotot/ltLaTeXpyplot.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/commits)
 [![GitHub last commit](https://img.shields.io/github/last-commit/lucastorterotot/ltLaTeXpyplot.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/commits)
 [![GitHub](https://img.shields.io/github/license/lucastorterotot/ltLaTeXpyplot.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/blob/master/LICENSE)
-[![Python Version](https://img.shields.io/badge/Python-3.X-informational.svg)](https://www.python.org/)
-[![matplotlib Version](https://img.shields.io/badge/matplotlib-3.8.1-informational.svg)](https://matplotlib.org/)
+[![Python Version](https://img.shields.io/badge/Python-3.6+-informational.svg)](https://www.python.org/)
+[![matplotlib Version](https://img.shields.io/badge/matplotlib-3.1.0-informational.svg)](https://matplotlib.org/)
 
 ## Introduction
 
