@@ -17,132 +17,68 @@ def Rnl(r,n,l,Z=1,a0=a0):
     u = Z/a0
     return ((2* u/n)**3 * (factorial(n-l-1))/(2*n*(factorial(n+l))**3))**.5 * np.exp(-u/n*r) * (2* u/n * r)**l * genlaguerre(n-l-1,2*l+1)(2* u/n * r)
 
-# Shperical harmonics, see
-# https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Spherical_harmonics
+from scipy.special import lpmv
 
-def Y00(theta, phi):
-    return 1./(2*np.pi**.5)
+def unnorm_Ylm(theta, phi, l, m):
+    return np.exp(phi * m * 1j) * lpmv(m, l, np.cos(theta))
 
-def Y10(theta, phi):
-    return .5*(3./np.pi)**.5*np.cos(theta)
-def Y11p(theta, phi):
-    return -.5*(3./(2*np.pi))**.5*np.sin(theta)*np.exp(phi*1j)
-def Y11m(theta, phi):
-    return .5*(3./(2*np.pi))**.5*np.sin(theta)*np.exp(-phi*1j)
+Ylm_normalizers = {}
 
-def Y20(theta, phi):
-    return .25*(5./np.pi)**.5*(3*np.cos(theta)**2-1)
-def Y21p(theta, phi):
-    return -.5*(15./(2*np.pi))**.5*np.sin(theta)*np.cos(theta)*np.exp(phi*1j)
-def Y21m(theta, phi):
-    return .5*(15./(2*np.pi))**.5*np.sin(theta)*np.cos(theta)*np.exp(-phi*1j)
-def Y22p(theta, phi):
-    return .25*(15./(2*np.pi))**.5*np.sin(theta)**2*np.exp(phi*2j)
-def Y22m(theta, phi):
-    return .25*(15./(2*np.pi))**.5*np.sin(theta)**2*np.exp(-phi*2j)
-
-def Y30(theta, phi):
-    return .25 * (7/np.pi)**.5 * (5*np.cos(theta)**3 - 3*np.cos(theta))
-def Y31p(theta, phi):
-    return -1./8 * (21/np.pi)**.5 * np.sin(theta) * (5*np.cos(theta)**2-1) * np.exp(phi*1j)
-def Y31m(theta, phi):
-    return 1./8 * (21/np.pi)**.5 * np.sin(theta) * (5*np.cos(theta)**2-1) * np.exp(-phi*1j)
-def Y32p(theta, phi):
-    return 1./4 * (105/(2*np.pi))**.5 * np.sin(theta)**2 * np.cos(theta) * np.exp(phi*2j)
-def Y32m(theta, phi):
-    return 1./4 * (105/(2*np.pi))**.5 * np.sin(theta)**2 * np.cos(theta) * np.exp(-phi*2j)
-def Y33p(theta, phi):
-    return -1./8 * (35/np.pi)**.5 * np.sin(theta)**3 * np.exp(phi*3j)
-def Y33m(theta, phi):
-    return 1./8 * (35/np.pi)**.5 * np.sin(theta)**3 * np.exp(-phi*3j)
-
-def Y40(theta, phi):
-    return 3./16 * (1/np.pi)**.5 * (35 * np.cos(theta)**4 - 30 * np.cos(theta)**2 + 3)
-def Y41p(theta, phi):
-    return -3./8 * (5/np.pi)**.5 *np.sin(theta) * (7*np.cos(theta)**3-3*np.cos(theta)) * np.exp(phi*1j)
-def Y41m(theta, phi):
-    return 3./8 * (5/np.pi)**.5 *np.sin(theta) * (7*np.cos(theta)**3-3*np.cos(theta)) * np.exp(-phi*1j)
-def Y42p(theta, phi):
-    return 3./8 * (5/(2*np.pi))**.5 * np.sin(theta)**2 * (7*np.cos(theta)**2-1) * np.exp(phi*2j)
-def Y42m(theta, phi):
-    return 3./8 * (5/(2*np.pi))**.5 * np.sin(theta)**2 * (7*np.cos(theta)**2-1) * np.exp(-phi*2j)
-def Y43p(theta, phi):
-    return -3./8 * (35/np.pi)**.5 * np.sin(theta)**3 * np.cos(theta) * np.exp(phi*3j)
-def Y43m(theta, phi):
-    return 3./8 * (35/np.pi)**.5 * np.sin(theta)**3 * np.cos(theta) * np.exp(-phi*3j)
-def Y44p(theta, phi):
-    return 3./16 * (35/(2*np.pi))**.5 * np.sin(theta)**4 * np.exp(phi*4j)
-def Y44m(theta, phi):
-    return 3./16 * (35/(2*np.pi))**.5 * np.sin(theta)**4 * np.exp(-phi*4j)
+def Ylm(theta, phi, l, m):
+    if '{}_{}'.format(l,abs(m)) in Ylm_normalizers:
+        return Ylm_normalizers['{}_{}'.format(l,abs(m))] * unnorm_Ylm(theta, phi, l, m)
+    else: # compute the normalizer
+        print("\tComputing normalization factor for Y {} {}.".format(l,abs(m)))
+        steps = 100
+        thetas = np.arange(0,np.pi*(1+1./steps),np.pi/steps)
+        phis = np.arange(-np.pi*(1+1./steps),np.pi*(1+1./steps),np.pi/steps)
+        integral = 0
+        Delta = (thetas[-1]-thetas[0])*(phis[-1]-phis[0])/(len(thetas)*len(phis))
+        for t in thetas:
+            for p in phis:
+                integral += np.absolute(unnorm_Ylm(t, p, l, m))**2 * np.sin(t) * Delta
+        Ylm_normalizers['{}_{}'.format(l,abs(m))] = np.sqrt(1./integral)
+        return Ylm(theta, phi, l, m)
 
 def Ys(theta, phi):
-    return np.real(Y00(theta, phi))
+    return np.real(Ylm(theta, phi, 0, 0))
 
 def Ypz(theta, phi):
-    return np.real(Y10(theta, phi))
+    return np.real(Ylm(theta, phi, 1, 0))
 def Ypx(theta, phi):
-    return np.real(.5**(.5) * (-Y11p(theta, phi)+Y11m(theta, phi)))
+    return np.real(.5**(.5) * (-Ylm(theta, phi, 1, 1)+Ylm(theta, phi, 1, -1)))
 def Ypy(theta, phi):
-    return np.real(.5**(.5) / 1j * (-Y11p(theta, phi)-Y11m(theta, phi)))
+    return np.real(.5**(.5) / 1j * (-Ylm(theta, phi, 1, 1)-Ylm(theta, phi, 1, -1)))
 
 def Ydz2(theta, phi):
-    return np.real(Y20(theta, phi))
+    return np.real(Ylm(theta, phi, 2, 0))
 def Ydxz(theta, phi):
-    return np.real(.5**(.5) * (-Y21p(theta, phi)+Y21m(theta, phi)))
+    return np.real(.5**(.5) * (-Ylm(theta, phi, 2, 1)+Ylm(theta, phi, 2, -1)))
 def Ydyz(theta, phi):
-    return np.real(.5**(.5) / 1j * (-Y21p(theta, phi)-Y21m(theta, phi)))
+    return np.real(.5**(.5) / 1j * (-Ylm(theta, phi, 2, 1)-Ylm(theta, phi, 2, -1)))
 def Ydx2my2(theta, phi):
-    return np.real(.5**(.5) * (Y22p(theta, phi)+Y22m(theta, phi)))
+    return np.real(.5**(.5) * (Ylm(theta, phi, 2, 2)+Ylm(theta, phi, 2, 2)))
 def Ydxy(theta, phi):
-    return np.real(.5**(.5) /1j * (Y22p(theta, phi)-Y22m(theta, phi)))
+    return np.real(.5**(.5) /1j * (Ylm(theta, phi, 2, 2)-Ylm(theta, phi, 2, -2)))
 # def Ydz2my2(theta, phi):
 #     return .25*(15./np.pi)**.5*(np.cos(theta)**2-np.sin(theta)**2*np.sin(phi)**2)
 # def Ydz2mx2(theta, phi):
 #     return .25*(15./np.pi)**.5*(np.cos(theta)**2-np.sin(theta)**2*np.cos(phi)**2)
 
 def Yfz3(theta, phi):
-    return np.real(Y30(theta, phi))
+    return np.real(Ylm(theta, phi, 3, 0))
 def Yfxz2(theta, phi):
-    return np.real(.5**(.5) * (-Y31p(theta, phi)+Y31m(theta, phi)))
+    return np.real(.5**(.5) * (-Ylm(theta, phi, 3, 1)+Ylm(theta, phi, 3, -1)))
 def Yfyz2(theta, phi):
-    return np.real(.5**(.5) / 1j * (-Y31p(theta, phi)-Y31m(theta, phi)))
+    return np.real(.5**(.5) / 1j * (-Ylm(theta, phi, 3, 1)-Ylm(theta, phi, 3, -1)))
 def Yfxyz(theta, phi):
-    return np.real(.5**(.5) / 1j * (Y32p(theta, phi)-Y32m(theta, phi)))
+    return np.real(.5**(.5) / 1j * (Ylm(theta, phi, 3, 2)-Ylm(theta, phi, 3, -2)))
 def Yfzx2my2(theta, phi):
-    return np.real(.5**(.5) * (Y32p(theta, phi)+Y32m(theta, phi)))
+    return np.real(.5**(.5) * (Ylm(theta, phi, 3, 2)+Ylm(theta, phi, 3, -2)))
 def Yfxx2m3y2(theta, phi):
-    return np.real(.5**(.5) * (-Y33p(theta, phi)+Y33m(theta, phi)))
+    return np.real(.5**(.5) * (-Ylm(theta, phi, 3, 3)+Ylm(theta, phi, 3, -3)))
 def Yfy3x2my2(theta, phi):
-    return np.real(.5**(.5) / 1j * (-Y33p(theta, phi)-Y33m(theta, phi)))
-
-
-Y_fcts_C = {
-    '00' : Y00,
-    '10' : Y10,
-    '11p' : Y11p,
-    '11m' : Y11m,
-    '20' : Y20,
-    '21p' : Y21p,
-    '21m' : Y21m,
-    '22p' : Y22p,
-    '22m' : Y22m,
-    '30' : Y30,
-    '31p' : Y31p,
-    '31m' : Y31m,
-    '32p' : Y32p,
-    '32m' : Y32m,
-    '33p' : Y33p,
-    '33m' : Y33m,
-    # '40' : Y40,
-    # '41p' : Y41p,
-    # '41m' : Y41m,
-    # '42p' : Y42p,
-    # '42m' : Y42m,
-    # '43p' : Y43p,
-    # '43m' : Y43m,
-    # '44p' : Y44p,
-    # '44m' : Y44m,
-}
+    return np.real(.5**(.5) / 1j * (-Ylm(theta, phi, 3, 3)-Ylm(theta, phi, 3, -3)))
 
 Y_fcts_R = {
     's' : Ys,
