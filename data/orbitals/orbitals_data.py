@@ -25,10 +25,10 @@ def unnorm_Ylm(theta, phi, l, m):
 Ylm_normalizers = {}
 
 def Ylm(theta, phi, l, m):
-    if '{}_{}'.format(l,abs(m)) in Ylm_normalizers:
-        return Ylm_normalizers['{}_{}'.format(l,abs(m))] * unnorm_Ylm(theta, phi, l, m)
+    if '{}_{}'.format(l,m) in Ylm_normalizers:
+        return Ylm_normalizers['{}_{}'.format(l,m)] * unnorm_Ylm(theta, phi, l, m)
     else: # compute the normalizer
-        print("\tComputing normalization factor for Y {} {}.".format(l,abs(m)))
+        print("\tComputing normalization factor for Y {} {}.".format(l,m))
         steps = 100
         thetas = np.arange(0,np.pi*(1+1./steps),np.pi/steps)
         phis = np.arange(-np.pi*(1+1./steps),np.pi*(1+1./steps),np.pi/steps)
@@ -37,7 +37,7 @@ def Ylm(theta, phi, l, m):
         for t in thetas:
             for p in phis:
                 integral += np.absolute(unnorm_Ylm(t, p, l, m))**2 * np.sin(t) * Delta
-        Ylm_normalizers['{}_{}'.format(l,abs(m))] = np.sqrt(1./integral)
+        Ylm_normalizers['{}_{}'.format(l,m)] = np.sqrt(1./integral)
         return Ylm(theta, phi, l, m)
 
 def Ys(theta, phi):
