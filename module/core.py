@@ -529,7 +529,7 @@ class ltGraph:
                 self.y_ticks_max = self.y_max
             if self.y_ticks_min is not None and self.y_ticks_max is not None :
                 self.graph.yaxis.set_ticks(np.arange(self.y_ticks_min,self.y_ticks_max+self.y_ticks_step/10.,self.y_ticks_step))
-        if self.z_ticks_step is not None and projection=='3d' :
+        if self.z_ticks_step is not None and self.projection=='3d' :
             if self.z_ticks_min is None:
                 self.z_ticks_min = self.z_min
             if self.z_ticks_max is None:
