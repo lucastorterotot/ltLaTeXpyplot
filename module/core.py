@@ -1254,7 +1254,7 @@ class ltPlotHist:
                     ), graph)
         
 class ltPlotScalField:
-    def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, levels=None, Nlevels=None, color=color_default, label=None, clabel=False, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield'], linewidths=linewidths['contour2d']):
+    def __init__(self, x, y, z_fct, C_fct=None, cmap=cmap_default, levels=None, Nlevels=None, color=color_default, label=None, clabel=False, norm_xy=True, norm_xyz=False, alpha=1, alpha_3d=0.5, use_cmap=True, linewidth=linewidths['scalfield'], linewidths=linewidths['contour2d'], only_lines=None):
         self.label = label
         self.x = x
         self.y = y
@@ -1272,6 +1272,10 @@ class ltPlotScalField:
         self.linewidth = linewidth
         self.linewidths = linewidths
         self.C_fct = C_fct
+        if only_lines is None:
+            self.only_lines = (self.linewidth != 0)
+        else:
+            self.only_lines = only_lines
 
     def plot(self, fig, graph):
         if fig.graphs[graph].projection == '3d':
@@ -1336,12 +1340,20 @@ class ltPlotScalField:
         fig.color_theme_candidate = False
         if self.alpha == 1 :
             self.alpha = self.alpha_3d
-        _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, C_fct=self.C_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap, linewidth=self.linewidth)
+        _ScalField3d = ltPlotSurf(self.x, self.y, z_fct=self.z_fct, C_fct=self.C_fct, label=self.label, alpha=self.alpha, color=self.color, cmap=self.cmap, norm_xy=self.norm_xy, norm_xyz=self.norm_xyz, use_cmap=self.use_cmap, linewidth=self.linewidth, only_lines=self.only_lines)
         _ScalField3d.plot(fig, graph)
 
 
 class ltPlotSurf:
-    def __init__(self, theta, phi, x_fct=None, y_fct=None, z_fct=None, R_fct=None, C_fct=None, label=None, alpha=0.5, color=color_default, cmap=cmap_default, norm_xy=True, norm_xyz=False, use_cmap=False, linewidth=linewidths['surface']):
+    def __init__(self,
+                 theta, phi,
+                 x_fct=None, y_fct=None, z_fct=None,
+                 R_fct=None, C_fct=None,
+                 label=None,
+                 alpha=0.5, color=color_default, cmap=cmap_default, use_cmap=False,
+                 cmap_low = None, cmap_high = None,
+                 norm_xy=True, norm_xyz=False,
+                 linewidth=linewidths['surface'], only_lines=None):
         if R_fct is not None:
             def x_fct(t, p):
                 return R_fct(t, p) * np.sin(t) * np.cos(p)
@@ -1364,11 +1376,18 @@ class ltPlotSurf:
         self.alpha = alpha
         self.color = color
         self.cmap = cmap
+        self.use_cmap = use_cmap
         self.norm_xy = norm_xy or norm_xyz
         self.norm_xyz = norm_xyz
-        self.use_cmap = use_cmap
         self.linewidth = linewidth
         self.C_fct = C_fct
+        self.cmap_low = cmap_low
+        self.cmap_high = cmap_high
+        if only_lines is None:
+            self.only_lines = (self.linewidth != 0)
+        else:
+            self.only_lines = only_lines
+            
 
     def plot(self, fig, graph):
         if not isinstance(self.color, str):
@@ -1400,15 +1419,20 @@ class ltPlotSurf:
         normalize_3d(self, fig.graphs[graph], x, y, z)
         method = ax.plot_surface
         if self.use_cmap:
-            C_fct_eff = z
+            C_fct_eff = self.C_fct if self.C_fct is not None else z
             if callable(self.C_fct):
                 C_fct_eff = self.C_fct(theta, phi)
-            norm = mpl.colors.Normalize(vmin=C_fct_eff.min().min(), vmax=C_fct_eff.max().max())
+            cmap_low, cmap_high = self.cmap_low, self.cmap_high
+            if cmap_low is None:
+                cmap_low = C_fct_eff.min().min()
+            if cmap_high is None:
+                cmap_high = C_fct_eff.max().max()
+            norm = mpl.colors.Normalize(vmin=cmap_low, vmax=cmap_high)
             facecolors = getattr(mpl.cm, self.cmap)(norm(C_fct_eff))
             surf = method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, cmap=self.cmap, facecolors=facecolors)
         else:
             surf = method(x, y, z, rstride=1, cstride=1, linewidth=self.linewidth, alpha=self.alpha, color=self.color, edgecolors=self.color)
-        if not self.linewidth == 0 :
+        if self.only_lines:
             surf.set_facecolor((1,1,1,0))
         if fig.graphs[graph].show_cmap_legend and self.use_cmap:
             m = mpl.cm.ScalarMappable(cmap=getattr(mpl.cm, self.cmap), norm=norm)
@@ -1416,7 +1440,15 @@ class ltPlotSurf:
             add_colorbar(m, fig.graphs[graph])
         
 class ltPlotVectField2d:
-    def __init__(self, x, y, vx_fct, vy_fct, label=None, color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None, norm_xy=True, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
+    def __init__(self,
+                 x, y,
+                 vx_fct, vy_fct,
+                 label=None,
+                 color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None,
+                 cmap_low = None, cmap_high = None,
+                 norm_xy=True,
+                 label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default,
+                 linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
         self.label = label
         self.x = x
         self.y = y
@@ -1434,6 +1466,8 @@ class ltPlotVectField2d:
         self.cmap = cmap
         self.use_cmap = use_cmap
         self.C_fct = C_fct
+        self.cmap_low = cmap_low
+        self.cmap_high = cmap_high
 
     def plot(self, fig, graph):
         if not isinstance(self.color, str):
@@ -1457,7 +1491,12 @@ class ltPlotVectField2d:
                 C_fct_eff = self.C_fct(xs, ys).flatten()
             if self.C_fct is None:
                 C_fct_eff = ((vx**2+vy**2)**.5).flatten()
-            norm = mpl.colors.Normalize()
+            cmap_low, cmap_high = self.cmap_low, self.cmap_high
+            if cmap_low is None:
+                cmap_low = C_fct_eff.min()
+            if cmap_high is None:
+                cmap_high = C_fct_eff.max()
+            norm = mpl.colors.Normalize(vmin=cmap_low, vmax=cmap_high)
             norm.autoscale(C_fct_eff)
             color = getattr(mpl.cm, self.cmap)(norm(C_fct_eff))
         fig.graphs[graph].graph.quiver(xs, ys, vx, vy, linewidth=self.linewidth, label=self.label, color=color)
@@ -1517,8 +1556,16 @@ class ltPlotVectField2d:
         
         
 class ltPlotVectField3d(ltPlotVectField2d):
-    def __init__(self, x, y, z, vx_fct, vy_fct, vz_fct, label=None, color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None, norm_xy=True, norm_xyz=False, label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default, linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
-        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, color=color, cmap=cmap, use_cmap=use_cmap, C_fct=C_fct, norm_xy=norm_xy, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
+    def __init__(self,
+                 x, y, z,
+                 vx_fct, vy_fct, vz_fct,
+                 label=None,
+                 color=color_default, cmap=cmap_default, use_cmap=False, C_fct=None,
+                 cmap_low = None, cmap_high = None,
+                 norm_xy=True, norm_xyz=False,
+                 label_fieldline=None, color_fieldline=color_default, dashes_fieldline=dashes_default,
+                 linewidth=linewidths['vectfield'], linewidth_fieldline=linewidths['vectfieldline']):
+        ltPlotVectField2d.__init__(self, x, y, vx_fct, vy_fct, label=label, color=color, cmap=cmap, use_cmap=use_cmap, C_fct=C_fct, cmap_low=cmap_low, cmap_high=cmap_high, norm_xy=norm_xy, label_fieldline=label_fieldline, color_fieldline=color_fieldline, dashes_fieldline=dashes_fieldline, linewidth=linewidth, linewidth_fieldline=linewidth_fieldline)
         self.z = z
         self.vz_fct = vz_fct
         self.norm_xy = norm_xy or norm_xyz
@@ -1546,7 +1593,12 @@ class ltPlotVectField3d(ltPlotVectField2d):
                 C_fct_eff = self.C_fct(xs, ys, zs).flatten()
             if self.C_fct is None:
                 C_fct_eff = ((vx**2+vy**2+vz**2)**.5).flatten()
-            norm = mpl.colors.Normalize()
+            cmap_low, cmap_high = self.cmap_low, self.cmap_high
+            if cmap_low is None:
+                cmap_low = C_fct_eff.min()
+            if cmap_high is None:
+                cmap_high = C_fct_eff.max()
+            norm = mpl.colors.Normalize(vmin=cmap_low, vmax=cmap_high)
             norm.autoscale(C_fct_eff)
             color = getattr(mpl.cm, self.cmap)(norm(C_fct_eff))
         fig.graphs[graph].graph.quiver(xs, ys, zs, vx, vy, vz, length=0.1, normalize=True, linewidth=self.linewidth, label=self.label, color=color)
