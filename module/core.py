@@ -203,6 +203,9 @@ class ltFigure:
         self.color_theme_candidate = True
         self.auto_color = auto_color
 
+    def close(self):
+        plt.close(self.fig)
+        
     def update(self):
         pgf_preamble = pgf_with_latex['pgf.preamble']
         if self.lang == 'FR':
