@@ -147,15 +147,15 @@ def set_aspect(ax, aspect, adjustable=None, anchor=None):
 def normalize_3d(plot, ltGraph, x, y, z):
     ax = ltGraph.graph
     if plot.norm_xy or plot.norm_xyz :
-        max_range_xy = np.array([x.max() -x.min(), y.max() -y.min()]).max()/2
-        max_range_z = np.array([z.max() -z.min()]).max()/2
+        max_range_xy = max([x.max() -x.min(), y.max() -y.min()])/2
+        max_range_z = (z.max() -z.min())/2
         try:
             ax.set_aspect('equal')
         except NotImplementedError:
             set_aspect(ax, 'equal')
             ltGraph.fig.suppressNotImplementedError = True
         if plot.norm_xyz :
-            max_range = np.array([max_range_xy, max_range_z]).max()
+            max_range = max([max_range_xy, max_range_z])
             max_range_xy = max_range
             max_range_z  = max_range
         Xb = max_range_xy*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
@@ -1017,9 +1017,8 @@ class ltPlotHist:
                     self.binning = np.linspace(x.min(), x.max(), self.bins+1)
             else:
                 self.binning = np.linspace(self.range[0], self.range[1], self.bins+1)
-        self.x = np.zeros(len(self.binning)-1)
-        self.xerr_up = np.zeros(len(self.binning)-1)
-        self.xerr_down = np.zeros(len(self.binning)-1)
+        if not isinstance(self.binning, np.ndarray):
+            self.binning = np.array(self.binning)
         if self.y is None:
             self.y = np.zeros(len(self.binning)-1)
         if self.yerr_up is None:
@@ -1030,10 +1029,9 @@ class ltPlotHist:
             self.entries_in_bin = np.zeros(len(self.binning)-1)
         if self.weights_in_bin is None:
             self.weights_in_bin = np.zeros(len(self.binning)-1)
-        for k in range(len(self.x)):
-            self.x[k] = (self.binning[k+1]+self.binning[k])/2
-            self.xerr_up[k] = (self.binning[k+1]-self.binning[k])/2
-            self.xerr_down[k] = (self.binning[k+1]-self.binning[k])/2
+        self.x = (self.binning[1:]+self.binning[:-1])/2
+        self.xerr_up = (self.binning[1:]-self.binning[:-1])/2
+        self.xerr_down = (self.binning[1:]-self.binning[:-1])/2
 
     def Fill(self, xs, weights=None):
         self.entries += [val for val in xs]
@@ -1044,9 +1042,7 @@ class ltPlotHist:
         if self.cumulative:
             for k in range(1,len(hist)):
                 hist[k] += hist[k-1]
-        self.y = np.zeros(len(hist))
-        for k in range(len(hist)):
-            self.y[k] = hist[k]
+        self.y = np.array(hist)
         self.entries_in_bin = np.zeros(len(hist))
         self.weights_in_bin = np.zeros(len(hist))
         self.yerr_up = np.zeros(len(hist))
