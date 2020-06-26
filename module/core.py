@@ -1042,7 +1042,7 @@ class ltPlotHist:
         if self.cumulative:
             for k in range(1,len(hist)):
                 hist[k] += hist[k-1]
-        self.y = np.array(hist)
+        self.y = np.array(hist, dtype = 'float')
         self.entries_in_bin = np.zeros(len(hist))
         self.weights_in_bin = np.zeros(len(hist))
         self.yerr_up = np.zeros(len(hist))
