@@ -1117,8 +1117,7 @@ class ltPlotHist:
     def Scale(self, value):
         for k in range(len(self.weights)):
             self.weights[k] *= value
-        for k in range(len(self.y)):
-            self.y[k] *= value
+        self.y *= value
         self.weights_in_bin *= value
         self.yerr_up *= abs(value)
         self.yerr_down *= abs(value)
