@@ -295,6 +295,7 @@ class ltGraph:
                  x_ticks=True, x_ticks_min=None, x_ticks_max=None, x_ticks_step=None,
                  y_ticks=True, y_ticks_min=None, y_ticks_max=None, y_ticks_step=None,
                  z_ticks=True, z_ticks_min=None, z_ticks_max=None, z_ticks_step=None,
+                 xticklabels = None, yticklabels = None,
                  minorticks=True,
                  num_x_major=True, num_x_minor=False,
                  num_y_major=True, num_y_minor=False,
@@ -337,6 +338,8 @@ class ltGraph:
         self.z_ticks_min = z_ticks_min
         self.z_ticks_max = z_ticks_max
         self.z_ticks_step = z_ticks_step
+        self.xticklabels = xticklabels
+        self.yticklabels = yticklabels
         self.minorticks = minorticks
         self.num_x_major = num_x_major
         self.num_y_major = num_y_major
@@ -485,11 +488,21 @@ class ltGraph:
                     width=linewidths[ticks_category+'ticks']
                 )
 
+    def set_xticklabels(self):
+        if self.xticklabels is not None:
+            self.graph.xaxis.set_ticklabels(self.xticklabels)
+
+    def set_yticklabels(self):
+        if self.yticklabels is not None:
+            self.graph.yaxis.set_ticklabels(self.yticklabels)
+
     def update(self):
         if self.title is not None:
             self.graph.set_title(self.title, fontsize=pgf_with_latex["font.size"])
         self.graph.set_xscale(self.x_scaling)
+        self.set_xticklabels()
         self.graph.set_yscale(self.y_scaling)
+        self.set_yticklabels()
         if self.projection == '3d':
             self.graph.set_zscale(self.z_scaling)
 
