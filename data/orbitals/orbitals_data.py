@@ -96,7 +96,7 @@ Y_fcts_R = {
     'fxyz' : Yfxyz,
     'fz_x2-y2' : Yfzx2my2,
     'fx_x2-3y2' : Yfxx2m3y2,
-    'fy3_x2-y2' : Yfy3x2my2,
+    'fy_3x2-y2' : Yfy3x2my2,
 }
 
 orbitals = ['1s',
@@ -108,6 +108,6 @@ orbitals = ['1s',
             '4s',
             '4px', '4py', '4pz',
             '4dz2', '4dxz', '4dyz', '4dxy', '4dx2-y2',
-            '4fz3', '4fxz2', '4fyz2', '4fxyz', '4fz_x2-y2', '4fx_x2-3y2', '4fy3_x2-y2']
+            '4fz3', '4fxz2', '4fyz2', '4fxyz', '4fz_x2-y2', '4fx_x2-3y2', '4fy_3x2-y2']
 
 orbital_to_L = {'s':0, 'p':1, 'd':2, 'f':3}
