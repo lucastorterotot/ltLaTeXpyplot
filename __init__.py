@@ -1,4 +1,4 @@
-from ltLaTeXpyplot.module.core import (
+from ltLaTeXpyplot.module.master import (
     ltFigure,
     ltGraph,
     ltPlotEpH,
