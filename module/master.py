@@ -678,6 +678,7 @@ class ltPlotFct:
                  Fs=1,
                  Nfft=256,
                  pad_to=None,
+                 padding = 0,
                  noverlap=None,
                  cmap=cmap_default):
         self.label = label
@@ -695,6 +696,7 @@ class ltPlotFct:
         self.Fs = Fs
         self.Nfft = Nfft
         self.pad_to = pad_to
+        self.padding = padding
         self.noverlap = noverlap
         self.cmap = cmap
 
@@ -706,21 +708,20 @@ class ltPlotFct:
         fig.graphs[graph].graph.plot(self.x, self.y, color=self.color, linewidth=self.linewidth, label=self.label, marker=self.marker, markersize=self.markersize, dashes=self.dashes)
 
     def compute_TF(self, **kwargs):
-        ''' This code has been adapted from
-        https://www.physique-experimentale.com/python/transformee_de_fourier.py
-        '''
-        tf_to_sort = np.fft.fft(self.y)
-        f_to_sort = np.fft.fftfreq(n=self.x.shape[-1], d=np.mean(np.diff(self.x)))
-        ind = int(len(f_to_sort)/2)
-        tf_deb = tf_to_sort[ind:]
-        tf_fin = tf_to_sort[:ind]
-        self.tf = np.concatenate((tf_deb, tf_fin))
-        f_deb = f_to_sort[ind:]
-        f_fin = f_to_sort[:ind]
-        self.f = np.concatenate((f_deb, f_fin))
-        self.psd = np.square(np.abs(self.tf))
-        self.psdn = self.psd/self.psd.max()
-        self.TF = ltPlotFct(self.f, self.psd, **kwargs)
+        ys = self.y
+
+        if self.padding > 0:
+            ys = np.pad(self.y, int(self.padding/2), mode='constant')
+
+        self.tf = np.fft.fftshift(np.fft.fft(ys))
+        self.f = np.arange(len(self.tf)) * self.Fs/len(self.tf) - .5*self.Fs
+
+        self.TF = ltPlotFct(
+            self.f,
+            np.square(np.abs(self.tf)),
+            **kwargs
+        )
+
         self.TF_computed = True
 
     def plot_TF(self, fig, graph, **kwargs):
