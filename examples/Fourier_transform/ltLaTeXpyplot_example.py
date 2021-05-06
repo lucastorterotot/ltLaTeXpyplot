@@ -18,7 +18,7 @@ x = np.sin(omega0*t)*np.exp(-t/tau)
 fct = lt.ltPlotFct(t, x, Fs = 1/t[1])
 
 # Define graphs
-fig.addgraph('graph1', x_label='$\\nu$', y_label='TF', show_legend=True, legend_on_side=False, x_min=0, x_max=2)
+fig.addgraph('graph1', x_label='$\\nu$ (Hz)', y_label='TF', show_legend=True, legend_on_side=False, x_min=0, x_max=2)
 
 # Insert object in plots
 fct.plot_TF(fig, 'graph1', label='Fourier tr.')
