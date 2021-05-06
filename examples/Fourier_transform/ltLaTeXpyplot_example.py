@@ -15,7 +15,7 @@ omega0 = 2*np.pi*f0
 t = np.arange(0.,50.,0.01)
 x = np.sin(omega0*t)*np.exp(-t/tau)
 
-fct = lt.ltPlotFct(t, x)
+fct = lt.ltPlotFct(t, x, Fs = 1/t[1])
 
 # Define graphs
 fig.addgraph('graph1', x_label='$\\nu$', y_label='TF', show_legend=True, legend_on_side=False, x_min=0, x_max=2)
