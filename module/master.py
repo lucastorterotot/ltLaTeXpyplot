@@ -1717,22 +1717,22 @@ class ltPlotNMR:
             pikes_deltas = [0]
             pikes_heights = [1]
         
-            for k in range(0,len(mults)):
+            for k in range(len(mults)):
                 new_pikes_deltas = []
                 new_pikes_heights = []
                 J_value = Js[k]
                 mult = mults[k]
                 coeffs_Js_max = .5*(mult-1)
-                J_coeffs = np.arange(-coeffs_Js_max,coeffs_Js_max+1e-6,1)
-                for l in range(0,len(pikes_deltas)):
-                    for m in range(0,mult):
-                        new_pikes_deltas.append(pikes_deltas[l]+J_value*1./(freq)*J_coeffs[m])
-                        new_pikes_heights.append(pikes_heights[l]*factorial(mult-1)*1./(2**(mult-1)*factorial(m)*factorial(mult-1-m)))
+                J_coeffs = np.linspace(-coeffs_Js_max,coeffs_Js_max,mult)
+                for pike_delta,pike_height in zip(pikes_deltas,pikes_heights):
+                    for m in range(mult):
+                        new_pikes_deltas.append(pike_delta+J_value*1./(freq)*J_coeffs[m])
+                        new_pikes_heights.append(pike_height*factorial(mult-1)*1./(2**(mult-1)*factorial(m)*factorial(mult-1-m)))
                 pikes_deltas = new_pikes_deltas
                 pikes_heights = new_pikes_heights
                     
-            for pike in range(0,nb_pikes):
-                spectrum += 1./(1+(delta-delta0-pikes_deltas[pike])**2*freq**2/(1.5e0))*pikes_heights[pike]*nbH
+            for pike_delta,pike_height in zip(pikes_deltas,pikes_heights):
+                spectrum += 1./(1+(delta-delta0-pike_delta)**2*freq**2/(1.5e0))*pike_height*nbH
             
         # for signal in signals:
         #     delta0 = signal[0]
