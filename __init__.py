@@ -5,6 +5,7 @@ from ltLaTeXpyplot.module.master import (
     ltPlotFct,
     ltPlotFct3d,
     ltPlotHist,
+    ltNMRsignal,
     ltPlotNMR,
     ltPlotPie,
     ltPlotPieautopct,

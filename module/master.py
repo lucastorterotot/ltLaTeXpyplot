@@ -1656,6 +1656,23 @@ class ltPlotVectField3d(ltPlotVectField2d):
         normalize_3d(self, fig.graphs[graph], line_xyz[0], line_xyz[1], line_xyz[2])
         fig.graphs[graph].graph.plot(line_xyz[0], line_xyz[1], line_xyz[2], label=label, color=color, dashes=dashes, linewidth=self.linewidth_fieldline)
 
+
+class ltNMRsignal:
+    def __init__(
+        self,
+        delta,
+        nbH = 1,
+        mults = [],
+        J_Hz = []
+    ):
+        self.delta = delta
+        self.nbH = nbH
+        self.mults = mults
+        self.J_Hz = J_Hz
+
+    def inverse(self):
+        return ltNMRsignal(self.delta, -self.nbH, self.mults, self.J_Hz)
+
         
 class ltPlotNMR:
     def __init__(self, delta_min=0, delta_max=11, Freq_MHz=100, color=color_default, show_integral=True, dashes=dashes_default, linewidth=linewidths['NMR'], integral_linewidth=linewidths['NMR integral']):
@@ -1669,8 +1686,11 @@ class ltPlotNMR:
         self.linewidth = linewidth
         self.integral_linewidth = integral_linewidth
 
-    def addsignal(self, delta, nbH, mult, J_Hz):
-        self.signals.append([delta, nbH, mult, J_Hz])
+    def addsignal(self, NMRsignal):
+        self.signals.append(NMRsignal)
+
+    def removesignal(self, NMRsignal):
+        self.signals.append(NMRsignal.inverse())
 
     def plot(self, fig, graph):
         if not isinstance(self.color, str):
@@ -1683,10 +1703,10 @@ class ltPlotNMR:
         delta = np.arange(self.delta_min, self.delta_max, 1e-5)
         spectrum = 0*delta
         for signal in self.signals:
-            delta0 = signal[0]
-            nbH = signal[1]
-            mults = signal[2]
-            Js = signal[3]
+            delta0 = signal.delta
+            nbH = signal.nbH
+            mults = signal.mults
+            Js = signal.J_Hz
             freq = self.Freq_MHz
             color = self.color
             dashes = self.dashes
