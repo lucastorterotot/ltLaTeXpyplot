@@ -1017,7 +1017,9 @@ class ltPlotHist:
                  bins=None, range=None,
                  cumulative=False,
                  color=color_default, label=None,
-                 show_uncert=False, fill=True, linewidth=linewidths['plotfct']):
+                 show_uncert=False, fill=True,
+                 show_bins = False,
+                 linewidth=linewidths['plotfct']):
         self.entries = []
         self.weights = []
         self.bins = bins
@@ -1026,6 +1028,7 @@ class ltPlotHist:
         self.color = color
         self.label = label
         self.show_uncert = show_uncert
+        self.show_bins = show_bins
         self.fill = fill
         self.linewidth = linewidth
         self.x = None
@@ -1202,6 +1205,14 @@ class ltPlotHist:
             binning_seq += [self.binning[k], self.binning[k+1]]
             y_sequence += [max([self.y[k], _min]), max([self.y[k], _min])]
         fig.graphs[graph].graph.fill(binning_seq, y_sequence, color=self.color, linewidth=linewidth, clip_path=None, label=self.label, fill=self.fill)
+        if self.show_bins:
+            for k in range(0, len(binning_seq), 2):
+                xpos = binning_seq[k]
+                y1 = mini
+                y2 = y_sequence[k]
+                if y2 > mini:
+                    ltPlotFct([xpos, xpos], [y1, y2], color='black', linewidth = .5).plot(fig, graph)
+            ltPlotFct(binning_seq+[binning_seq[-1]], y_sequence+[mini], color='black', linewidth = .5).plot(fig, graph)
         if self.show_uncert:
             self._plot_uncerts(fig, graph)
 
