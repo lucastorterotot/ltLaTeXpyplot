@@ -296,6 +296,7 @@ class ltGraph:
                  y_ticks=True, y_ticks_min=None, y_ticks_max=None, y_ticks_step=None,
                  z_ticks=True, z_ticks_min=None, z_ticks_max=None, z_ticks_step=None,
                  xticklabels = None, yticklabels = None,
+                 xtickpos = None, ytickpos = None,
                  minorticks=True,
                  num_x_major=True, num_x_minor=False,
                  num_y_major=True, num_y_minor=False,
@@ -340,6 +341,8 @@ class ltGraph:
         self.z_ticks_step = z_ticks_step
         self.xticklabels = xticklabels
         self.yticklabels = yticklabels
+        self.xtickpos = xtickpos
+        self.ytickpos = ytickpos
         self.minorticks = minorticks
         self.num_x_major = num_x_major
         self.num_y_major = num_y_major
@@ -490,10 +493,12 @@ class ltGraph:
 
     def set_xticklabels(self):
         if self.xticklabels is not None:
+            self.graph.set_xticks(self.xtickpos)
             self.graph.xaxis.set_ticklabels(self.xticklabels)
 
     def set_yticklabels(self):
         if self.yticklabels is not None:
+            self.graph.set_yticks(self.ytickpos)
             self.graph.yaxis.set_ticklabels(self.yticklabels)
 
     def update(self):
