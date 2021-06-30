@@ -17,9 +17,17 @@ This package for Python 3.x provides tools to produce easily `pgf` figures to be
 ## Installation
 
 1. Go in a directory where you want to install this repository and clone it:
+
+- by `ssh` if you have a key:
 ```
 git clone git@gitlab.com:lucastorterotot/ltLaTeXpyplot.git --origin lucas
 ```
+
+- else by `https`:
+```
+git clone https://gitlab.com/lucastorterotot/ltLaTeXpyplot.git --origin lucas
+```
+
 2. Run the provided installation script:
 ```
 ./ltLaTeXpyplot/install
