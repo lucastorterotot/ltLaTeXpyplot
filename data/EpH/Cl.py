@@ -1,4 +1,4 @@
-from ltLaTeXpyplot.data.EpH.EpHgeneric import *
+from ltLaTeXpyplot.module.EpHgeneric import *
 
 import numpy as np
 

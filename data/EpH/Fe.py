@@ -1,4 +1,4 @@
-from ltLaTeXpyplot.data.EpH.EpHgeneric import *
+from ltLaTeXpyplot.module.EpHgeneric import *
 
 Ezb = -0.44
 Ebc = 0.77
