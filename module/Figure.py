@@ -55,9 +55,7 @@ class ltFigure:
     def update(self):
         pgf_preamble = pgf_with_latex['pgf.preamble']
         if self.lang == 'FR':
-            pgf_with_latex['pgf.preamble'].append(
-                r"\SIdecimalsign{,}\SIthousandsep{\,}"
-            )
+            pgf_with_latex['pgf.preamble'] += r"\SIdecimalsign{,}\SIthousandsep{\,}"
         mpl.rcParams.update(pgf_with_latex)
         
         if self.title is not None:
