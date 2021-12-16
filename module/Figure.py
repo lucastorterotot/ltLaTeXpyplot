@@ -22,6 +22,7 @@ class ltFigure:
                  page_width_cm = 17,
                  width_frac = .8,
                  height_width_ratio = 1./golden,
+                 height_width_ratio_factor = 1,
                  tight_layout = False,
                  lang = 'FR',
                  auto_color = True
@@ -30,10 +31,10 @@ class ltFigure:
         self.title = title
         self.page_width_cm = page_width_cm
         self.width_frac = width_frac
-        self.height_width_ratio = height_width_ratio
+        self.height_width_ratio = height_width_ratio * height_width_ratio_factor
 
         self.fig_width_inches = page_width_cm * width_frac * inches_per_cm
-        self.fig_height_inches = self.fig_width_inches * height_width_ratio
+        self.fig_height_inches = self.fig_width_inches * self.height_width_ratio
 
         self.figsize = [self.fig_width_inches, self.fig_height_inches]
 
