@@ -5,7 +5,7 @@ name="ltLaTeXpyplot python package"
 echo "Installing $name..."
 
 ainstal_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-ainstal_dir=${ainstal_dir%"ltLaTeXpyplot"}
+ainstal_dir=${ainstal_dir%$(basename $(pwd))}
 
 if [[ $(grep -l "$name" ~/.bashrc) = ~/.bashrc ]]
 then
