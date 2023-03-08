@@ -99,11 +99,18 @@ class ltPlotRegLin(ltPlotPts):
         # reduced chi2 for a and b
         chi2r = np.sum(np.square(residual(popt,y,x)))/(x.size-popt.size)
 
+        # R2
+        y_mean = y.mean()
+        SS_tot = ((y - y_mean)**2).sum()
+        SS_res = ((y - (popt[0]*x+popt[1]))**2).sum()
+        R2 = 1 - SS_res/SS_tot
+
         if self.verbose:
             print('  Linear regression :')
             print('    f(x) = a * x + b')
             print('    a = {} ;'.format(popt[0]))
-            print('    b = {}.'.format(popt[1]))
+            print('    b = {} ;'.format(popt[1]))
+            print('    r^2 = {}.'.format(R2))
             print(' ')
 
         x_aj = np.linspace(min(x),max(x),100)
@@ -114,6 +121,7 @@ class ltPlotRegLin(ltPlotPts):
         self.pcov = pcov
         self.uopt = uopt
         self.chi2r = chi2r
+        self.R2 = R2
         self.x_aj = x_aj
         self.y_aj = y_aj
 
@@ -182,7 +190,8 @@ class ltPlotRegLin(ltPlotPts):
                     '\n'.join([
                         '{} $f(x) = ax+b$'.format(reglintxt),
                         '$a = \\num{{ {0:.2e} }} \\pm \\num{{  {1:.2e} }}$'.format(self.popt[0],self.uopt[0]),
-                        '$b = \\num{{ {0:.2e} }} \\pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1])
+                        '$b = \\num{{ {0:.2e} }} \\pm \\num{{ {1:.2e} }}$'.format(self.popt[1],self.uopt[1]),
+                        '$r^2 = \\num{{ {0:.4} }}$'.format(self.R2),
                         ]),
                     transform = ax.transAxes,
                     multialignment = multialignment,
