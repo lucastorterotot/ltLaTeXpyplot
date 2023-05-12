@@ -2,8 +2,8 @@ from ltLaTeXpyplot.module.EpHgeneric import *
 
 import numpy as np
 
-Eza = 1.4
-Eab = 1.59
+Eza = 1.39
+Eab = 1.63
 pKa_HClO_ClO = 7.5
 
 def Esepza(pC, pH):
