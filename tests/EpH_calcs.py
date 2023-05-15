@@ -8,7 +8,7 @@ import numpy as np
 class Test_EpH_calcs(unittest.TestCase):
     tests_elements_sizes = {
         'Ag_pI' : (5, 16, -0.1, 0.93168),
-        'Cl' : (2, 8, -.1, 1.4),
+        'Cl' : (3, 8, -.1, 1.39),
         'Cu' : (2, 6, -.1, 0.64664),
         'Fe' : (2, 7, -0.49916, 0.97),
         'H' : (5, 6, -0.35496, 0.1),
