@@ -14,6 +14,7 @@ class Test_EpH_calcs(unittest.TestCase):
         'H' : (5, 6, -0.35496, 0.1),
         'I' : (5, 7, -.1, 0.81138),
         'O' : (5, 6, -.1, 0.9342),
+        'Zn' : (5, 14, -1.23623, 0.1),
     }
     
     def create(self, element, C_tr):
