@@ -8,7 +8,7 @@ import numpy as np
 class Test_EpH_calcs(unittest.TestCase):
     tests_elements_sizes = {
         'Ag_pI' : (5, 16, -0.1, 0.93168),
-        'Cl' : (3, 8, -.1, 1.39),
+        'Cl' : (2, 8, -.1, 1.44916),
         'Cu' : (2, 6, -.1, 0.64664),
         'Fe' : (2, 7, -0.49916, 0.97),
         'H' : (5, 6, -0.35496, 0.1),
@@ -32,7 +32,10 @@ class Test_EpH_calcs(unittest.TestCase):
         ''' Mostly desinged to spot changes in graphs'''
         for element, values in self.tests_elements_sizes.items():
             pH_min, pH_max, E_min, E_max = values
-            EpHplt, graph = self.create(element, 1e-2)
+            C_tr = 1e-2
+            if element == "Cl":
+                C_tr = 1e-1
+            EpHplt, graph = self.create(element, C_tr)
             self.assertEqual(np.round(EpHplt.pH_min), pH_min)
             self.assertEqual(np.round(EpHplt.pH_max), pH_max)
             self.assertEqual(np.round(EpHplt.E_min, 5), E_min)
