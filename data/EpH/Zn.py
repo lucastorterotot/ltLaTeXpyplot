@@ -29,7 +29,7 @@ sep5 = EpHsep(pHsepb, pHsepb, E1, 'max')
 
 spe1 = EpHspe('Zn$^{2+}$', 'min', pHsepa, 'max', Esepza)
 spe2 = EpHspe('Zn(OH)$_2$', pHsepa, pHsepb, 'max', Esepza)
-spe3 = EpHspe('Zn', 'min', 'max', Esepza, E2)
+spe3 = EpHspe('Zn', 'min', 'max', Esepza, E2, pH_r = .4)
 spe4 = EpHspe('Zn(OH)$_4$$^{2-}$', 'max', pHsepb, 'max', E2)
 
 seps = [sep1, sep2, sep3, sep4, sep5]
