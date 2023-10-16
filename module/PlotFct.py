@@ -21,10 +21,14 @@ class ltPlotFct:
                  cmap = defaults.cmap):
         self.label = label
         self.x = x
+        if type(x) == list:
+            self.x = np.array(x)
         if callable(y):
             self.y = y(x)
         else:
             self.y = y
+        if type(y) == list:
+            self.y = np.array(y)
         self.color = color
         self.dashes = dashes
         self.marker = marker

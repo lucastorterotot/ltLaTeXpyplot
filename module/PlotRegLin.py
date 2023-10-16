@@ -65,6 +65,11 @@ class ltPlotRegLin(ltPlotPts):
                         np.array(yerr_for_reg[0])
                         + np.array(yerr_for_reg[1])
                     )/2
+
+        if type(xerr) == list:
+            xerr_for_reg = np.array(xerr)
+        if type(yerr) == list:
+            yerr_for_reg = np.array(yerr)
         
         # linear function to adjust
         def f(x,p):
@@ -86,7 +91,7 @@ class ltPlotRegLin(ltPlotPts):
         p0 = np.array([p0_x,p0_y])
 
         # minimizing algorithm
-        result = spo.leastsq(residual, p0, args = (y, x), full_output = True)
+        result = spo.leastsq(residual, p0, args = (self.y, self.x), full_output = True)
 
         # Result:
         # optimized parameters a and b
@@ -97,12 +102,12 @@ class ltPlotRegLin(ltPlotPts):
         uopt = np.sqrt(np.abs(np.diagonal(pcov)))
 
         # reduced chi2 for a and b
-        chi2r = np.sum(np.square(residual(popt,y,x)))/(x.size-popt.size)
+        chi2r = np.sum(np.square(residual(popt,self.y,self.x)))/(self.x.size-popt.size)
 
         # R2
-        y_mean = y.mean()
-        SS_tot = ((y - y_mean)**2).sum()
-        SS_res = ((y - (popt[0]*x+popt[1]))**2).sum()
+        y_mean = self.y.mean()
+        SS_tot = ((self.y - y_mean)**2).sum()
+        SS_res = ((self.y - (popt[0]*self.x+popt[1]))**2).sum()
         R2 = 1 - SS_res/SS_tot
 
         if self.verbose:
