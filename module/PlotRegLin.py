@@ -50,7 +50,12 @@ class ltPlotRegLin(ltPlotPts):
         self.verbose = verbose
 
         xerr_for_reg = xerr
+        if type(xerr) == list:
+            xerr_for_reg = np.array(xerr)
+
         yerr_for_reg = yerr
+        if type(yerr) == list:
+            yerr_for_reg = np.array(yerr)
 
         if len(xerr_for_reg) == 2:
                 if len(xerr_for_reg[0]) == len(x) and len(xerr_for_reg[1]) == len(x):
@@ -65,11 +70,6 @@ class ltPlotRegLin(ltPlotPts):
                         np.array(yerr_for_reg[0])
                         + np.array(yerr_for_reg[1])
                     )/2
-
-        if type(xerr) == list:
-            xerr_for_reg = np.array(xerr)
-        if type(yerr) == list:
-            yerr_for_reg = np.array(yerr)
         
         # linear function to adjust
         def f(x,p):
