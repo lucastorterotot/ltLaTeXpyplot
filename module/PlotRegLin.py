@@ -65,7 +65,7 @@ class ltPlotRegLin(ltPlotPts):
                     )/2
 
         if len(yerr_for_reg) == 2:
-                if len(yerr_for_reg[0]) == len(x) and len(yerr_for_reg[1]) == len(x):
+                if len(yerr_for_reg[0]) == len(y) and len(yerr_for_reg[1]) == len(y):
                     yerr_for_reg = (
                         np.array(yerr_for_reg[0])
                         + np.array(yerr_for_reg[1])
