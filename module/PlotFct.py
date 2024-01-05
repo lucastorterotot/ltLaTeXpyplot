@@ -58,17 +58,28 @@ class ltPlotFct:
                                     )
 
     def compute_TF(self, **kwargs):
+        import scipy as sp
+        import scipy.fftpack
+
         ys = self.y
 
         if self.padding > 0:
             ys = np.pad(self.y, int(self.padding/2), mode = 'constant')
 
-        self.tf = np.fft.fftshift(np.fft.fft(ys))
-        self.f = np.arange(len(self.tf)) * self.Fs/len(self.tf) - .5*self.Fs
+        FFT = abs(sp.fftpack.fft(ys))/len(ys) * 2
+        freqs = sp.fftpack.fftfreq(len(ys), 1/self.Fs)
+        FFT[0] /= 2
+        FFT = FFT[0:len(FFT)//2]
+        freqs = freqs[0:len(freqs)//2]
+        
+        #self.tf = np.fft.fftshift(np.fft.fft(ys))
+        #self.f = np.arange(len(self.tf)) * self.Fs/len(self.tf) - .5*self.Fs
+        self.tf = FFT
+        self.f = freqs
 
         self.TF = ltPlotFct(
             self.f,
-            np.square(np.abs(self.tf)),
+            self.tf,
             **kwargs
         )
 
