@@ -27,6 +27,7 @@ class ltGraph:
                  num_y_major = True, num_y_minor = False,
                  num_z_major = True, num_z_minor = False,
                  show_grid = False, show_x_axis = False, show_y_axis = False,
+                 show_grid_minor_x = False, show_grid_minor_y = False,
                  show_legend = False, legend_location = 'best', legend_on_side = False,
                  show_cmap_legend = False, cmap_label = None,
                  position = [1,1,1],
@@ -76,6 +77,8 @@ class ltGraph:
         self.num_y_minor = num_y_minor
         self.num_z_minor = num_z_minor
         self.show_grid = show_grid
+        self.show_grid_minor_x = show_grid_minor_x
+        self.show_grid_minor_y = show_grid_minor_y
         self.show_x_axis = show_x_axis
         self.show_y_axis = show_y_axis
         self.show_legend = show_legend
@@ -196,6 +199,10 @@ class ltGraph:
         
         if show_grid:
             self.graph.grid(linewidth = defaults.linewidths['grid'])
+            if show_grid_minor_x:
+                self.graph.grid(axis = "x", which = "minor", linewidth = defaults.linewidths['grid']/2)
+            if show_grid_minor_y:
+                self.graph.grid(axis = "y", which = "minor", linewidth = defaults.linewidths['grid']/2)
         if show_x_axis and not (projection == '3d' or x_min is None or x_max is None):
             self.graph.plot([x_min,x_max],
                             [0,0],
