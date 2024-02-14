@@ -57,19 +57,24 @@ class ltPlotRegLin(ltPlotPts):
         if type(yerr) == list:
             yerr_for_reg = np.array(yerr)
 
-        if len(xerr_for_reg) == 2:
-                if len(xerr_for_reg[0]) == len(x) and len(xerr_for_reg[1]) == len(x):
-                    xerr_for_reg = (
-                        np.array(xerr_for_reg[0])
-                        + np.array(xerr_for_reg[1])
-                    )/2
-
-        if len(yerr_for_reg) == 2:
-                if len(yerr_for_reg[0]) == len(y) and len(yerr_for_reg[1]) == len(y):
-                    yerr_for_reg = (
-                        np.array(yerr_for_reg[0])
-                        + np.array(yerr_for_reg[1])
-                    )/2
+        try:
+            if len(xerr_for_reg) == 2:
+                    if len(xerr_for_reg[0]) == len(x) and len(xerr_for_reg[1]) == len(x):
+                        xerr_for_reg = (
+                            np.array(xerr_for_reg[0])
+                            + np.array(xerr_for_reg[1])
+                        )/2
+        except:
+            pass
+        try:
+            if len(yerr_for_reg) == 2:
+                    if len(yerr_for_reg[0]) == len(y) and len(yerr_for_reg[1]) == len(y):
+                        yerr_for_reg = (
+                            np.array(yerr_for_reg[0])
+                            + np.array(yerr_for_reg[1])
+                        )/2
+        except:
+            pass
         
         # linear function to adjust
         def f(x,p):
