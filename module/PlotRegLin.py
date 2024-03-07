@@ -228,17 +228,59 @@ class ltPlotRegLin(ltPlotPts):
 
             infos = [
                 '{} $f(x) = ax+b$'.format(reglintxt),
-                '$a = \\num{{ {0}e{1} }} \\pm \\num{{ {2:.1e} }}$'.format(
-                    np.round(self.popt[0]*10**(-int(np.log10(abs(self.popt[0])))), 10),
-                    int(np.log10(abs(self.popt[0]))),
-                    self.uopt[0],
-                ),
-                '$b = \\num{{ {0}e{1} }} \\pm \\num{{ {2:.1e} }}$'.format(
-                    np.round(self.popt[1]*10**(-int(np.log10(abs(self.popt[1])))+1), 10),
-                    int(np.log10(abs(self.popt[1]))-1),
-                    self.uopt[1],
-                ),
             ]
+
+            pow_a = 0
+            a = self.popt[0]
+            while abs(a) < 1:
+                pow_a -= 1
+                a *= 10
+            while abs(a) >= 10:
+                pow_a += 1
+                a /= 10
+
+            if pow_a == 0:
+                infos.append(
+                    '$a = \\num{{ {0} }} \\pm \\num{{ {1} }}$'.format(
+                        a,
+                        self.uopt[0],
+                    )
+                )
+            else:
+                infos.append(
+                    '$a = \\num{{ {0}e{1} }} \\pm \\num{{ {2:.1e} }}$'.format(
+                        np.round(a, 10),
+                        pow_a,
+                        self.uopt[0],
+                    ),
+                )
+
+            pow_b = 0
+            b = self.popt[1]
+            while abs(b) < 1:
+                pow_b -= 1
+                b *= 10
+            while abs(b) >= 10:
+                pow_b += 1
+                b /= 10
+
+
+            if pow_b == 0:
+                infos.append(
+                    '$b = \\num{{ {0} }} \\pm \\num{{ {1} }}$'.format(
+                        b,
+                        self.uopt[1],
+                    )
+                )
+            else:
+                infos.append(
+                    '$b = \\num{{ {0}e{1} }} \\pm \\num{{ {2:.1e} }}$'.format(
+                        np.round(b, 10),
+                        pow_b,
+                        self.uopt[1],
+                    )
+                )
+
             if not self.from_MC:
                 infos.append('$r^2 = \\num{{ {0:.4} }}$'.format(self.R2))
             ax.text(x_info, y_info,
