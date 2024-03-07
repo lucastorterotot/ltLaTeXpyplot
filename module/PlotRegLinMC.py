@@ -4,14 +4,15 @@
 import ltLaTeXpyplot.module.default_mpl_settings as defaults
 from ltLaTeXpyplot.module.PlotPts import ltPlotPts
 from ltLaTeXpyplot.module.PlotFct import ltPlotFct
+from ltLaTeXpyplot.module.PlotRegLin import ltPlotRegLin
 
 import numpy as np
-from ltLaTeXpyplot.module.utils import creation_liste_droites
+from ltLaTeXpyplot.module.utils import creation_liste_droites, calcule_une_droite
 
-class ltPlotRegLinMC(ltPlotPts):
+class ltPlotRegLinMC(ltPlotRegLin):
     def __init__(self,
                  x, y, xerr, yerr,
-                 N = 1000,
+                 N = 10000,
                  distrib = "uniform",
                  distrib_x = None,
                  distrib_y = None,
@@ -31,24 +32,29 @@ class ltPlotRegLinMC(ltPlotPts):
                  info_placement = 'upper left',
                  verbose = False
                 ):
-        ltPlotPts.__init__(self,
-                           x, y, xerr, yerr,
-                           label = label,
-                           color = color,
-                           marker = marker,
-                           markersize = markersize,
-                           linewidth = linewidth,
-                           elinewidth = elinewidth,
-                           capsize = capsize,
-                           capthick = capthick
-                          )
+        ltPlotRegLin.__init__(self,
+                            x, y, xerr, yerr,
+                            label = label,
+                            label_reg = label_reg,
+                            color = color,
+                            color_reg = color_reg,
+                            marker = marker,
+                            markersize = markersize,
+                            linewidth = linewidth,
+                            elinewidth = elinewidth,
+                            capsize = capsize,
+                            capthick = capthick,
+                            dashes = dashes,
+                            nb_ch_u = nb_ch_u,
+                            give_info = give_info,
+                            info_placement = info_placement,
+                            verbose = verbose,
+                            from_MC = True,
+                           )
+        xerr_for_reg = self.xerr_for_reg
+        yerr_for_reg = self.yerr_for_reg
+
         self.N = N
-        self.label_reg = label_reg
-        self.color_reg = color_reg
-        self.dashes = dashes
-        self.give_info = give_info
-        self.info_placement = info_placement
-        self.verbose = verbose
 
         if distrib_x is None:
             distrib_x = distrib
@@ -57,46 +63,16 @@ class ltPlotRegLinMC(ltPlotPts):
         self.distrib_x = distrib_x
         self.distrib_y = distrib_y
 
-        xerr_for_reg = xerr
-        if type(xerr) == list:
-            xerr_for_reg = np.array(xerr)
-        elif type(xerr) in [int, float]:
-            xerr_for_reg = np.ones(len(x)) * xerr
+        self.compute()
 
-        yerr_for_reg = yerr
-        if type(yerr) == list:
-            yerr_for_reg = np.array(yerr)
-        elif type(yerr) in [int, float]:
-            yerr_for_reg = np.ones(len(y)) * yerr
+    def compute(self):
+        lst_a, lst_b = creation_liste_droites(self.x, self.y, self.xerr_for_reg, self.yerr_for_reg, self.N, self.distrib_x, self.distrib_y)
+        a, b = calcule_une_droite(self.x, self.y)
+        u_a = np.std(lst_a)
+        u_b = np.std(lst_b)
 
-        try:
-            if len(xerr_for_reg) == 2:
-                    if len(xerr_for_reg[0]) == len(x) and len(xerr_for_reg[1]) == len(x):
-                        xerr_for_reg = (
-                            np.array(xerr_for_reg[0])
-                            + np.array(xerr_for_reg[1])
-                        )/2
-        except:
-            pass
-        try:
-            if len(yerr_for_reg) == 2:
-                    if len(yerr_for_reg[0]) == len(y) and len(yerr_for_reg[1]) == len(y):
-                        yerr_for_reg = (
-                            np.array(yerr_for_reg[0])
-                            + np.array(yerr_for_reg[1])
-                        )/2
-        except:
-            pass
-            
-        lst_a, lst_b = creation_liste_droites(x, y, xerr_for_reg, yerr_for_reg, N, distrib_x, distrib_y)
-        a = np.mean(lst_a)
-        u_a = np.std(lst_a)#/N**.5
-        b = np.mean(lst_b)
-        u_b = np.std(lst_b)#/N**.5
-
-        round_param_a = int(nb_ch_u - np.log10(u_a))
-        round_param_b = int(nb_ch_u - np.log10(u_b))
-        self.nb_ch_u = nb_ch_u
+        round_param_a = int(self.nb_ch_u - np.log10(u_a))
+        round_param_b = int(self.nb_ch_u - np.log10(u_b))
         
         # optimized parameters a and b
         exact_popt = (a, b)
@@ -106,102 +82,36 @@ class ltPlotRegLinMC(ltPlotPts):
         uopt = (np.round(u_a, round_param_a), np.round(u_b, round_param_b))
 
         if self.verbose:
-            print('  Linear regression :')
+            print('  Linear regression (MC) :')
             print('    f(x) = a * x + b')
             print('    a = {} +/- {} ;'.format(popt[0], uopt[0]))
             print('    b = {} +/- {} ;'.format(popt[1], uopt[1]))
             print(' ')
 
-        x_aj = np.linspace(min(x),max(x),100)
-        y_aj = popt[0]*np.linspace(min(x),max(x),100)+popt[1]
+        self.x_aj = np.linspace(min(self.x),max(self.x),100)
+        self.y_aj = exact_popt[0]*np.linspace(min(self.x),max(self.x),100)+exact_popt[1]
 
         self.popt = popt
-        self.exact_popt = popt
+        self.exact_popt = exact_popt
         self.uopt = uopt
-        self.exact_uopt = uopt
-        self.x_aj = x_aj
-        self.y_aj = y_aj
+        self.exact_uopt = exact_uopt
 
         self.points = ltPlotPts(
-            x, y, xerr, yerr,
-            label = label,
-            color = color,
-            marker = marker,
-            markersize = markersize,
+            self.x, self.y, self.xerr, self.yerr,
+            label = self.label,
+            color = self.color,
+            marker = self.marker,
+            markersize = self.markersize,
             linewidth = self.linewidth,
             elinewidth = self.elinewidth,
             capsize = self.capsize,
             capthick = self.capthick
         )
         self.reglin = ltPlotFct(
-            x_aj, y_aj,
-            label = label_reg,
-            color = color_reg,
-            dashes = dashes,
+            self.x_aj, self.y_aj,
+            label = self.label_reg,
+            color = self.color_reg,
+            dashes = self.dashes,
             linewidth = self.linewidth
         )
         
-    def plot(self, fig, graph, lang = None):
-        fig.color_theme_candidate = False
-        if lang is None:
-            lang = fig.lang
-        self.plot_reg(fig, graph, lang = lang)
-        self.plot_pts(fig, graph)
-
-    def plot_reg(self, fig, graph, lang = None):
-        if not isinstance(self.color, str):
-            fig.color_theme_candidate = False
-        elif self.color != defaults.color:
-            fig.color_theme_candidate = False
-        if lang is None:
-            lang = fig.lang
-        self.reglin.plot(fig, graph)
-        if self.give_info:
-            x_info = 0.5
-            y_info = 0.5
-            multialignment = 'center'
-            verticalalignment = 'center'
-            horizontalalignment = 'center'
-            if 'left' in self.info_placement :
-                x_info = 0.025
-                multialignment = 'left'
-                horizontalalignment = 'left'
-            if 'right' in self.info_placement :
-                x_info = 0.975
-                multialignment = 'right'
-                horizontalalignment = 'right'
-            if 'upper' in self.info_placement :
-                y_info = 0.95
-                verticalalignment = 'top'
-            if 'lower' in self.info_placement :
-                y_info = 0.05
-                verticalalignment = 'bottom'
-            else :
-                pass
-            ax = fig.graphs[graph].graph
-
-            reglintxt = "Linear regression (MC):"
-            if lang == 'FR':
-                reglintxt = "R\\'egression lin\\'eaire (MC) :"
-            ax.text(x_info, y_info,
-                    '\n'.join([
-                        '{} $f(x) = ax+b$'.format(reglintxt),
-                        '$a = \\num{{ {0}e{1} }} \\pm \\num{{ {2:.1e} }}$'.format(
-                            np.round(self.popt[0]*10**(-int(np.log10(abs(self.popt[0])))), 10),
-                            int(np.log10(abs(self.popt[0]))),
-                            self.uopt[0],
-                        ),
-                        '$b = \\num{{ {0}e{1} }} \\pm \\num{{ {2:.1e} }}$'.format(
-                            np.round(self.popt[1]*10**(-int(np.log10(abs(self.popt[1])))+1), 10),
-                            int(np.log10(abs(self.popt[1]))-1),
-                            self.uopt[1],
-                        ),
-                        ]),
-                    transform = ax.transAxes,
-                    multialignment = multialignment,
-                    verticalalignment = verticalalignment,
-                    horizontalalignment = horizontalalignment
-                   )
-
-    def plot_pts(self, fig, graph):
-        self.points.plot(fig, graph)
