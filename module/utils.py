@@ -4,6 +4,7 @@
 from ltLaTeXpyplot.module.default_tex_settings import pgf_with_latex, inches_per_cm, figsize
 
 import numpy as np
+import random as rd
 import matplotlib.ticker as tkr
 
 import matplotlib.pyplot as plt
@@ -96,3 +97,71 @@ def factorial (x):
         for k in range(1,x+1):
             result*= k
     return result
+
+def tirage_une_valeur(mu, sigma, distrib, fct):
+    ''' Donne de manière aléatoire une valeur
+    entrées : x un flottant
+              sigma un flottant
+              distrib la fonction de random à utiliser
+    sorties : x un flottant'''
+
+    if distrib == "gauss":
+        x = fct(mu, sigma)
+    elif distrib == "uniform":
+        x = fct(mu - sigma*3**.5, mu + sigma*3**.5)
+    return x
+
+def creation_points_aleatoires(lst_x, lst_y, sigma_x, sigma_y, distrib_x, fct_x, distrib_y, fct_y):
+    '''Renvoie deux listes de même taille que lst_x et lst_y
+    consituées de points tirée aléatoirement
+    entrées : lst_x une liste de flottants
+              lst_y une liste flottants
+              sigma_x une liste de flottants
+              sigma_y une liste de flottants
+              distrib la fonction de random à utiliser
+    sorties : lst_x_bis une liste de flottants
+              lst_y_bis y une liste de flottants'''
+    n = len(lst_x)
+    lst_x_bis = []
+    lst_y_bis = []
+    for i in range(n):
+        x = tirage_une_valeur(lst_x[i], sigma_x[i], distrib_x, fct_x)
+        y = tirage_une_valeur(lst_y[i], sigma_y[i], distrib_y, fct_y)
+        lst_x_bis.append(x)
+        lst_y_bis.append(y)
+    return lst_x_bis, lst_y_bis
+
+def calcule_une_droite(lst_x, lst_y):
+    ''' Fait une régression linéaire
+    entrées : lst_x une liste de flottants
+              lst_y y une liste de flottants
+    sorties : a et b des flottants
+              correspondant aux paramètres de la régression linéaire,
+              y = a * x + b'''
+ 
+    a, b = np.polyfit(lst_x, lst_y, 1)
+    return a, b
+
+def creation_liste_droites(lst_x, lst_y, sigma_x, sigma_y, N, distrib_x, distrib_y):
+    '''Donne une liste de N estimations des paramètres a et b
+    de la régression linéaire
+    entrées : lst_x une liste de flottants
+              lst_y une liste flottants
+              sigma_x un flottant
+              sigma_y un flottant
+              N un entier
+              distrib la fonction de random à utiliser
+    sorties : lst_a une liste de flottants
+              lst_b une liste de flottans
+              '''
+    fct_x = getattr(rd, distrib_x)
+    fct_y = getattr(rd, distrib_y)
+    lst_a = []
+    lst_b = []
+    for i in range(N):
+        lst_xi, lst_yi = creation_points_aleatoires(lst_x, lst_y, sigma_x, sigma_y, distrib_x, fct_x, distrib_y, fct_y)
+        a, b = calcule_une_droite(lst_xi, lst_yi)
+        lst_a.append(a)
+        lst_b.append(b)
+    return lst_a, lst_b
+
