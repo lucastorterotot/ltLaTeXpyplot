@@ -232,10 +232,10 @@ class ltPlotRegLin(ltPlotPts):
 
             pow_a = 0
             a = self.popt[0]
-            while abs(a) < 1:
+            while abs(a) < 1 and a != 0:
                 pow_a -= 1
                 a *= 10
-            while abs(a) >= 10:
+            while abs(a) >= 10 and a != 0:
                 pow_a += 1
                 a /= 10
 
@@ -257,10 +257,10 @@ class ltPlotRegLin(ltPlotPts):
 
             pow_b = 0
             b = self.popt[1]
-            while abs(b) < 1:
+            while abs(b) < 1 and b != 0:
                 pow_b -= 1
                 b *= 10
-            while abs(b) >= 10:
+            while abs(b) >= 10 and b != 0:
                 pow_b += 1
                 b /= 10
 
