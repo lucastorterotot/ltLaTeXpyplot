@@ -131,17 +131,6 @@ def creation_points_aleatoires(lst_x, lst_y, sigma_x, sigma_y, distrib_x, fct_x,
         lst_y_bis.append(y)
     return lst_x_bis, lst_y_bis
 
-def calcule_une_droite(lst_x, lst_y):
-    ''' Fait une régression linéaire
-    entrées : lst_x une liste de flottants
-              lst_y y une liste de flottants
-    sorties : a et b des flottants
-              correspondant aux paramètres de la régression linéaire,
-              y = a * x + b'''
- 
-    a, b = np.polyfit(lst_x, lst_y, 1)
-    return a, b
-
 def creation_liste_droites(lst_x, lst_y, sigma_x, sigma_y, N, distrib_x, distrib_y):
     '''Donne une liste de N estimations des paramètres a et b
     de la régression linéaire
@@ -160,7 +149,7 @@ def creation_liste_droites(lst_x, lst_y, sigma_x, sigma_y, N, distrib_x, distrib
     lst_b = []
     for i in range(N):
         lst_xi, lst_yi = creation_points_aleatoires(lst_x, lst_y, sigma_x, sigma_y, distrib_x, fct_x, distrib_y, fct_y)
-        a, b = calcule_une_droite(lst_xi, lst_yi)
+        a, b = np.polyfit(lst_xi, lst_yi, 1)
         lst_a.append(a)
         lst_b.append(b)
     return lst_a, lst_b

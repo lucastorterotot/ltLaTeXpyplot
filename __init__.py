@@ -6,7 +6,6 @@ from ltLaTeXpyplot.module.PlotFct3d import ltPlotFct3d
 from ltLaTeXpyplot.module.PlotPts import ltPlotPts
 from ltLaTeXpyplot.module.PlotPts3d import ltPlotPts3d
 from ltLaTeXpyplot.module.PlotRegLin import ltPlotRegLin
-from ltLaTeXpyplot.module.PlotRegLinMC import ltPlotRegLinMC
 from ltLaTeXpyplot.module.PlotPie import ltPlotPie
 from ltLaTeXpyplot.module.PlotHist import ltPlotHist
 from ltLaTeXpyplot.module.PlotScalField import ltPlotScalField

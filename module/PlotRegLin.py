@@ -6,7 +6,7 @@ from ltLaTeXpyplot.module.PlotPts import ltPlotPts
 from ltLaTeXpyplot.module.PlotFct import ltPlotFct
 
 import numpy as np
-from ltLaTeXpyplot.module.utils import calcule_une_droite
+from ltLaTeXpyplot.module.utils import creation_liste_droites
 import scipy.optimize as spo
 
 class ltPlotRegLin(ltPlotPts):
@@ -14,7 +14,11 @@ class ltPlotRegLin(ltPlotPts):
     https://www.physique-experimentale.com/python/ajustement_de_courbe.py
     '''
     def __init__(self,
-                 x, y, xerr, yerr,
+                 x, y, xerr = None, yerr = None,
+                 N = 10000,
+                 distrib = "uniform",
+                 distrib_x = None,
+                 distrib_y = None,
                  label = None,
                  label_reg = None,
                  color = defaults.color,
@@ -27,10 +31,13 @@ class ltPlotRegLin(ltPlotPts):
                  capthick = defaults.linewidths['capthick'],
                  dashes = defaults.dashes,
                  nb_ch_u = 2,
+                 nb_ch_a = 3,
+                 nb_ch_b = 3,
                  give_info = True,
                  info_placement = 'upper left',
                  verbose = False,
-                 from_MC = False,
+                 reg_popt_mode = "auto",
+                 reg_uopt_mode = "auto",
                 ):
         ltPlotPts.__init__(self,
                            x, y, xerr, yerr,
@@ -50,7 +57,10 @@ class ltPlotRegLin(ltPlotPts):
         self.info_placement = info_placement
         self.verbose = verbose
         self.nb_ch_u = nb_ch_u
-        self.from_MC = from_MC
+        self.nb_ch_a = nb_ch_a
+        self.nb_ch_b = nb_ch_b
+        self.reg_popt_mode = reg_popt_mode
+        self.reg_uopt_mode = reg_uopt_mode
 
         xerr_for_reg = xerr
         if type(xerr) == list:
@@ -86,10 +96,71 @@ class ltPlotRegLin(ltPlotPts):
         self.xerr_for_reg = xerr_for_reg
         self.yerr_for_reg = yerr_for_reg
 
-        if not from_MC:
-            self.compute()
+        self.N = N
+
+        if distrib_x is None:
+            distrib_x = distrib
+        if distrib_y is None:
+            distrib_y = distrib
+        self.distrib_x = distrib_x
+        self.distrib_y = distrib_y
+
+        self.compute()
 
     def compute(self):
+        self.used_popt_mode = self.reg_popt_mode
+        self.used_uopt_mode = self.reg_uopt_mode
+        
+        if self.xerr is None and self.yerr is None:
+            self.used_popt_mode = "polyfit"
+            self.used_uopt_mode = None
+        else:
+            if self.used_popt_mode == "auto":
+                self.used_popt_mode = "polyfit" # CPGE education programm
+            if self.used_uopt_mode == "auto":
+                if self.used_popt_mode == "least_square":
+                    self.used_uopt_mode = "least_square"
+                elif self.used_popt_mode == "polyfit":
+                    self.used_uopt_mode = "MC"
+
+        # first a and b estimation with polyfit
+        a0, b0 = np.polyfit(self.x, self.y, 1)
+        self.exact_popt = np.array([a0, b0])
+        round_param_a = int(self.nb_ch_a - np.log10(abs(a0)))
+        round_param_b = int(self.nb_ch_b - np.log10(abs(b0)))
+        popt = (np.round(a0, round_param_a), np.round(b0, round_param_b))
+        self.popt = popt
+        self.uopt = (0,0)
+
+        if self.used_popt_mode == "least_square":
+            self.compute_least_square()
+
+        if self.used_uopt_mode == "MC":
+            self.compute_uopt_MC()
+            
+        self.x_aj = np.linspace(min(self.x),max(self.x),1000)
+        self.y_aj = self.exact_popt[0] * self.x_aj + self.exact_popt[1]
+        
+        self.points = ltPlotPts(
+            self.x, self.y, self.xerr, self.yerr,
+            label = self.label,
+            color = self.color,
+            marker = self.marker,
+            markersize = self.markersize,
+            linewidth = self.linewidth,
+            elinewidth = self.elinewidth,
+            capsize = self.capsize,
+            capthick = self.capthick
+        )
+        self.reglin = ltPlotFct(
+            self.x_aj, self.y_aj,
+            label = self.label_reg,
+            color = self.color_reg,
+            dashes = self.dashes,
+            linewidth = self.linewidth
+        )
+        
+    def compute_least_square(self):
         # linear function to adjust
         def f(x,p):
             a,b = p 
@@ -104,14 +175,9 @@ class ltPlotRegLin(ltPlotPts):
         def residual(p, y, x):
             return (y-f(x,p))/np.sqrt(self.yerr_for_reg**2 + (Dx_f(x,p)*self.xerr_for_reg)**2)
 
-        # initial estimation
-        # usually OK but sometimes one need to give a different
-        # starting point to make it converge
-        a0, b0 = calcule_une_droite(self.x, self.y)
-        p0 = np.array([a0, b0])
-
+        # initial estimation is exact_popt
         # minimizing algorithm
-        result = spo.leastsq(residual, p0, args = (self.y, self.x), full_output = True)
+        result = spo.leastsq(residual, self.exact_popt, args = (self.y, self.x), full_output = True)
 
         # Result:
         # optimized parameters a and b
@@ -146,9 +212,6 @@ class ltPlotRegLin(ltPlotPts):
             print('    r^2 = {}.'.format(R2))
             print(' ')
 
-        self.x_aj = np.linspace(min(self.x),max(self.x),100)
-        self.y_aj = exact_popt[0]*np.linspace(min(self.x),max(self.x),100)+exact_popt[1]
-
         self.result = result
         self.popt = popt
         self.exact_popt = exact_popt
@@ -158,25 +221,33 @@ class ltPlotRegLin(ltPlotPts):
         self.chi2r = chi2r
         self.R2 = R2
 
-        self.points = ltPlotPts(
-            self.x, self.y, self.xerr, self.yerr,
-            label = self.label,
-            color = self.color,
-            marker = self.marker,
-            markersize = self.markersize,
-            linewidth = self.linewidth,
-            elinewidth = self.elinewidth,
-            capsize = self.capsize,
-            capthick = self.capthick
-        )
-        self.reglin = ltPlotFct(
-            self.x_aj, self.y_aj,
-            label = self.label_reg,
-            color = self.color_reg,
-            dashes = self.dashes,
-            linewidth = self.linewidth
-        )
+    def compute_uopt_MC(self):
+        lst_a, lst_b = creation_liste_droites(self.x, self.y, self.xerr_for_reg, self.yerr_for_reg, self.N, self.distrib_x, self.distrib_y)
+        u_a = np.std(lst_a)
+        u_b = np.std(lst_b)
+
+        round_param_a = int(self.nb_ch_u - np.log10(u_a))
+        round_param_b = int(self.nb_ch_u - np.log10(u_b))
         
+        # optimized parameters a and b
+        a, b = self.exact_popt[0], self.exact_popt[1]
+        popt = (np.round(a, round_param_a), np.round(b, round_param_b))
+        # uncetainties on parameters (1 sigma)
+        exact_uopt = (u_a, u_b)
+        uopt = (np.round(u_a, round_param_a), np.round(u_b, round_param_b))
+
+        if self.verbose:
+            print('  Linear regression (MC) :')
+            print('    f(x) = a * x + b')
+            print('    a = {} +/- {} ;'.format(popt[0], uopt[0]))
+            print('    b = {} +/- {} ;'.format(popt[1], uopt[1]))
+            print(' ')
+
+        self.popt = popt
+        self.uopt = uopt
+        self.exact_uopt = exact_uopt
+
+
     def plot(self, fig, graph, lang = None):
         fig.color_theme_candidate = False
         if lang is None:
@@ -219,7 +290,7 @@ class ltPlotRegLin(ltPlotPts):
             reglintxt = "Linear regression"
             if lang == 'FR':
                 reglintxt = "R\\'egression lin\\'eaire"
-            if self.from_MC:
+            if self.used_uopt_mode == "MC":
                 reglintxt += " (MC)"
             if lang == 'FR':
                 reglintxt += " :"
@@ -240,20 +311,26 @@ class ltPlotRegLin(ltPlotPts):
                 a /= 10
 
             if pow_a == 0:
-                infos.append(
-                    '$a = \\num{{ {0} }} \\pm \\num{{ {1} }}$'.format(
-                        a,
+                s = '$a = \\num{{ {0} }}'.format(
+                    a,
+                )
+                if self.uopt[0] != 0:
+                    s = s + ' \\pm \\num{{ {0} }}'.format(
                         self.uopt[0],
                     )
-                )
+                s = s + '$'
+                infos.append(s)
             else:
-                infos.append(
-                    '$a = \\num{{ {0}e{1} }} \\pm \\num{{ {2:.1e} }}$'.format(
-                        np.round(a, 10),
-                        pow_a,
-                        self.uopt[0],
-                    ),
+                s = '$a = \\num{{ {0}e{1} }}'.format(
+                    np.round(a, 10),
+                    pow_a,
                 )
+                if self.uopt[0] != 0:
+                    s = s + ' \\pm \\num{{ {0:.1e} }}'.format(
+                        self.uopt[0],
+                    )
+                s = s + '$'
+                infos.append(s)
 
             pow_b = 0
             b = self.popt[1]
@@ -266,22 +343,28 @@ class ltPlotRegLin(ltPlotPts):
 
 
             if pow_b == 0:
-                infos.append(
-                    '$b = \\num{{ {0} }} \\pm \\num{{ {1} }}$'.format(
-                        b,
+                s = '$b = \\num{{ {0} }}'.format(
+                    b,
+                )
+                if self.uopt[1] != 0:
+                    s = s + ' \\pm \\num{{ {0} }}'.format(
                         self.uopt[1],
                     )
-                )
+                s = s + '$'
+                infos.append(s)
             else:
-                infos.append(
-                    '$b = \\num{{ {0}e{1} }} \\pm \\num{{ {2:.1e} }}$'.format(
-                        np.round(b, 10),
-                        pow_b,
+                s = '$b = \\num{{ {0}e{1} }}'.format(
+                    np.round(b, 10),
+                    pow_b,
+                )
+                if self.uopt[1] != 0:
+                    s = s + ' \\pm \\num{{ {0:.1e} }}'.format(
                         self.uopt[1],
                     )
-                )
+                s = s + '$'
+                infos.append(s)
 
-            if not self.from_MC:
+            if hasattr(self, "R2"):
                 infos.append('$r^2 = \\num{{ {0:.4} }}$'.format(self.R2))
             ax.text(x_info, y_info,
                     '\n'.join(infos),
