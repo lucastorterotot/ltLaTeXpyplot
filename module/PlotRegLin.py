@@ -223,8 +223,8 @@ class ltPlotRegLin(ltPlotPts):
 
     def compute_uopt_MC(self):
         lst_a, lst_b = creation_liste_droites(self.x, self.y, self.xerr_for_reg, self.yerr_for_reg, self.N, self.distrib_x, self.distrib_y)
-        u_a = np.std(lst_a)
-        u_b = np.std(lst_b)
+        u_a = np.std(lst_a, ddof = 1)
+        u_b = np.std(lst_b, ddof = 1)
 
         round_param_a = int(self.nb_ch_u - np.log10(u_a))
         round_param_b = int(self.nb_ch_u - np.log10(u_b))
