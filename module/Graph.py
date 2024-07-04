@@ -254,9 +254,7 @@ class ltGraph:
         if self.title is not None:
             self.graph.set_title(self.title, fontsize = pgf_with_latex["font.size"])
         self.graph.set_xscale(self.x_scaling)
-        self.set_xticklabels()
         self.graph.set_yscale(self.y_scaling)
-        self.set_yticklabels()
         if self.projection == '3d':
             self.graph.set_zscale(self.z_scaling)
 
@@ -408,6 +406,8 @@ class ltGraph:
                     connects[1].set_visible(x0 == y1)
                     connects[2].set_visible(x1 == y0)
                     connects[3].set_visible(x1 ^ y1)
+        self.set_xticklabels()
+        self.set_yticklabels()
 
     def fill_between(self, x, y1, y2, alpha = .5, **kwargs):
         self.graph.fill_between(x, y1, y2, alpha = alpha, **kwargs)
