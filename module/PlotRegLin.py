@@ -65,14 +65,20 @@ class ltPlotRegLin(ltPlotPts):
         xerr_for_reg = xerr
         if type(xerr) == list:
             xerr_for_reg = np.array(xerr)
-        elif type(xerr) in [int, float]:
-            xerr_for_reg = np.ones(len(x)) * xerr
+        else:
+            try:
+                xerr_for_reg = np.ones(len(x)) * xerr
+            except:
+                pass
 
         yerr_for_reg = yerr
         if type(yerr) == list:
             yerr_for_reg = np.array(yerr)
-        elif type(yerr) in [int, float]:
-            yerr_for_reg = np.ones(len(y)) * yerr
+        else:
+            try:
+                yerr_for_reg = np.ones(len(y)) * yerr
+            except:
+                pass
 
         try:
             if len(xerr_for_reg) == 2:
