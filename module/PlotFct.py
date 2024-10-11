@@ -32,7 +32,7 @@ class ltPlotFct:
         self.color = color
         self.dashes = dashes
         self.marker = marker
-        self.markersize = defaults.marker_size if marker is not None else None
+        self.markersize = markersize if marker is not None else None
         self.TF_computed = False
         self.linewidth = linewidth
         self.Fs = Fs
