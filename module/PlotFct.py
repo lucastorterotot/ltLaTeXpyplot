@@ -8,6 +8,7 @@ import numpy as np
 class ltPlotFct:
     def __init__(self,
                  x, y,
+                 fmt = None,
                  label = None,
                  color = defaults.color,
                  dashes = defaults.dashes,
@@ -29,6 +30,7 @@ class ltPlotFct:
             self.y = y
         if type(y) == list:
             self.y = np.array(y)
+        self.fmt = fmt
         self.color = color
         self.dashes = dashes
         self.marker = marker
@@ -47,15 +49,26 @@ class ltPlotFct:
             fig.color_theme_candidate = False
         elif self.color != defaults.color:
             fig.color_theme_candidate = False
-        fig.graphs[graph].graph.plot(self.x,
-                                     self.y,
-                                     color = self.color,
-                                     linewidth = self.linewidth,
-                                     label = self.label,
-                                     marker = self.marker,
-                                     markersize = self.markersize,
-                                     dashes = self.dashes
-                                    )
+        if self.fmt == None:
+            fig.graphs[graph].graph.plot(self.x,
+                                        self.y,
+                                        color = self.color,
+                                        linewidth = self.linewidth,
+                                        label = self.label,
+                                        marker = self.marker,
+                                        markersize = self.markersize,
+                                        dashes = self.dashes
+                                        )
+        else:
+            fig.graphs[graph].graph.plot(self.x,
+                                        self.y,
+                                        self.fmt,
+                                        color = self.color,
+                                        linewidth = self.linewidth,
+                                        label = self.label,
+                                        markersize = self.markersize,
+                                        dashes = self.dashes
+                                        )
 
     def compute_TF(self, **kwargs):
         import scipy as sp
