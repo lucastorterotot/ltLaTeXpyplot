@@ -24,5 +24,5 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
     "xtick.labelsize": 9,
     "ytick.labelsize": 9,
     "figure.figsize": figsize(0.9,1./golden),     # default fig size of 0.9 textwidth
-    "pgf.preamble": r"\usepackage[utf8x]{inputenc}\usepackage[T1]{fontenc}\usepackage{sistyle}\SIproductsign{\!\times\!}\SIunitsep{\,}\SIunitdot{{\fontfamily{cmr}\cdot}}",
+    "pgf.preamble": r"\usepackage[utf8x]{inputenc}\usepackage[T1]{fontenc}\usepackage{sistyle}\SIproductsign{\!\times\!}\SIunitsep{\,}\SIunitdot{{\fontfamily{cmr}\cdot}}\def\qty{\SI}\def\U#1{\qty{}{#1}}",
     }

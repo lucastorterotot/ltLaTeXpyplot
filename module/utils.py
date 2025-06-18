@@ -38,7 +38,7 @@ def num_format(value, pos):
     return string
 
 def ltPlotPieautopct(x, unit = '%', maxdec = 1):
-    return ''.join(['\\SI{', str(round(x,maxdec)), '}{', unit, '}'])
+    return ''.join(['\\qty{', str(round(x,maxdec)), '}{', unit, '}'])
 
 num_formatter = tkr.FuncFormatter(num_format)  # make formatter
 
