@@ -1,6 +1,7 @@
 image: debian:bookworm
 
 before_script:
+  - apt-get -qq -y python
   - python -V
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
   - export instal_dir=$(pwd)
