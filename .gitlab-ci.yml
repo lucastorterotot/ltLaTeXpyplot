@@ -1,7 +1,6 @@
-image: debian:bookworm
+image: python:latest
 
 before_script:
-  - apt-get -qq install -y python3
   - python -V
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
   - export instal_dir=$(pwd)
