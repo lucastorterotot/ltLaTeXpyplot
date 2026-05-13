@@ -6,10 +6,20 @@ from ltLaTeXpyplot.module.PlotFct import ltPlotFct
 
 import numpy as np
 
+'''
+Conventions de tracé :
+    1) m = molecules
+    concentration totale en solutés égale à Ctr, égalité des concentrations en molécules aux frontières
+    2) a = atomes
+    concentration totale en atomes égale à Ctr, égalité des concentrations en atomes aux frontières
+    3) c = constante
+    toutes les concentrations sont prises égales à Ctr
+'''
 class ltPlotEpH:
     def __init__(self,
                  element,
                  C_tr,
+                 convention = "molecules",
                  pH_min = 0,
                  pH_max = 14,
                  E_min = -.1,
@@ -22,6 +32,13 @@ class ltPlotEpH:
         self.element = element
 
         self.C_tr = C_tr
+        if convention == "molecules":
+            convention = "m"
+        elif convention == "atomes":
+            convention = "a"
+        elif convention == "constante":
+            convention = "c"
+        self.convention = convention
         self.pH_min = pH_min
         self.pH_max = pH_max
         self.E_min = E_min
@@ -39,21 +56,22 @@ class ltPlotEpH:
         E_min, E_max = self.E_min, self.E_max
         pH_min, pH_max = self.pH_min, self.pH_max
         pC = -np.log10(self.C_tr)
+        convention = self.convention
         for sep in self.data_file.seps:
             for pH in [sep.pHa, sep.pHb]:
                 if type(pH) is not str:
-                    pH_min = min([pH_min, pH(pC)])
-                    pH_max = max([pH_max, pH(pC)])
+                    pH_min = min([pH_min, pH(pC, convention)])
+                    pH_max = max([pH_max, pH(pC, convention)])
             for Ep in [sep.Ea, sep.Eb]:
                 if type(Ep) is not str:
                     list_E = [E_min, E_max]
                     for pH in [sep.pHa, sep.pHb]:
                         if type(pH) is not str:
-                            list_E.append(Ep(pC, pH(pC)))
+                            list_E.append(Ep(pC, convention, pH(pC, convention)))
                         elif pH == 'min':
-                            list_E.append(Ep(pC, pH_min))
+                            list_E.append(Ep(pC, convention, pH_min))
                         elif pH == 'max':
-                            list_E.append(Ep(pC, pH_max))
+                            list_E.append(Ep(pC, convention, pH_max))
                     E_min = min(list_E)
                     E_max = max(list_E)
         self.E_min, self.E_max = E_min, E_max
@@ -89,7 +107,8 @@ class ltPlotEpH:
                           pH_max = self.pH_max,
                           E_min = self.E_min,
                           E_max = self.E_max,
-                          conc = self.C_tr
+                          conc = self.C_tr,
+                          convention = self.convention,
                          )
 
         for sep in self.data_file.seps:

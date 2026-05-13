@@ -5,27 +5,27 @@ Ebc = 0.77
 pKsFe2OH2 = 15.1
 pKsFe2OH3 = 38
 
-def pHsepa(pC):
+def pHsepa(pC, convention):
     return 14-(pKsFe2OH3-pC)/3
-def pHsepb(pC):
+def pHsepb(pC, convention):
     return 14-(pKsFe2OH2-pC)/2
 
-def Esepzb(pC, pH):
+def Esepzb(pC, convention, pH):
     return Ezb-RT_on_F/2*pC
 
-def Esepbc(pC, pH):
+def Esepbc(pC, convention, pH):
     return Ebc
 
-def Esepbc_plus(pC, pH):
+def Esepbc_plus(pC, convention, pH):
     return Ebc + .2
 
-def Ecible(pC, pH):
-    return Esepbc(pC, pH)-RT_on_F*3*pHsepb(pC)+RT_on_F*3*pHsepa(pC)
+def Ecible(pC, convention, pH):
+    return Esepbc(pC, convention, pH)-RT_on_F*3*pHsepb(pC, convention)+RT_on_F*3*pHsepa(pC, convention)
 
-def Efa(pC, pH):
-    return Ecible(pC, pH)-RT_on_F*pH+RT_on_F*pHsepb(pC)
-def Efb(pC, pH):
-    return Esepzb(pC, pH)-RT_on_F*pH+RT_on_F*pHsepb(pC)
+def Efa(pC, convention, pH):
+    return Ecible(pC, convention, pH)-RT_on_F*pH+RT_on_F*pHsepb(pC, convention)
+def Efb(pC, convention, pH):
+    return Esepzb(pC, convention, pH)-RT_on_F*pH+RT_on_F*pHsepb(pC, convention)
 
 sep1 = EpHsep('min', pHsepa, Esepbc, Esepbc)
 sep2 = EpHsep('min', pHsepb, Esepzb, Esepzb)

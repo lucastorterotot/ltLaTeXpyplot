@@ -9,7 +9,7 @@ T_value = T_value_C + 273.15
 RT_on_F = (Boltzmann*T_value/elementary_charge * np.log(10))
 
 class EpHgeneric:
-    def __init__(self, pH_min=0, pH_max=14, E_min=-1, E_max=1, conc=1e-3, pC=None):
+    def __init__(self, pH_min=0, pH_max=14, E_min=-1, E_max=1, conc=1e-3, convention = "m", pC=None):
         self.pH_min = pH_min
         self.pH_max = pH_max
         self.E_min = E_min
@@ -22,6 +22,7 @@ class EpHgeneric:
             self.conc = 10**(-1.*pC)
         else:
             raise ValueError('Please set a correct concentration input.')
+        self.convention = convention
         self.seps = []
         self.spes = []
 
@@ -32,7 +33,7 @@ class EpHgeneric:
     def addspe(self, spe):
         condition = spe.condition
         if not spe.condition == True :
-            condition = spe.condition(self.pC)
+            condition = spe.condition(self.pC, self.convention)
         if condition:
             pHa, pHb, Ea, Eb = self.get_position(spe, spe.pHa, spe.pHb, spe.Ea, spe.Eb)
             pH = pHa * (1-spe.pH_r) + pHb * spe.pH_r
@@ -45,25 +46,25 @@ class EpHgeneric:
         elif obj.pHa == 'max':
             pHa = self.pH_max
         else:
-            pHa = obj.pHa(self.pC)
+            pHa = obj.pHa(self.pC, self.convention)
         if obj.pHb == 'min':
             pHb = self.pH_min
         elif obj.pHb == 'max':
             pHb = self.pH_max
         else:
-            pHb = obj.pHb(self.pC)
+            pHb = obj.pHb(self.pC, self.convention)
         if obj.Ea == 'min':
             Ea = self.E_min
         elif obj.Ea == 'max':
             Ea = self.E_max
         else:
-            Ea = obj.Ea(self.pC, pHa)
+            Ea = obj.Ea(self.pC, self.convention, pHa)
         if obj.Eb == 'min':
             Eb = self.E_min
         elif obj.Eb == 'max':
             Eb = self.E_max
         else:
-            Eb = obj.Eb(self.pC, pHb)
+            Eb = obj.Eb(self.pC, self.convention, pHb)
         return pHa, pHb, Ea, Eb
 
 class EpHsep:

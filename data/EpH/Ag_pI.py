@@ -3,18 +3,18 @@ from ltLaTeXpyplot.module.EpHgeneric import *
 Eza = 0.8
 pKs_AgI = 16.1
 
-def pI_sep(pC):
+def pI_sep(pC, convention):
     return pKs_AgI - pC
-def pI_sep_plus(pC):
-    return pI_sep(pC)+2
+def pI_sep_plus(pC, convention):
+    return pI_sep(pC, convention)+2
 
-def Esepza(pC, pH):
+def Esepza(pC, convention, pH):
     return Eza - RT_on_F * pC
-def Esepza_plus(pC, pH):
-    return Esepza(pC, pH) + .25
+def Esepza_plus(pC, convention, pH):
+    return Esepza(pC, convention, pH) + .25
 
-def Esep_pI_min(pC, pH):
-    return Esepza(pC, pH) + RT_on_F * (pH - pI_sep(pC))
+def Esep_pI_min(pC, convention, pH):
+    return Esepza(pC, convention, pH) + RT_on_F * (pH - pI_sep(pC, convention))
 
 sep1 = EpHsep('min', pI_sep, Esep_pI_min, Esepza)
 sep2a = EpHsep(pI_sep, pI_sep_plus, Esepza, Esepza)

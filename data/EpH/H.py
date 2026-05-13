@@ -2,13 +2,13 @@ from ltLaTeXpyplot.module.EpHgeneric import *
 
 E0 = 0
 
-def E1 (pC, pH):
+def E1 (pC, convention, pH):
     return E0-RT_on_F*pH
 
-def E1_up(pC, pH):
-    return E1(pC, pH)+.1
-def E1_down(pC, pH):
-    return E1(pC, pH)-.1
+def E1_up(pC, convention, pH):
+    return E1(pC, convention, pH)+.1
+def E1_down(pC, convention, pH):
+    return E1(pC, convention, pH)-.1
 
 sep1 = EpHsep('min', 'max', E1, E1)
 

@@ -6,19 +6,19 @@ Eza = -0.76
 pKs_Zn_2OH = 16.7
 pKb_Zn_4OH = 15.3
 
-def Esepza(pC, pH):
+def Esepza(pC, convention, pH):
     return (Eza - RT_on_F/2 * pC)
 
-def pHsepa(pC):
+def pHsepa(pC, convention):
     return pC/2 + 14 - pKs_Zn_2OH/2
 
-def pHsepb(pC):
+def pHsepb(pC, convention):
     return 14+(pKs_Zn_2OH-pKb_Zn_4OH-pC)/2
 
-def E1(pC, pH):
+def E1(pC, convention, pH):
     return Eza + RT_on_F*(14-pKs_Zn_2OH/2-pH)
 
-def E2(pC, pH):
+def E2(pC, convention, pH):
     return Eza + RT_on_F/2*(-pKb_Zn_4OH+4*14-4*pH-pC)
 
 sep1 = EpHsep('min', pHsepa, Esepza, Esepza)

@@ -4,23 +4,23 @@ Eaz = 1.39
 Ezb = 1.63
 pKa_HClO_ClO = 7.5
 
-def Esepaz(pC, pH):
+def Esepaz(pC, convention, pH):
     return Eaz + RT_on_F*pC
 
-def pHsepa(pC):
+def pHsepa(pC, convention):
     return (Ezb - Eaz - RT_on_F*pC*2)/RT_on_F
 
-def Esepzb(pC, pH):
+def Esepzb(pC, convention, pH):
     return Ezb - RT_on_F*pC - RT_on_F*pH
 
-def pHsepb(pC):
+def pHsepb(pC, convention):
     return pKa_HClO_ClO
 
-def Esepab(pC, pH):
-    if pH > pHsepb(pC):
-        return Esepab(pC, pHsepb(pC)) - RT_on_F*(pH - pHsepb(pC))
+def Esepab(pC, convention, pH):
+    if pH > pHsepb(pC, convention):
+        return Esepab(pC, convention, pHsepb(pC, convention)) - RT_on_F*(pH - pHsepb(pC, convention))
     else:
-        return Esepzb(pC, pHsepa(pC)) - RT_on_F/2*(pH - pHsepa(pC))
+        return Esepzb(pC, convention, pHsepa(pC, convention)) - RT_on_F/2*(pH - pHsepa(pC, convention))
 
 sep1 = EpHsep('min', pHsepa, Esepaz, Esepaz)
 sep2 = EpHsep('min', pHsepa, Esepzb, Esepzb)

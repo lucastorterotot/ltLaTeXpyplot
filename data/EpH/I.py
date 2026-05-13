@@ -3,17 +3,17 @@ from ltLaTeXpyplot.module.EpHgeneric import *
 Eaz = 0.54
 Ezb = 1.19
 
-def Esepaz(pC, pH):
+def Esepaz(pC, convention, pH):
     return Eaz + RT_on_F*pC
 
-def pHsep(pC):
+def pHsep(pC, convention):
     return (Ezb - Eaz - RT_on_F*pC*(1+1/5))/RT_on_F*10/12
 
-def Esepzb(pC, pH):
+def Esepzb(pC, convention, pH):
     return Ezb - RT_on_F/5*pC - RT_on_F*12/10*pH
 
-def Esepab(pC, pH):
-    return Esepzb(pC, pHsep(pC)) - RT_on_F*(pH - pHsep(pC))
+def Esepab(pC, convention, pH):
+    return Esepzb(pC, convention, pHsep(pC, convention)) - RT_on_F*(pH - pHsep(pC, convention))
 
 sep1 = EpHsep('min', pHsep, Esepaz, Esepaz)
 sep2 = EpHsep(pHsep, 'max', Esepab, Esepab)
