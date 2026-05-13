@@ -1,4 +1,4 @@
-image: python:3.6.12
+image: debian:bookworm
 
 before_script:
   - python -V
