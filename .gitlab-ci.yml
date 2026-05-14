@@ -1,3 +1,5 @@
+image: python:latest
+
 before_script:
   - python -V
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
