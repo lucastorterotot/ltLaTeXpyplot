@@ -2,11 +2,12 @@ image: python:latest
 
 before_script:
   - python -V
-  - export PYTHONPATH=$(pwd)/..:$(pwd):$PYTHONPATH
+  - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
   - export instal_dir=$(pwd)
   - python -m pip install matplotlib
   - python -m pip install numpy scipy --upgrade
   - apt-get -qq update && apt-get -qq install -y texlive texlive-latex-extra texlive-science texlive-extra-utils
+  - echo $PYTHONPATH
 
 stages:
   - test
