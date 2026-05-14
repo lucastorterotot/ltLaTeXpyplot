@@ -24,7 +24,7 @@ coverage:
 prod:
   stage: test
   script:
-    - for file in $(find $instal_dir/examples/ -type f -iname ltLaTeXpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltLaTeXpyplot_example.py ; done
+    - for file in $(find $instal_dir/examples/ -type f -iname ltlatexpyplot_example.py) ; do echo $file ; cd $(dirname $file) ; ./ltlatexpyplot_example.py ; done
   artifacts:
     paths:
     - examples/
