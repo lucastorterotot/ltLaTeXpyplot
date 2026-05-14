@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ltLaTeXpyplot.module.default_mpl_settings as defaults
-from ltLaTeXpyplot.module.PlotPts import ltPlotPts
-from ltLaTeXpyplot.module.PlotFct import ltPlotFct
+import ltlatexpyplot.module.default_mpl_settings as defaults
+from ltlatexpyplot.module.PlotPts import ltPlotPts
+from ltlatexpyplot.module.PlotFct import ltPlotFct
 
 import numpy as np
-from ltLaTeXpyplot.module.utils import creation_liste_droites
+from ltlatexpyplot.module.utils import creation_liste_droites
 import scipy.optimize as spo
 
 class ltPlotRegLin(ltPlotPts):

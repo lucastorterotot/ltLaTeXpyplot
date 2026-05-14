@@ -1,4 +1,4 @@
-from ltLaTeXpyplot.module.EpHgeneric import *
+from ltlatexpyplot.module.EpHgeneric import *
 
 Eza = 0.8
 pKs_AgI = 16.1

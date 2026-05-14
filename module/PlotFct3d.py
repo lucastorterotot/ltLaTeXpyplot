@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ltLaTeXpyplot.module.default_mpl_settings as defaults
-from ltLaTeXpyplot.module.PlotFct import ltPlotFct
-from ltLaTeXpyplot.module.utils import normalize_3d
+import ltlatexpyplot.module.default_mpl_settings as defaults
+from ltlatexpyplot.module.PlotFct import ltPlotFct
+from ltlatexpyplot.module.utils import normalize_3d
 
 class ltPlotFct3d(ltPlotFct):
     def __init__(self,

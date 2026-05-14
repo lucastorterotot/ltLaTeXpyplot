@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import ltLaTeXpyplot as lt
+import ltlatexpyplot as lt
 import numpy as np
 
 class Test_EpH_calcs(unittest.TestCase):

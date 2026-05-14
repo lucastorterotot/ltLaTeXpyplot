@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from ltLaTeXpyplot.module.utils import num_format
+from ltlatexpyplot.module.utils import num_format
 import numpy as np
 
 class Test_num_format(unittest.TestCase):

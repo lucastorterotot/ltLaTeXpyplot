@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ltLaTeXpyplot.module.default_mpl_settings as defaults
-from ltLaTeXpyplot.module.PlotSurf import ltPlotSurf
-from ltLaTeXpyplot.module.utils import add_colorbar
+import ltlatexpyplot.module.default_mpl_settings as defaults
+from ltlatexpyplot.module.PlotSurf import ltPlotSurf
+from ltlatexpyplot.module.utils import add_colorbar
 
 from matplotlib.ticker import MaxNLocator
 import numpy as np

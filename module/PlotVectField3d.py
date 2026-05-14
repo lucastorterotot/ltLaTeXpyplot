@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ltLaTeXpyplot.module.default_mpl_settings as defaults
-from ltLaTeXpyplot.module.PlotVectField2d import ltPlotVectField2d
-from ltLaTeXpyplot.module.utils import normalize_3d
+import ltlatexpyplot.module.default_mpl_settings as defaults
+from ltlatexpyplot.module.PlotVectField2d import ltPlotVectField2d
+from ltlatexpyplot.module.utils import normalize_3d
 
 import numpy as np
 from scipy.integrate import odeint

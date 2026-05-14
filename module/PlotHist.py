@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ltLaTeXpyplot.module.default_mpl_settings as defaults
-from ltLaTeXpyplot.module.PlotFct import ltPlotFct
+import ltlatexpyplot.module.default_mpl_settings as defaults
+from ltlatexpyplot.module.PlotFct import ltPlotFct
 
 import numpy as np
 

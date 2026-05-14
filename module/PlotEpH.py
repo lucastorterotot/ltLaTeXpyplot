@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ltLaTeXpyplot.module.default_mpl_settings as defaults
-from ltLaTeXpyplot.module.PlotFct import ltPlotFct
+import ltlatexpyplot.module.default_mpl_settings as defaults
+from ltlatexpyplot.module.PlotFct import ltPlotFct
 
 import numpy as np
 
@@ -49,7 +49,7 @@ class ltPlotEpH:
             self.text_color = text_color
         self.linewidth = linewidth
         self.show_species = show_species
-        self.data_file = __import__('ltLaTeXpyplot.data.EpH.{}'.format(self.element), fromlist = [''])
+        self.data_file = __import__('ltlatexpyplot.data.EpH.{}'.format(self.element), fromlist = [''])
         self.computed = False
 
     def compute(self):
@@ -102,7 +102,7 @@ class ltPlotEpH:
         if not self.computed:
             self.compute()
             
-        from ltLaTeXpyplot.module.EpHgeneric import EpHgeneric
+        from ltlatexpyplot.module.EpHgeneric import EpHgeneric
         data = EpHgeneric(pH_min = self.pH_min,
                           pH_max = self.pH_max,
                           E_min = self.E_min,

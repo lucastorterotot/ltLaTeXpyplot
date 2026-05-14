@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ltLaTeXpyplot.module.default_tex_settings import pgf_with_latex, inches_per_cm, figsize
+from ltlatexpyplot.module.default_tex_settings import pgf_with_latex, inches_per_cm, figsize
 
 import numpy as np
 import random as rd

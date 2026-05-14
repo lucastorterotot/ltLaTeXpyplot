@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ltLaTeXpyplot.module.default_mpl_settings as defaults
+import ltlatexpyplot.module.default_mpl_settings as defaults
 
 import numpy as np
 

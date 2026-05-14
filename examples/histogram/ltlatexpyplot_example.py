@@ -3,7 +3,7 @@
 
 import numpy as np
 
-import ltLaTeXpyplot as lt
+import ltlatexpyplot as lt
 
 # Create figure
 fig = lt.ltFigure(name='fig', height_width_ratio = .7)

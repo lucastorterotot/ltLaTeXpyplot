@@ -3,7 +3,7 @@
 
 import numpy as np
 
-import ltLaTeXpyplot as lt
+import ltlatexpyplot as lt
 
 # Create figure
 fig1 = lt.ltFigure(name='fig1')

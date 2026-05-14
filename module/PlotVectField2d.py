@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ltLaTeXpyplot.module.default_mpl_settings as defaults
-from ltLaTeXpyplot.module.utils import add_colorbar
+import ltlatexpyplot.module.default_mpl_settings as defaults
+from ltlatexpyplot.module.utils import add_colorbar
 
 import numpy as np
 from scipy.integrate import odeint

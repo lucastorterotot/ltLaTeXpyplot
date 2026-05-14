@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ltLaTeXpyplot.module.default_mpl_settings as defaults
-from ltLaTeXpyplot.module.utils import ltPlotPieautopct
+import ltlatexpyplot.module.default_mpl_settings as defaults
+from ltlatexpyplot.module.utils import ltPlotPieautopct
 
 import matplotlib.pyplot as plt
 

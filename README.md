@@ -1,12 +1,12 @@
-# ltLaTeXpyplot python package
+# ltlatexpyplot python package
 
 This package is under development for the moment!
 
-[![pipeline status](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/badges/master/pipeline.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/pipelines)
-[![coverage report](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/badges/master/coverage.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/-/jobs)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/lucastorterotot/ltLaTeXpyplot.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/commits)
-[![GitHub last commit](https://img.shields.io/github/last-commit/lucastorterotot/ltLaTeXpyplot.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/commits)
-[![GitHub](https://img.shields.io/github/license/lucastorterotot/ltLaTeXpyplot.svg)](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/blob/master/LICENSE)
+[![pipeline status](https://gitlab.com/lucastorterotot/ltlatexpyplot/badges/master/pipeline.svg)](https://gitlab.com/lucastorterotot/ltlatexpyplot/pipelines)
+[![coverage report](https://gitlab.com/lucastorterotot/ltlatexpyplot/badges/master/coverage.svg)](https://gitlab.com/lucastorterotot/ltlatexpyplot/-/jobs)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/lucastorterotot/ltlatexpyplot.svg)](https://gitlab.com/lucastorterotot/ltlatexpyplot/commits)
+[![GitHub last commit](https://img.shields.io/github/last-commit/lucastorterotot/ltlatexpyplot.svg)](https://gitlab.com/lucastorterotot/ltlatexpyplot/commits)
+[![GitHub](https://img.shields.io/github/license/lucastorterotot/ltlatexpyplot.svg)](https://gitlab.com/lucastorterotot/ltlatexpyplot/blob/master/LICENSE)
 [![Python Version](https://img.shields.io/badge/Python-3.6+-informational.svg)](https://www.python.org/)
 [![matplotlib Version](https://img.shields.io/badge/matplotlib-3.1.0-informational.svg)](https://matplotlib.org/)
 
@@ -20,17 +20,17 @@ This package for Python 3.x provides tools to produce easily `pgf` figures to be
 
 - by `ssh` if you have a key:
 ```
-git clone git@gitlab.com:lucastorterotot/ltLaTeXpyplot.git --origin lucas
+git clone git@gitlab.com:lucastorterotot/ltlatexpyplot.git --origin lucas
 ```
 
 - else by `https`:
 ```
-git clone https://gitlab.com/lucastorterotot/ltLaTeXpyplot.git --origin lucas
+git clone https://gitlab.com/lucastorterotot/ltlatexpyplot.git --origin lucas
 ```
 
 2. Run the provided installation script:
 ```
-./ltLaTeXpyplot/install
+./ltlatexpyplot/install
 ```
 3. Install required `Python3` modules:
 ```
@@ -53,4 +53,4 @@ apt-get install texlive-full
 
 ## Usage
 
-See the examples [in this directory](https://gitlab.com/lucastorterotot/ltLaTeXpyplot/tree/master/examples).
+See the examples [in this directory](https://gitlab.com/lucastorterotot/ltlatexpyplot/tree/master/examples).

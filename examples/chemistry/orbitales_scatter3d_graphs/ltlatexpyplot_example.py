@@ -3,9 +3,8 @@
 
 import numpy as np
 
-import ltLaTeXpyplot as lt
-import ltLaTeXpyplot.data.orbitals.orbitals_data as data # uses the orbital data of this package
-import matplotlib.pyplot as plt
+import ltlatexpyplot as lt
+import ltlatexpyplot.data.orbitals.orbitals_data as data # uses the orbital data of this package
 
 r_on_a0 = np.arange(0,data.r_on_a0_MAX,0.1)
 
@@ -20,17 +19,17 @@ phi = np.arange(-np.pi*(1+1./steps),np.pi*(1+1./steps),np.pi/steps)
 
 print('  Creating orbitals: scatter plots...')
 
-ntot = len(data.orbitals)
+to_process = ['1s', '3dxz']
+
+ntot = len(to_process)
 ncur = 0
 
 size = 2000
-
-for key in data.orbitals:
+for key in to_process:
     cmap = 'coolwarm'
     if key in ['1s', 's', '00'] :
         cmap += '_r'
     ncur += 1
-    
     fig = lt.ltFigure(name='orbitale-'+key, height_width_ratio=1)
     max_range = data.r_on_a0_max["3x"] * data.a0
     fig.addgraph('graph1', projection='3d', x_ticks=False, y_ticks=False, z_ticks=False,
@@ -83,6 +82,5 @@ for key in data.orbitals:
     print('    Orbital ', ncur, '/', ntot, ' : '+key)
 
     fig.save(format='png')
-    plt.close()
 
 print('  Orbitals created.')

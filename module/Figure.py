@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ltLaTeXpyplot.module.default_tex_settings import pgf_with_latex
-from ltLaTeXpyplot.module.utils import inches_per_cm
-from ltLaTeXpyplot.module.Graph import ltGraph
+from ltlatexpyplot.module.default_tex_settings import pgf_with_latex
+from ltlatexpyplot.module.utils import inches_per_cm
+from ltlatexpyplot.module.Graph import ltGraph
 
 from scipy.constants import golden
 

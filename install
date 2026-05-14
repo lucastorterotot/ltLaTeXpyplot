@@ -1,6 +1,6 @@
 #!/bin/bash
 
-name="ltLaTeXpyplot python package"
+name="ltlatexpyplot python package"
 
 echo "Installing $name..."
 

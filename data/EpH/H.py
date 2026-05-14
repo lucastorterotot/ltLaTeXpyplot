@@ -1,4 +1,4 @@
-from ltLaTeXpyplot.module.EpHgeneric import *
+from ltlatexpyplot.module.EpHgeneric import *
 
 E0 = 0
 
