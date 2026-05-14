@@ -3,6 +3,7 @@ image: python:latest
 before_script:
   - python -V
   - export PYTHONPATH=$(pwd)/..:$PYTHONPATH
+  - python -m pip install -e .
   - export instal_dir=$(pwd)
   - python -m pip install matplotlib
   - python -m pip install numpy scipy --upgrade
