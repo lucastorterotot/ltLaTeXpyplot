@@ -9,11 +9,16 @@ import numpy as np
 '''
 Conventions de tracé :
     1) m = molecules
-    concentration totale en solutés égale à Ctr, égalité des concentrations en molécules aux frontières
+    concentration totale en solutés égale à Ctr,
+    pression totale en gaz égale à 1 bar et pressions partielles sur la base des molécules,
+    égalité des concentrations en molécules aux frontières
     2) a = atomes
-    concentration totale en atomes égale à Ctr, égalité des concentrations en atomes aux frontières
+    concentration totale en atomes égale à Ctr,
+    pression totale en gaz égale à 1 bar et pressions partielles sur la base des atomes,
+    égalité des concentrations en atomes aux frontières
     3) c = constante
-    toutes les concentrations sont prises égales à Ctr
+    toutes les concentrations sont prises égales à Ctr,
+    toutes les pressions sont prises égales à 1 bar
 '''
 class ltPlotEpH:
     def __init__(self,
